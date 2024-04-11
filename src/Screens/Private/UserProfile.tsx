@@ -49,31 +49,64 @@ const UserProfile = () => {
           </Box>
           <HStack gap={'$7'}>
             <VStack alignItems="center" justifyContent="center">
-              <Text color={'$black'}>1215</Text>
-              <Text color={'$black'}>Posts</Text>
+              <Text
+                color={'$black'}
+                fontFamily="Montserrat-Medium"
+                fontSize={13}>
+                1215
+              </Text>
+              <Text color={'$black'} fontSize={12} fontFamily="Montserrat-Bold">
+                Posts
+              </Text>
             </VStack>
             <VStack alignItems="center" justifyContent="center">
-              <Text color={'$black'}>956</Text>
-              <Text color={'$black'}>Followers</Text>
+              <Text
+                color={'$black'}
+                fontFamily="Montserrat-Medium"
+                fontSize={13}>
+                956
+              </Text>
+              <Text color={'$black'} fontFamily="Montserrat-Bold" fontSize={12}>
+                Followers
+              </Text>
             </VStack>
             <VStack alignItems="center" justifyContent="center">
-              <Text color={'$black'}>566</Text>
-              <Text color={'$black'}>Following</Text>
+              <Text
+                color={'$black'}
+                fontFamily="Montserrat-Medium"
+                fontSize={13}>
+                566
+              </Text>
+              <Text color={'$black'} fontFamily="Montserrat-Bold" fontSize={12}>
+                Following
+              </Text>
             </VStack>
           </HStack>
         </HStack>
         <VStack px={'$4'}>
-          <Text>Chinmay Muduli</Text>
-          <Text>Coding</Text>
-          <Text>Hyderabad | Fitness | Perfectional Coder</Text>
-          <Text>demo@gmail.com</Text>
+          <Text fontFamily="Montserrat-Medium" fontSize={13}>
+            Chinmay Muduli
+          </Text>
+          <Text fontFamily="Montserrat-Medium" fontSize={13}>
+            Coding
+          </Text>
+          <Text fontFamily="Montserrat-Medium" fontSize={13}>
+            Hyderabad | Fitness | Perfectional Coder
+          </Text>
+          <Text fontFamily="Montserrat-Medium" fontSize={13}>
+            demo@gmail.com
+          </Text>
         </VStack>
         <HStack px={'$4'} gap={'$10'} mt={'$4'}>
           <Button borderRadius={5}>
-            <Text color="$white">Connect</Text>
+            <Text color="$white" fontFamily="Montserrat-Medium" fontSize={13}>
+              Connect
+            </Text>
           </Button>
           <Button borderRadius={5}>
-            <Text color="$white">Message</Text>
+            <Text color="$white" fontFamily="Montserrat-Medium" fontSize={13}>
+              Message
+            </Text>
           </Button>
         </HStack>
         <Box mt={'$8'} flex={1}>
@@ -85,7 +118,7 @@ const UserProfile = () => {
               <>
                 <Pressable
                   w={Dimensions.get('window').width / 2}
-                  mb={'$3'}
+                  mb={'$4'}
                   justifyContent="center"
                   alignItems="center"
                   onPress={() => {
@@ -95,6 +128,8 @@ const UserProfile = () => {
                     <AppIcon {...item.icon} size={20} />
                     <Text
                       color={'black'}
+                      fontFamily="Montserrat-Medium"
+                      fontSize={13}
                       fontWeight={
                         selectSwitch === item?.title ? 'bold' : 'medium'
                       }

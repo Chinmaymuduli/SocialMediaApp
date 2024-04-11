@@ -67,7 +67,12 @@ const PostFeed = () => {
                   style={{width: 40, height: 40, borderRadius: 100}}
                 />
                 <View style={{paddingLeft: 5}}>
-                  <Text style={{fontSize: 15, fontWeight: 'bold'}}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontFamily: 'Montserrat-Bold',
+                      color: 'black',
+                    }}>
                     {data.postTitle}
                   </Text>
                 </View>
@@ -118,15 +123,16 @@ const PostFeed = () => {
             </HStack>
 
             <View style={{paddingHorizontal: 15}}>
-              <Text>
+              <Text style={{fontFamily: 'Montserrat-Medium', fontSize: 13}}>
                 Liked by {like ? 'you and' : ''}{' '}
                 {like ? data.likes + 1 : data.likes} others
               </Text>
               <Text
                 style={{
-                  fontWeight: '700',
-                  fontSize: 14,
+                  // fontWeight: '700',
+                  fontSize: 13,
                   paddingVertical: 2,
+                  fontFamily: 'Montserrat-Medium',
                 }}>
                 If enjoy the video ! Please like and Subscribe :)
               </Text>

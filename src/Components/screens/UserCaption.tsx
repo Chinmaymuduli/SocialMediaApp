@@ -1,6 +1,5 @@
-import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import {Box, Divider, FlatList, Pressable} from '@gluestack-ui/themed';
+import {Box, Divider, FlatList, Pressable, Text} from '@gluestack-ui/themed';
 
 const UserCaption = () => {
   const CAPTION_DATA = [
@@ -26,19 +25,19 @@ const UserCaption = () => {
     },
   ];
   return (
-    <Box mt={'$3'} px={'$2'}>
+    <Box mt={'$3'}>
       {CAPTION_DATA.map((item: any) => (
-        <React.Fragment key={item?.id}>
-          <Pressable m={'$0.5'}>
-            <Text>{item?.caption}</Text>
+        <Box key={item?.id}>
+          <Pressable px={'$3'} py={'$2'}>
+            <Text fontFamily="Montserrat-Medium" fontSize={13}>
+              {item?.caption}
+            </Text>
           </Pressable>
           <Divider />
-        </React.Fragment>
+        </Box>
       ))}
     </Box>
   );
 };
 
 export default UserCaption;
-
-const styles = StyleSheet.create({});

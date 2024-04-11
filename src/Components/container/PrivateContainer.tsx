@@ -31,66 +31,66 @@ const PrivateContainer = ({
   const rightIcons = icons?.filter(_ => _.side === 'RIGHT');
   return (
     <SafeAreaView flex={1} bg={'white'}>
-      <Box {..._box}>
-        <Box bgColor={'white'} softShadow="1">
+      {/* <Box {..._box}> */}
+      <Box bgColor={'white'} softShadow="1">
+        <HStack
+          px={'$3'}
+          bg={color}
+          alignItems={'center'}
+          justifyContent={'space-between'}
+          py={'$3'}>
+          <HStack alignItems={'center'} gap={'$3'}>
+            {hasBackIcon && (
+              <Pressable
+                onPress={() => {
+                  if (leftIcon?.onPress) return leftIcon.onPress();
+                  if (canGoBack()) return goBack();
+                }}
+                h={'$9'}
+                w={'$9'}
+                borderRadius={12}
+                bgColor={'white'}
+                softShadow="1"
+                alignItems={'center'}
+                justifyContent={'center'}>
+                <FontAwesome6
+                  name="chevron-left"
+                  size={24}
+                  color={COLORS.secondary}
+                />
+              </Pressable>
+            )}
+            {image ? (
+              <Image
+                source={image}
+                alt="image"
+                style={{height: 30, width: 100}}
+                resizeMode="contain"
+              />
+            ) : (
+              <Text fontSize="$lg" fontFamily={'Montserrat-Medium'}>
+                {title}
+              </Text>
+            )}
+          </HStack>
           <HStack
-            px={'$3'}
-            bg={color}
             alignItems={'center'}
-            justifyContent={'space-between'}
-            py={'$3'}>
-            <HStack alignItems={'center'} gap={'$3'}>
-              {hasBackIcon && (
+            gap={rightIcons?.length! > 0 ? '$5' : '$0'}>
+            {rightIcons?.map((_, i) => (
+              <React.Fragment key={i}>
                 <Pressable
                   onPress={() => {
-                    if (leftIcon?.onPress) return leftIcon.onPress();
-                    if (canGoBack()) return goBack();
-                  }}
-                  h={'$9'}
-                  w={'$9'}
-                  borderRadius={12}
-                  bgColor={'white'}
-                  softShadow="1"
-                  alignItems={'center'}
-                  justifyContent={'center'}>
-                  <FontAwesome6
-                    name="chevron-left"
-                    size={24}
-                    color={COLORS.secondary}
-                  />
+                    if (_?.onPress) return _.onPress();
+                  }}>
+                  <AppIcon size={25} color={COLORS.secondary} {..._?.icon} />
                 </Pressable>
-              )}
-              {image ? (
-                <Image
-                  source={image}
-                  alt="image"
-                  style={{height: 30, width: 100}}
-                  resizeMode="contain"
-                />
-              ) : (
-                <Text fontSize="$lg" fontWeight="semibold">
-                  {title}
-                </Text>
-              )}
-            </HStack>
-            <HStack
-              alignItems={'center'}
-              gap={rightIcons?.length! > 0 ? '$5' : '$0'}>
-              {rightIcons?.map((_, i) => (
-                <React.Fragment key={i}>
-                  <Pressable
-                    onPress={() => {
-                      if (_?.onPress) return _.onPress();
-                    }}>
-                    <AppIcon size={25} color={COLORS.secondary} {..._?.icon} />
-                  </Pressable>
-                </React.Fragment>
-              ))}
-            </HStack>
+              </React.Fragment>
+            ))}
           </HStack>
-        </Box>
-        {children}
+        </HStack>
       </Box>
+      {children}
+      {/* </Box> */}
     </SafeAreaView>
   );
 };

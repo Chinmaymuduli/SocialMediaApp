@@ -19,12 +19,12 @@ const Feeds = () => {
         },
         {
           icon: {EntypoName: 'dots-three-vertical'},
-          onPress: () => navigate('Profile'),
+          onPress: () => navigate('Settings'),
           side: 'RIGHT',
         },
       ]}
       image={IMAGES.LOGO}>
-      <ScrollView contentContainerStyle={{paddingBottom: 100}}>
+      <ScrollView contentContainerStyle={{paddingBottom: 50}}>
         <PostFeed />
       </ScrollView>
     </PrivateContainer>

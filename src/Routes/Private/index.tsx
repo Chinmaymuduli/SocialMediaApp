@@ -17,6 +17,7 @@ export default function PrivateRoutes({initialRouteName}: PrivateRouteProps) {
       screenOptions={{headerShown: false}}>
       <Stack.Screen name="TabLayout" component={TabLayout} />
       <Stack.Screen name="UserProfile" component={Private.UserProfile} />
+      <Stack.Screen name="Settings" component={Private.Settings} />
     </Stack.Navigator>
   );
 }
