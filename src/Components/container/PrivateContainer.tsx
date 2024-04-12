@@ -13,6 +13,7 @@ type Props = {
   hasBackIcon?: boolean;
   icons?: {
     icon?: any;
+    iconColor?: any;
     onPress?: () => void;
     side: 'LEFT' | 'RIGHT';
   }[];
@@ -82,7 +83,11 @@ const PrivateContainer = ({
                   onPress={() => {
                     if (_?.onPress) return _.onPress();
                   }}>
-                  <AppIcon size={25} color={COLORS.secondary} {..._?.icon} />
+                  <AppIcon
+                    size={25}
+                    color={_?.iconColor ? _?.iconColor : COLORS.secondary}
+                    {..._?.icon}
+                  />
                 </Pressable>
               </React.Fragment>
             ))}

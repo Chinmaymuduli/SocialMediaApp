@@ -4,8 +4,10 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {PrivateContainer} from '~/Components/container';
 import {COLORS} from '~/Styles';
 import {Box} from '@gluestack-ui/themed';
+import {colorsArray} from '~/Constants';
 
 const SettingScreen = () => {
+  const bgColor = (i: number) => colorsArray[i % colorsArray.length];
   const navigateToEditProfile = () => {
     // navigation.navigate("EditProfile");
   };
@@ -74,7 +76,7 @@ const SettingScreen = () => {
   ];
 
   const supportItems = [
-    {icon: 'help-outline', text: 'Help & Support', action: navigateToSupport},
+    {icon: 'report-problem', text: 'Help & Support', action: navigateToSupport},
     {icon: 'help-outline', text: 'Contact Us', action: navigateToSupport},
 
     {
@@ -91,13 +93,17 @@ const SettingScreen = () => {
 
   const cacheAndCellularItems = [
     {
-      icon: 'delete-outline',
+      icon: 'bookmark-add',
       text: 'Request Connections',
       action: navigateToFreeSpace,
     },
-    {icon: 'save-alt', text: 'My Connections', action: navigateToDateSaver},
-    {icon: 'save-alt', text: 'My Meetings', action: navigateToDateSaver},
-    {icon: 'save-alt', text: 'Reviews & Ratings', action: navigateToDateSaver},
+    {icon: 'diversity-1', text: 'My Connections', action: navigateToDateSaver},
+    {icon: 'event-note', text: 'My Meetings', action: navigateToDateSaver},
+    {
+      icon: 'rate-review',
+      text: 'Reviews & Ratings',
+      action: navigateToDateSaver,
+    },
   ];
 
   const actionsItems = [
@@ -109,7 +115,7 @@ const SettingScreen = () => {
     {icon: 'logout', text: 'Log out', action: logout},
   ];
 
-  const renderSettingsItem = ({icon, text, action}: any) => (
+  const renderSettingsItem = ({icon, text, action}: any, index: any) => (
     <TouchableOpacity
       onPress={action}
       style={{
@@ -119,7 +125,18 @@ const SettingScreen = () => {
         paddingLeft: 12,
         gap: 7,
       }}>
-      <MaterialIcons name={icon} size={24} color={COLORS.secondary} />
+      {/* <MaterialIcons name={icon} size={24} color={COLORS.secondary} /> */}
+      <Box
+        bg={bgColor(index)}
+        borderRadius={7}
+        justifyContent={'center'}
+        alignItems={'center'}
+        w={'$6'}
+        h={'$6'}>
+        <Box p={'$1'}>
+          <MaterialIcons name={icon} size={15} color={'white'} />
+        </Box>
+      </Box>
       <Text style={{fontSize: 13, fontFamily: 'Montserrat-SemiBold'}}>
         {text}
       </Text>
@@ -131,79 +148,117 @@ const SettingScreen = () => {
       <ScrollView
         // style={{marginHorizontal: 12}}
         showsVerticalScrollIndicator={false}>
-        {/* Account Settings */}
-        <View style={{marginBottom: 12}}>
-          <Text style={{marginVertical: 10, fontFamily: 'Montserrat-SemiBold'}}>
-            Account
-          </Text>
-          <View
-            style={{
-              borderRadius: 12,
-              //   backgroundColor: 'rgba(36, 39, 96, 0.05)',
-            }}>
-            {accountItems.map((item, index) => (
-              <React.Fragment key={index}>
-                {renderSettingsItem(item)}
-              </React.Fragment>
-            ))}
-          </View>
-        </View>
+        <Box px={'$3'} mt={'$2'}>
+          {/* Account Settings */}
+          <Box
+            softShadow="1"
+            bgColor="white"
+            style={{marginBottom: 12}}
+            borderRadius={10}>
+            <Text
+              style={{
+                marginVertical: 10,
+                fontFamily: 'Montserrat-SemiBold',
+                marginLeft: 12,
+              }}>
+              Account
+            </Text>
+            <View
+              style={{
+                borderRadius: 12,
+                //   backgroundColor: 'rgba(36, 39, 96, 0.05)',
+              }}>
+              {accountItems.map((item, index) => (
+                <React.Fragment key={index}>
+                  {renderSettingsItem(item, index)}
+                </React.Fragment>
+              ))}
+            </View>
+          </Box>
 
-        {/* Connections & Details */}
-        <View style={{marginBottom: 12}}>
-          <Text style={{marginVertical: 10, fontFamily: 'Montserrat-SemiBold'}}>
-            Connections & Details{' '}
-          </Text>
-          <View
-            style={{
-              borderRadius: 12,
-              //   backgroundColor: 'rgba(36, 39, 96, 0.05)',
-            }}>
-            {cacheAndCellularItems.map((item, index) => (
-              <React.Fragment key={index}>
-                {renderSettingsItem(item)}
-              </React.Fragment>
-            ))}
-          </View>
-        </View>
+          {/* Connections & Details */}
+          <Box
+            softShadow="1"
+            bgColor="white"
+            style={{marginBottom: 12}}
+            borderRadius={10}>
+            <Text
+              style={{
+                marginVertical: 10,
+                fontFamily: 'Montserrat-SemiBold',
+                marginLeft: 12,
+              }}>
+              Connections & Details{' '}
+            </Text>
+            <View
+              style={{
+                borderRadius: 12,
+                //   backgroundColor: 'rgba(36, 39, 96, 0.05)',
+              }}>
+              {cacheAndCellularItems.map((item, index) => (
+                <React.Fragment key={index}>
+                  {renderSettingsItem(item, index)}
+                </React.Fragment>
+              ))}
+            </View>
+          </Box>
 
-        {/* Support and About settings */}
+          {/* Support and About settings */}
 
-        <Box style={{marginBottom: 12}} softShadow="1" bgColor="white">
-          <Text style={{fontFamily: 'Montserrat-SemiBold'}}>
-            Support & About{' '}
-          </Text>
-          <View
-            style={{
-              borderRadius: 12,
-              //   backgroundColor: 'rgba(36, 39, 96, 0.05)',
-            }}>
-            {supportItems.map((item, index) => (
-              <React.Fragment key={index}>
-                {renderSettingsItem(item)}
-              </React.Fragment>
-            ))}
-          </View>
+          <Box
+            style={{marginBottom: 12}}
+            softShadow="1"
+            bgColor="white"
+            borderRadius={10}>
+            <Text
+              style={{
+                fontFamily: 'Montserrat-SemiBold',
+                marginLeft: 12,
+                marginVertical: 10,
+              }}>
+              Support & About{' '}
+            </Text>
+            <View
+              style={{
+                borderRadius: 12,
+                //   backgroundColor: 'rgba(36, 39, 96, 0.05)',
+              }}>
+              {supportItems.map((item, index) => (
+                <React.Fragment key={index}>
+                  {renderSettingsItem(item, index)}
+                </React.Fragment>
+              ))}
+            </View>
+          </Box>
+
+          {/* Actions Settings */}
+
+          <Box
+            style={{marginBottom: 12}}
+            softShadow="1"
+            bgColor="white"
+            borderRadius={10}>
+            <Text
+              style={{
+                marginVertical: 10,
+                fontFamily: 'Montserrat-SemiBold',
+                marginLeft: 12,
+              }}>
+              Actions
+            </Text>
+            <View
+              style={{
+                borderRadius: 12,
+                //   backgroundColor: 'rgba(36, 39, 96, 0.05)',
+              }}>
+              {actionsItems.map((item, index) => (
+                <React.Fragment key={index}>
+                  {renderSettingsItem(item, index)}
+                </React.Fragment>
+              ))}
+            </View>
+          </Box>
         </Box>
-
-        {/* Actions Settings */}
-
-        <View style={{marginBottom: 12}}>
-          <Text style={{marginVertical: 10, fontFamily: 'Montserrat-SemiBold'}}>
-            Actions
-          </Text>
-          <View
-            style={{
-              borderRadius: 12,
-              //   backgroundColor: 'rgba(36, 39, 96, 0.05)',
-            }}>
-            {actionsItems.map((item, index) => (
-              <React.Fragment key={index}>
-                {renderSettingsItem(item)}
-              </React.Fragment>
-            ))}
-          </View>
-        </View>
       </ScrollView>
     </PrivateContainer>
   );

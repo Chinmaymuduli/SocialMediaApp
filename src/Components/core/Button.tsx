@@ -14,6 +14,7 @@ type ButtonProps = {
   iconSide?: 'LEFT' | 'RIGHT';
   onPress?: () => void;
   _text?: TextProps;
+  btnWidth?: any;
 } & RowProps;
 
 const Button: React.FC<ButtonProps> = ({
@@ -24,6 +25,7 @@ const Button: React.FC<ButtonProps> = ({
   icon,
   onPress,
   _text,
+  btnWidth,
   iconSide = 'LEFT',
   ..._row
 }) => {
@@ -43,7 +45,7 @@ const Button: React.FC<ButtonProps> = ({
       disabled={isDisabled || isLoading}
       //   _pressed={{opacity: 0.6}}
       //   _disabled={{opacity: 0.6}}
-      w={'45%'}
+      w={btnWidth ? btnWidth : '45%'}
       bg="transparent">
       <HStack
         // rounded="md"
