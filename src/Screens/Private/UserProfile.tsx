@@ -98,12 +98,12 @@ const UserProfile = () => {
           </Text>
         </VStack>
         <HStack px={'$4'} gap={'$10'} mt={'$4'}>
-          <Button borderRadius={5}>
+          <Button borderRadius={5} py={'$2'}>
             <Text color="$white" fontFamily="Montserrat-Medium" fontSize={13}>
               Connect
             </Text>
           </Button>
-          <Button borderRadius={5}>
+          <Button borderRadius={5} py={'$2'}>
             <Text color="$white" fontFamily="Montserrat-Medium" fontSize={13}>
               Message
             </Text>

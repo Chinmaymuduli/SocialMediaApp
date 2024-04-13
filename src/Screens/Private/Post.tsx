@@ -95,11 +95,18 @@ const Post = () => {
           </Box>
         </Box>
 
-        <Button borderRadius={5} btnWidth={'full'} mx={'$4'} mt={'$7'}>
-          <Text color="$white" fontFamily="Montserrat-Medium" fontSize={13}>
-            Post
-          </Text>
-        </Button>
+        <Box mt={'$7'}>
+          <Button
+            borderRadius={5}
+            btnWidth={'full'}
+            mx={'$4'}
+            py={'$2'}
+            onPress={() => handelPost()}>
+            <Text color="$white" fontFamily="Montserrat-Bold" fontSize={13}>
+              Post
+            </Text>
+          </Button>
+        </Box>
       </ScrollView>
     </PrivateContainer>
   );

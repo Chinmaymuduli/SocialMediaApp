@@ -24,6 +24,8 @@ import {useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/routes/private/types';
 import AppIcon from '~/Components/core/AppIcon';
 import {PrivateContainer} from '~/Components/container';
+import LinearGradient from 'react-native-linear-gradient';
+import {StyleSheet} from 'react-native';
 
 const ChatDetails = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
@@ -95,3 +97,19 @@ const ChatDetails = () => {
 };
 
 export default ChatDetails;
+var styles = StyleSheet.create({
+  linearGradient: {
+    flex: 1,
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderRadius: 5,
+  },
+  buttonText: {
+    fontSize: 18,
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
+    margin: 10,
+    color: '#ffffff',
+    backgroundColor: 'transparent',
+  },
+});
