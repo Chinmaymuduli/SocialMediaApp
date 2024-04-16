@@ -19,6 +19,14 @@ export default function PrivateRoutes({initialRouteName}: PrivateRouteProps) {
       <Stack.Screen name="UserProfile" component={Private.UserProfile} />
       <Stack.Screen name="Settings" component={Private.Settings} />
       <Stack.Screen name="ChatDetails" component={Private.ChatDetails} />
+      <Stack.Screen name="ContactUs" component={Private.ContactUs} />
+      <Stack.Screen name="Meetings" component={Private.Meetings} />
+      <Stack.Screen name="MyConnections" component={Private.MyConnections} />
+      <Stack.Screen name="Notifications" component={Private.Notifications} />
+      <Stack.Screen
+        name="RequestConnections"
+        component={Private.RequestConnections}
+      />
     </Stack.Navigator>
   );
 }

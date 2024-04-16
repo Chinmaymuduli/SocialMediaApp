@@ -5,8 +5,11 @@ import {PrivateContainer} from '~/Components/container';
 import {COLORS} from '~/Styles';
 import {Box} from '@gluestack-ui/themed';
 import {colorsArray} from '~/Constants';
+import {useNavigation} from '@react-navigation/native';
+import {PrivateScreenProps} from '~/Routes/Private/types';
 
 const SettingScreen = () => {
+  const {navigate} = useNavigation<PrivateScreenProps>();
   const bgColor = (i: number) => colorsArray[i % colorsArray.length];
   const navigateToEditProfile = () => {
     // navigation.navigate("EditProfile");
@@ -18,6 +21,7 @@ const SettingScreen = () => {
 
   const navigateToNotifications = () => {
     console.log('Notifications function');
+    navigate('Notifications');
   };
 
   const navigateToPrivacy = () => {
@@ -31,6 +35,10 @@ const SettingScreen = () => {
   const navigateToSupport = () => {
     console.log('Support function');
   };
+  const navigateToContact = () => {
+    console.log('Support function');
+    navigate('ContactUs');
+  };
 
   const navigateToTermsAndPolicies = () => {
     console.log('Terms and Policies function');
@@ -42,6 +50,18 @@ const SettingScreen = () => {
 
   const navigateToDateSaver = () => {
     console.log('Date saver');
+  };
+  const navigateToMeetings = () => {
+    console.log('Date saver');
+    navigate('Meetings');
+  };
+  const navigateToMyConnections = () => {
+    console.log('Date saver');
+    navigate('MyConnections');
+  };
+  const navigateToRequest = () => {
+    console.log('Date saver');
+    navigate('RequestConnections');
   };
 
   const navigateToReportProblem = () => {
@@ -57,11 +77,13 @@ const SettingScreen = () => {
   };
 
   const accountItems = [
-    {
-      icon: 'person-outline',
-      text: 'Edit Profile',
-      action: navigateToEditProfile,
-    },
+    // {
+    //   icon: 'person-outline',
+    //   text: 'Edit Profile',
+    //   action: navigateToEditProfile,
+    // }
+    {icon: 'lock-outline', text: 'Verify Aadhar', action: navigateToPrivacy},
+
     {
       icon: 'security',
       text: 'Two Step Verification',
@@ -72,12 +94,11 @@ const SettingScreen = () => {
       text: 'Notifications',
       action: navigateToNotifications,
     },
-    {icon: 'lock-outline', text: 'Verify Aadhar', action: navigateToPrivacy},
   ];
 
   const supportItems = [
     {icon: 'report-problem', text: 'Help & Support', action: navigateToSupport},
-    {icon: 'help-outline', text: 'Contact Us', action: navigateToSupport},
+    {icon: 'help-outline', text: 'Contact Us', action: navigateToContact},
 
     {
       icon: 'credit-card',
@@ -95,10 +116,14 @@ const SettingScreen = () => {
     {
       icon: 'bookmark-add',
       text: 'Request Connections',
-      action: navigateToFreeSpace,
+      action: navigateToRequest,
     },
-    {icon: 'diversity-1', text: 'My Connections', action: navigateToDateSaver},
-    {icon: 'event-note', text: 'My Meetings', action: navigateToDateSaver},
+    {
+      icon: 'diversity-1',
+      text: 'My Connections',
+      action: navigateToMyConnections,
+    },
+    {icon: 'event-note', text: 'My Meetings', action: navigateToMeetings},
     {
       icon: 'rate-review',
       text: 'Reviews & Ratings',
