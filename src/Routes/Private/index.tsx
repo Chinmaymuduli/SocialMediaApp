@@ -23,6 +23,7 @@ export default function PrivateRoutes({initialRouteName}: PrivateRouteProps) {
       <Stack.Screen name="Meetings" component={Private.Meetings} />
       <Stack.Screen name="MyConnections" component={Private.MyConnections} />
       <Stack.Screen name="Notifications" component={Private.Notifications} />
+      <Stack.Screen name="VerifyAadhar" component={Private.VerifyAadhar} />
       <Stack.Screen
         name="RequestConnections"
         component={Private.RequestConnections}

@@ -63,6 +63,10 @@ const SettingScreen = () => {
     console.log('Date saver');
     navigate('RequestConnections');
   };
+  const navigateToAadhar = () => {
+    console.log('Date saver');
+    navigate('VerifyAadhar');
+  };
 
   const navigateToReportProblem = () => {
     console.log('Report a problem');
@@ -82,7 +86,7 @@ const SettingScreen = () => {
     //   text: 'Edit Profile',
     //   action: navigateToEditProfile,
     // }
-    {icon: 'lock-outline', text: 'Verify Aadhar', action: navigateToPrivacy},
+    {icon: 'lock-outline', text: 'Verify Aadhar', action: navigateToAadhar},
 
     {
       icon: 'security',

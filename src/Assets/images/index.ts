@@ -7,4 +7,5 @@ export default {
   POST3: require('./post3.jpg'),
   POST4: require('./post4.jpg'),
   USER: require('./userProfile.png'),
+  AADHAAR: require('./aadhar.png'),
 };
