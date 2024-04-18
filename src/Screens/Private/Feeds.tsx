@@ -14,7 +14,7 @@ const Feeds = () => {
       icons={[
         {
           icon: {IoniconsName: 'notifications'},
-          onPress: () => navigate('Profile'),
+          onPress: () => navigate('Notifications'),
           side: 'RIGHT',
         },
         {

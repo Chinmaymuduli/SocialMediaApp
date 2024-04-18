@@ -1,6 +1,5 @@
 import React from 'react';
-import {View, Pressable, StyleSheet, KeyboardAvoidingView} from 'react-native';
-
+import {View, Pressable, StyleSheet} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {PublicNavigationProps} from '~/Routes/Public/types';
 import {
@@ -18,9 +17,11 @@ import {
 import {IMAGES} from '~/Assets';
 import {COLORS} from '~/Styles';
 import {Text} from '@gluestack-ui/themed';
+import {useAppContext} from '~/Contexts';
 
 const OtpScreen = () => {
   const navigation = useNavigation<PublicNavigationProps>();
+  const {setIsLoggedIn} = useAppContext();
   const resendOTP = () => {};
 
   return (
@@ -62,7 +63,11 @@ const OtpScreen = () => {
               <Text style={styles.registerLbl}>Resend OTP</Text>
             </Pressable>
           </Box>
-          <Button bgColor={COLORS.secondary} mt={'$12'} borderRadius={'$xl'}>
+          <Button
+            bgColor={COLORS.secondary}
+            mt={'$12'}
+            borderRadius={'$xl'}
+            onPress={() => setIsLoggedIn(true)}>
             <ButtonText fontFamily={'Montserrat-Bold'}>
               {' '}
               Verify and Continue

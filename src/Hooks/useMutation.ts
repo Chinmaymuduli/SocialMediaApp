@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useState} from 'react';
-import {COLORS} from '~/styles';
-import {BASE_URL} from '~/utils';
+import {BASE_URL} from '~/Utils';
 
 type MutationOptions = {
   method?: 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -39,19 +38,9 @@ const useMutation = () => {
       const results = await response.json();
       if (options?.isAlert && status !== 200) {
         console.log(results?.error?.message);
-        // Toast.show({
-        //   title: 'Error',
-        //   description: results?.error?.message,
-        //   bgColor: COLORS.secondary,
-        // });
       }
       if (options?.isAlert && status === 200) {
         console.log(results?.message);
-        // Toast.show({
-        //   title: 'Success',
-        //   description: results?.message,
-        //   bgColor: COLORS.primary,
-        // });
       }
       setIsLoading(false);
       return {results, status};

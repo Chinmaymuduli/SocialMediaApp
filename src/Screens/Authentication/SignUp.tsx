@@ -31,20 +31,84 @@ import EmailLogin from './EmailLogin';
 import {useNavigation} from '@react-navigation/native';
 import {PublicNavigationProps} from '~/Routes/Public/types';
 import {GlobeIcon} from '@gluestack-ui/themed';
+import {useBasicFunctions, useMutation} from '~/Hooks';
+import {Alert} from 'react-native';
+import {useAppContext} from '~/Contexts';
 
 const SignUp = () => {
   const {navigate} = useNavigation<PublicNavigationProps>();
   const [showPassword, setShowPassword] = useState(false);
   const [isPhoneLogin, setIsPhoneLogin] = useState(false);
-
+  const [email, setEmail] = useState<string>();
+  const [password, setPassword] = useState<string>();
+  const [phoneNumber, setPhoneNumber] = useState<string>();
+  const [selectedCountry, setSelectedCountry] = useState<any>({
+    code: 'IN',
+    name: 'India',
+    phone: '91',
+  });
+  const {mutation, isLoading} = useMutation();
   const handleState = () => {
     setShowPassword(showState => {
       return !showState;
     });
   };
 
-  const onSubmit = async (data: any) => {
-    console.log({data});
+  const onSubmit = async () => {
+    const strongRegex = new RegExp(
+      '^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$',
+    );
+
+    try {
+      if (!strongRegex.test(email!) || !email) {
+        Alert.alert('Error', 'Please Provide Email');
+      } else if (!password) {
+        Alert.alert('Error', 'Please Provide Password');
+      }
+      const loginData = await mutation(
+        `auth/register-with-email-and-password`,
+        {
+          method: 'POST',
+          body: {
+            email: email!.replace(/ +/g, ''),
+            password: password!.replace(/ +/g, ''),
+          },
+        },
+      );
+      console.log(loginData);
+      if (loginData?.status !== 201) {
+        Alert.alert('Error', loginData?.results?.error?.message);
+      } else {
+        navigate('OtpScreen');
+      }
+    } catch (error) {
+      console.log({error});
+    }
+  };
+
+  const handelPhoneLogin = async () => {
+    if (!phoneNumber) {
+      Alert.alert('Error', 'Please Provide Phone Number');
+    }
+    try {
+      const phoneSignUp = await mutation(`auth/register-with-phone`, {
+        method: 'POST',
+        body: {
+          phone: phoneNumber,
+          country_details: {
+            name: selectedCountry.name,
+            code: selectedCountry.code,
+          },
+        },
+      });
+      if (phoneSignUp?.results?.status !== 200) {
+        Alert.alert('Error', phoneSignUp?.results?.error?.message);
+      } else {
+        navigate('OtpScreen');
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -74,11 +138,20 @@ const SignUp = () => {
               </Text>
             </Box>
             {isPhoneLogin ? (
-              <PhoneLogin />
+              <PhoneLogin
+                selectedCountry={selectedCountry}
+                setSelectedCountry={setSelectedCountry}
+                phoneNumber={phoneNumber}
+                setPhoneNumber={setPhoneNumber}
+              />
             ) : (
               <EmailLogin
                 handleState={handleState}
                 showPassword={showPassword}
+                setEmail={setEmail}
+                setPassword={setPassword}
+                email={email}
+                password={password}
               />
             )}
           </Box>
@@ -86,8 +159,11 @@ const SignUp = () => {
           <VStack gap={'$5'} mt={'$9'}>
             <Button
               bgColor={COLORS.secondary}
+              isDisabled={isLoading}
               borderRadius={8}
-              onPress={() => navigate('OtpScreen')}
+              onPress={
+                isPhoneLogin ? () => handelPhoneLogin() : () => onSubmit()
+              }
               gap={'$1'}>
               <ButtonText color="$white" fontFamily={'Montserrat-Bold'}>
                 Save & Continue

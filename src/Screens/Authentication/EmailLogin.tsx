@@ -10,16 +10,47 @@ import {
   EyeOffIcon,
   MailIcon,
   Pressable,
+  FormControlLabelText,
+  FormControlHelper,
+  FormControlHelperText,
+  FormControlErrorIcon,
+  AlertCircleIcon,
+  FormControlErrorText,
 } from '@gluestack-ui/themed';
 import {Text} from '@gluestack-ui/themed';
 import {FormControl} from '@gluestack-ui/themed';
 import {UnlockIcon} from '@gluestack-ui/themed';
+import {FormControlLabel} from '@gluestack-ui/themed';
+import {FormControlError} from '@gluestack-ui/themed';
+import {Controller, useForm} from 'react-hook-form';
+import {TextInput} from 'react-native';
 
 type EmailType = {
   showPassword: boolean;
   handleState: () => void;
+  email?: string;
+  setEmail: (email: string) => void;
+  password?: string;
+  setPassword: (password: string) => void;
 };
-const EmailLogin = ({handleState, showPassword}: EmailType) => {
+const EmailLogin = ({
+  handleState,
+  showPassword,
+  email,
+  setEmail,
+  password,
+  setPassword,
+}: EmailType) => {
+  const {
+    control,
+    handleSubmit,
+    formState: {errors},
+  } = useForm({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
   return (
     <Box mt={'$7'} gap={'$3'}>
       <VStack gap={'$2'}>
@@ -30,10 +61,15 @@ const EmailLogin = ({handleState, showPassword}: EmailType) => {
           <Input alignItems="center">
             <InputIcon as={MailIcon} color="$coolGray500" pl="$8" size="lg" />
 
-            <InputField type="text" />
+            <InputField
+              type="text"
+              value={email}
+              onChangeText={txt => setEmail(txt)}
+            />
           </Input>
         </FormControl>
       </VStack>
+
       <VStack gap={'$2'}>
         <Text fontFamily={'Montserrat-Medium'} fontSize={15}>
           Password
@@ -41,7 +77,11 @@ const EmailLogin = ({handleState, showPassword}: EmailType) => {
         <FormControl isRequired mt={1}>
           <Input alignItems="center">
             <InputIcon as={UnlockIcon} color="$coolGray500" pl="$8" size="lg" />
-            <InputField type={showPassword ? 'text' : 'password'} />
+            <InputField
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChangeText={txt => setPassword(txt)}
+            />
             <Pressable onPress={handleState} pr="$3">
               {showPassword ? (
                 <Text

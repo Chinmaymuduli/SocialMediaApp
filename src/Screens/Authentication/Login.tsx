@@ -1,21 +1,14 @@
-import {SafeAreaView} from 'react-native';
+import {Alert, SafeAreaView} from 'react-native';
 import React, {useState} from 'react';
 import {
   Box,
   Center,
-  FormControl,
   Image,
-  Input,
   Text,
   VStack,
   Button,
   ScrollView,
-  InputField,
   ButtonText,
-  InputIcon,
-  InputSlot,
-  EyeIcon,
-  EyeOffIcon,
   ArrowRightIcon,
   PhoneIcon,
   MailIcon,
@@ -30,20 +23,63 @@ import EmailLogin from './EmailLogin';
 import {useNavigation} from '@react-navigation/native';
 import {PublicNavigationProps} from '~/Routes/Public/types';
 import {GlobeIcon} from '@gluestack-ui/themed';
+import {useMutation} from '~/Hooks';
 
 const Login = () => {
   const {navigate} = useNavigation<PublicNavigationProps>();
   const [showPassword, setShowPassword] = useState(false);
   const [isPhoneLogin, setIsPhoneLogin] = useState(false);
-
+  const [email, setEmail] = useState<string>();
+  const [password, setPassword] = useState<string>();
+  const {mutation, isLoading} = useMutation();
   const handleState = () => {
     setShowPassword(showState => {
       return !showState;
     });
   };
 
-  const onSubmit = async (data: any) => {
-    console.log({data});
+  const onSubmit = async () => {
+    // const strongRegex = new RegExp(
+    //   '^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$',
+    // );
+
+    // try {
+
+    // if (!strongRegex.test(email!) || !email) {
+    //   Alert.alert('Error', 'Please Provide Email');
+    // } else if (!password) {
+    //   Alert.alert('Error', 'Please Provide Password');
+    // }
+    //   const loginData = await mutation(`auth/signIn`, {
+    //     method: 'POST',
+    //     body: {
+    //       email: data?.Email.replace(/ +/g, ''),
+    //       password: data?.password.replace(/ +/g, ''),
+    //       timeZone,
+    //     },
+    //   });
+    //   if (loginData?.status === 200) {
+    //     handleLogin();
+    //     handleSetAccessToken(loginData?.results?.data?.token);
+    //     await AsyncStorage.setItem('isEnter', 'true');
+    //     setUser({
+    //       id: loginData?.results?.data?.user?.id,
+    //       token: loginData?.results?.data?.token,
+    //       name: loginData?.results?.data?.user?.name,
+    //       role: loginData?.results?.data?.user?.role,
+    //       departmentId: loginData?.results?.data?.user?.departmentId,
+    //       photo: loginData?.results?.data?.user?.photo,
+    //       email: loginData?.results?.data?.user?.email,
+    //       designationLevel: loginData?.results?.data?.user?.Designation?.level,
+    //       isHod: loginData?.results?.data?.user?.isHod,
+    //       joiningDate: loginData?.results?.data?.user?.joiningDate,
+    //     });
+    //   }
+    // } catch (error) {
+
+    // }
+
+    navigate('OtpScreen');
   };
 
   return (
@@ -78,6 +114,10 @@ const Login = () => {
               <EmailLogin
                 handleState={handleState}
                 showPassword={showPassword}
+                email={email}
+                setEmail={setEmail}
+                password={password}
+                setPassword={setPassword}
               />
             )}
           </Box>
@@ -86,7 +126,7 @@ const Login = () => {
             <Button
               bgColor={COLORS.secondary}
               borderRadius={8}
-              onPress={() => navigate('OtpScreen')}
+              onPress={() => onSubmit()}
               gap={'$1'}>
               <ButtonText color="$white" fontFamily={'Montserrat-Bold'}>
                 Sign In
