@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {BASE_URL} from '~/Utils';
 
 const useSwrApi = (url: string | null, options?: SWRConfiguration) => {
+  // console.log(`${BASE_URL}/${url}`, 'url');
   const fetcher = async (url: string) => {
     const accessToken = await AsyncStorage.getItem('accessToken');
     const headers: {

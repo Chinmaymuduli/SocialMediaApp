@@ -48,6 +48,7 @@ const SignUp = () => {
     phone: '91',
   });
   const {mutation, isLoading} = useMutation();
+  const {handleSetAccessToken} = useBasicFunctions();
   const handleState = () => {
     setShowPassword(showState => {
       return !showState;
@@ -75,11 +76,14 @@ const SignUp = () => {
           },
         },
       );
-      console.log(loginData);
       if (loginData?.status !== 201) {
         Alert.alert('Error', loginData?.results?.error?.message);
       } else {
-        navigate('OtpScreen');
+        handleSetAccessToken(loginData?.results?.data?.token);
+        navigate('OtpScreen', {
+          token: loginData?.results?.data?.token,
+          email: email,
+        });
       }
     } catch (error) {
       console.log({error});
@@ -97,14 +101,20 @@ const SignUp = () => {
           phone: phoneNumber,
           country_details: {
             name: selectedCountry.name,
-            code: selectedCountry.code,
+            code: selectedCountry.phone,
           },
         },
       });
-      if (phoneSignUp?.results?.status !== 200) {
+      // 631944
+      console.log(phoneSignUp?.results);
+      if (phoneSignUp?.results?.status !== true) {
         Alert.alert('Error', phoneSignUp?.results?.error?.message);
       } else {
-        navigate('OtpScreen');
+        handleSetAccessToken(phoneSignUp?.results?.data?.token);
+        navigate('OtpScreen', {
+          token: phoneSignUp?.results?.data?.token,
+          phone: phoneNumber,
+        });
       }
     } catch (error) {
       console.log(error);

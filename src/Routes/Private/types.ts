@@ -11,17 +11,16 @@ type PrivateScreens = {
   [key in keyof typeof Private]: undefined;
 };
 
-type OmittedScreens = 'Policies';
+type OmittedScreens = '';
 
 export type PrivateNavigationProp = Omit<PrivateScreens, OmittedScreens> & {
-  //   ContactsList: {
-  //     isGroup?: boolean;
-  //   };
+  // OtpScreen: {
+  //   token: string;
+  // };
 };
 
 export type PrivateRoutesTypes = {
   TabLayout: undefined;
-  //   DrawerLayout: undefined;
 } & PrivateNavigationProp;
 
 export type PrivateScreenProps = CompositeNavigationProp<

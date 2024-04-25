@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {PrivateContainer} from '~/Components/container';
 import {IMAGES} from '~/Assets';
 import {PrivateScreenProps} from '~/Routes/Private/types';
@@ -22,9 +22,24 @@ import {Input} from '@gluestack-ui/themed';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import {Button} from '~/Components/core';
 import AppIcon from '~/Components/core/AppIcon';
+import {useAppContext} from '~/Contexts';
+import {useMutation} from '~/Hooks';
 
 const Profile = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
+  const {userData} = useAppContext();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [nickName, setNickName] = useState('');
+  const [gender, setGender] = useState('');
+
+  const {mutation, isLoading} = useMutation();
+
+  useEffect(() => {
+    setEmail(userData?.email);
+  }, [userData]);
+
   const avatars = [
     {
       src: 'https://example.com.jpg',
@@ -42,6 +57,22 @@ const Profile = () => {
   ];
   const extraAvatars = avatars.slice(1);
   const remainingCount = extraAvatars.length;
+  const handelUpdateProfile = async () => {
+    try {
+      const updateData = await mutation(`users/self/update`, {
+        method: 'PUT',
+        body: {
+          name,
+          nickName,
+          gender,
+        },
+      });
+      console.log(updateData?.results?.error);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <PrivateContainer
       icons={[
@@ -136,7 +167,12 @@ const Profile = () => {
                 borderColor="$coolGray300"
                 isInvalid={false}
                 isReadOnly={false}>
-                <InputField placeholder="Enter Name" fontSize={12} />
+                <InputField
+                  placeholder="Enter Name"
+                  fontSize={12}
+                  value={name}
+                  onChangeText={txt => setName(txt)}
+                />
               </Input>
             </VStack>
 
@@ -153,7 +189,12 @@ const Profile = () => {
                 borderColor="$coolGray300"
                 isInvalid={false}
                 isReadOnly={false}>
-                <InputField placeholder="Enter Text here" fontSize={12} />
+                <InputField
+                  placeholder="Enter Text here"
+                  fontSize={12}
+                  value={nickName}
+                  onChangeText={txt => setNickName(txt)}
+                />
               </Input>
             </VStack>
 
@@ -225,7 +266,12 @@ const Profile = () => {
                 borderColor="$coolGray300"
                 isInvalid={false}
                 isReadOnly={false}>
-                <InputField placeholder="Enter Name" fontSize={12} />
+                <InputField
+                  placeholder="Enter Name"
+                  fontSize={12}
+                  value={phone}
+                  onChangeText={txt => setPhone(txt)}
+                />
               </Input>
             </VStack>
 
@@ -237,12 +283,17 @@ const Profile = () => {
                 flex={1}
                 variant="outline"
                 size="md"
-                isDisabled={false}
+                isDisabled={userData?.email_verify?.is_verified ? true : false}
                 alignItems="center"
                 borderColor="$coolGray300"
                 isInvalid={false}
                 isReadOnly={false}>
-                <InputField placeholder="Enter Text here" fontSize={12} />
+                <InputField
+                  placeholder="Enter Text here"
+                  fontSize={12}
+                  value={email}
+                  onChangeText={txt => setEmail(txt)}
+                />
               </Input>
             </VStack>
             {/* State */}
@@ -365,10 +416,11 @@ const Profile = () => {
         <Box mt={'$7'} mb={'$4'}>
           <Button
             borderRadius={5}
+            isLoading={isLoading}
             btnWidth={'full'}
             mx={'$4'}
             py={'$2'}
-            onPress={() => {}}>
+            onPress={() => handelUpdateProfile()}>
             <Text color="$white" fontFamily="Montserrat-Bold" fontSize={13}>
               Post
             </Text>

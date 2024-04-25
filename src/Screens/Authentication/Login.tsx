@@ -14,6 +14,7 @@ import {
   MailIcon,
   HStack,
   Pressable,
+  ButtonSpinner,
 } from '@gluestack-ui/themed';
 import {COLORS} from '~/Styles';
 import {IMAGES} from '~/Assets';
@@ -24,6 +25,7 @@ import {useNavigation} from '@react-navigation/native';
 import {PublicNavigationProps} from '~/Routes/Public/types';
 import {GlobeIcon} from '@gluestack-ui/themed';
 import {useMutation} from '~/Hooks';
+import useBasicFunction from '~/Hooks/useBasicFunctions';
 
 const Login = () => {
   const {navigate} = useNavigation<PublicNavigationProps>();
@@ -31,7 +33,14 @@ const Login = () => {
   const [isPhoneLogin, setIsPhoneLogin] = useState(false);
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
+  const [phoneNumber, setPhoneNumber] = useState<string>();
+  const [selectedCountry, setSelectedCountry] = useState<any>({
+    code: 'IN',
+    name: 'India',
+    phone: '91',
+  });
   const {mutation, isLoading} = useMutation();
+  const {handleSetAccessToken, handleLogin, getUser} = useBasicFunction();
   const handleState = () => {
     setShowPassword(showState => {
       return !showState;
@@ -39,47 +48,65 @@ const Login = () => {
   };
 
   const onSubmit = async () => {
-    // const strongRegex = new RegExp(
-    //   '^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$',
-    // );
+    const strongRegex = new RegExp(
+      '^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$',
+    );
 
-    // try {
+    try {
+      if (!strongRegex.test(email!) || !email) {
+        Alert.alert('Error', 'Please Provide Email');
+      } else if (!password) {
+        Alert.alert('Error', 'Please Provide Password');
+      }
+      const loginData = await mutation(`auth/login-with-email-and-password`, {
+        method: 'POST',
+        body: {
+          email: email!.replace(/ +/g, ''),
+          password: password!.replace(/ +/g, ''),
+        },
+      });
+      console.log(loginData);
+      if (loginData?.status !== 200) {
+        Alert.alert('Error', loginData?.results?.error?.message);
+      } else {
+        handleSetAccessToken(loginData?.results?.data?.access_token);
+        handleLogin();
+        getUser();
+        // navigate('OtpScreen', {
+        //   token: loginData?.results?.data?.token,
+        //   email: email,
+        // });
+      }
+    } catch (error) {
+      console.log({error});
+    }
+  };
 
-    // if (!strongRegex.test(email!) || !email) {
-    //   Alert.alert('Error', 'Please Provide Email');
-    // } else if (!password) {
-    //   Alert.alert('Error', 'Please Provide Password');
-    // }
-    //   const loginData = await mutation(`auth/signIn`, {
-    //     method: 'POST',
-    //     body: {
-    //       email: data?.Email.replace(/ +/g, ''),
-    //       password: data?.password.replace(/ +/g, ''),
-    //       timeZone,
-    //     },
-    //   });
-    //   if (loginData?.status === 200) {
-    //     handleLogin();
-    //     handleSetAccessToken(loginData?.results?.data?.token);
-    //     await AsyncStorage.setItem('isEnter', 'true');
-    //     setUser({
-    //       id: loginData?.results?.data?.user?.id,
-    //       token: loginData?.results?.data?.token,
-    //       name: loginData?.results?.data?.user?.name,
-    //       role: loginData?.results?.data?.user?.role,
-    //       departmentId: loginData?.results?.data?.user?.departmentId,
-    //       photo: loginData?.results?.data?.user?.photo,
-    //       email: loginData?.results?.data?.user?.email,
-    //       designationLevel: loginData?.results?.data?.user?.Designation?.level,
-    //       isHod: loginData?.results?.data?.user?.isHod,
-    //       joiningDate: loginData?.results?.data?.user?.joiningDate,
-    //     });
-    //   }
-    // } catch (error) {
+  const handelPhoneLogin = async () => {
+    if (!phoneNumber) {
+      Alert.alert('Error', 'Please Provide Phone Number');
+    }
+    try {
+      const phoneSignUp = await mutation(`auth/generate-otp`, {
+        method: 'POST',
+        body: {
+          phone: phoneNumber,
+        },
+      });
 
-    // }
-
-    navigate('OtpScreen');
+      console.log(phoneSignUp?.results);
+      if (phoneSignUp?.results?.success !== true) {
+        Alert.alert('Error', phoneSignUp?.results?.error?.message);
+      } else {
+        handleSetAccessToken(phoneSignUp?.results?.data?.token);
+        navigate('OtpScreen', {
+          token: phoneSignUp?.results?.data?.token,
+          phone: phoneNumber,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -109,7 +136,12 @@ const Login = () => {
               </Text>
             </Box>
             {isPhoneLogin ? (
-              <PhoneLogin />
+              <PhoneLogin
+                phoneNumber={phoneNumber!}
+                setPhoneNumber={setPhoneNumber}
+                selectedCountry={selectedCountry}
+                setSelectedCountry={setSelectedCountry}
+              />
             ) : (
               <EmailLogin
                 handleState={handleState}
@@ -126,12 +158,19 @@ const Login = () => {
             <Button
               bgColor={COLORS.secondary}
               borderRadius={8}
-              onPress={() => onSubmit()}
+              isDisabled={isLoading}
+              onPress={
+                isPhoneLogin ? () => handelPhoneLogin() : () => onSubmit()
+              }
               gap={'$1'}>
               <ButtonText color="$white" fontFamily={'Montserrat-Bold'}>
                 Sign In
               </ButtonText>
-              <ButtonIcon as={ArrowRightIcon} mt={'$0.5'} />
+              {isLoading ? (
+                <ButtonSpinner />
+              ) : (
+                <ButtonIcon as={ArrowRightIcon} mt={'$0.5'} />
+              )}
             </Button>
 
             <HStack alignItems={'center'} gap={'$2'} justifyContent={'center'}>

@@ -7,9 +7,11 @@ import {Box} from '@gluestack-ui/themed';
 import {colorsArray} from '~/Constants';
 import {useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
+import useBasicFunction from '~/Hooks/useBasicFunctions';
 
 const SettingScreen = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
+  const {handleLogout, handleClearAccessToken} = useBasicFunction();
   const bgColor = (i: number) => colorsArray[i % colorsArray.length];
   const navigateToEditProfile = () => {
     // navigation.navigate("EditProfile");
@@ -77,7 +79,8 @@ const SettingScreen = () => {
   };
 
   const logout = () => {
-    console.log('Logout');
+    handleLogout();
+    handleClearAccessToken();
   };
 
   const accountItems = [

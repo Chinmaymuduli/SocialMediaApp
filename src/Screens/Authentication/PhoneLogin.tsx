@@ -14,12 +14,18 @@ import {InputIcon} from '@gluestack-ui/themed';
 import {Image} from '@gluestack-ui/themed';
 import CountryPicker from '~/Components/core/CountryPicker';
 
+type Props = {
+  selectedCountry: any;
+  setSelectedCountry: (selectedCountry: any) => void;
+  phoneNumber: any;
+  setPhoneNumber: (phone: string) => void;
+};
 const PhoneLogin = ({
   selectedCountry,
   setSelectedCountry,
   phoneNumber,
   setPhoneNumber,
-}: any) => {
+}: Props) => {
   const [showCountryPicker, setShowCountryPicker] = useState(false);
 
   return (
