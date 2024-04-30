@@ -63,32 +63,6 @@ const AdminDashboard = () => {
       ),
       source: IMAGES.USER,
     },
-    {
-      id: '5',
-      name: 'Total Department',
-      count: '42',
-      icon: (
-        <AppIcon
-          AntDesignName={'calendar'}
-          size={28}
-          color={COLORS.textWhite}
-        />
-      ),
-      source: IMAGES.USER,
-    },
-    {
-      id: '6',
-      name: 'Research',
-      count: '17',
-      icon: (
-        <AppIcon
-          AntDesignName={'calendar'}
-          size={28}
-          color={COLORS.textWhite}
-        />
-      ),
-      source: IMAGES.USER,
-    },
   ];
   return (
     <PrivateContainer
@@ -124,10 +98,7 @@ const AdminDashboard = () => {
                       softShadow={'1'}
                       bg={'white'}
                       rounded={'$full'}
-                      borderColor={'blue.300'}
-                      // borderLeftWidth={'$3'}
-                      // borderRightWidth={'$3'}
-                    >
+                      borderColor={'blue.300'}>
                       <Image
                         source={item?.source}
                         h={'$10'}
@@ -136,15 +107,12 @@ const AdminDashboard = () => {
                       />
                     </Box>
                     <Box alignItems={'center'} my={'$3'}>
-                      <Text
-                        fontWeight={'bold'}
-                        //   fontSize={'$20'}
-                        fontFamily={'Montserrat-Bold'}>
+                      <Text fontFamily={'Montserrat-Bold'} fontSize={13}>
                         {item?.count}
                       </Text>
                       <Text
                         fontWeight={'semibold'}
-                        //   fontSize={'$12'}
+                        fontSize={14}
                         fontFamily={'Montserrat-Bold'}>
                         {item?.name}
                       </Text>
