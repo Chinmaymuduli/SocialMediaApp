@@ -14,3 +14,8 @@ export {default as Meetings} from './Settings/Meetings';
 export {default as Reviews} from './Settings/Reviews';
 export {default as Support} from './Settings/Support';
 export {default as ContactUs} from './Settings/ContactUs';
+export {default as AdminDashboard} from './Admin/AdminDashboard';
+export {default as AllUsers} from './Admin/AllUsers';
+export {default as AllSupports} from './Admin/AllSupports';
+export {default as AllPayments} from './Admin/AllPayments';
+export {default as AllMeetings} from './Admin/AllMeetings';

@@ -28,6 +28,8 @@ export default function PrivateRoutes({initialRouteName}: PrivateRouteProps) {
         name="RequestConnections"
         component={Private.RequestConnections}
       />
+      {/* Admin Panel */}
+      <Stack.Screen name="AdminDashboard" component={Private.AdminDashboard} />
     </Stack.Navigator>
   );
 }

@@ -3,46 +3,86 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Private} from '~/Screens';
 import AppIcon from '~/Components/core/AppIcon';
 import {COLORS} from '~/Styles';
+import {useAppContext} from '~/Contexts';
 
 const Tab = createBottomTabNavigator();
 
 export default function TabLayout() {
+  const {userData} = useAppContext();
+  console.log({userData});
   const TabArr: any = useMemo(
     () => [
-      {
-        route: 'Feeds',
-        label: 'Feeds',
-        icon: {
-          AntDesignName: 'instagram',
-        },
-        component: Private.Feeds,
-      },
-      {
-        route: 'Post',
-        label: 'Post',
-        icon: {
-          MaterialIconsName: 'shop',
-        },
-        component: Private.Post,
-      },
-      {
-        route: 'Messages',
-        label: 'Messages',
-        icon: {
-          MaterialIconsName: 'chat',
-        },
-        component: Private.Messages,
-      },
-      {
-        route: 'Profile',
-        label: 'Profile',
-        icon: {
-          MaterialIconsName: 'person-4',
-        },
-        component: Private.Profile,
-      },
+      ...(userData?.role === 'admin'
+        ? [
+            {
+              route: 'AdminDashboard',
+              label: 'Dashboard',
+              icon: {
+                MaterialIconsName: 'dashboard',
+              },
+              component: Private.AdminDashboard,
+            },
+            {
+              route: 'AllUsers',
+              label: 'All Users',
+              icon: {
+                MaterialIconsName: 'people',
+              },
+              component: Private.AllUsers,
+            },
+            {
+              route: 'AllMeetings',
+              label: 'Meetings',
+              icon: {
+                FontAwesomeName: 'meetup',
+              },
+              component: Private.AllMeetings,
+            },
+            {
+              route: 'AllPayments',
+              label: 'Payments',
+              icon: {
+                MaterialIconsName: 'payments',
+              },
+              component: Private.AllPayments,
+            },
+          ]
+        : [
+            {
+              route: 'Feeds',
+              label: 'Feeds',
+              icon: {
+                AntDesignName: 'instagram',
+              },
+              component: Private.Feeds,
+            },
+            {
+              route: 'Post',
+              label: 'Post',
+              icon: {
+                MaterialIconsName: 'shop',
+              },
+              component: Private.Post,
+            },
+            {
+              route: 'Messages',
+              label: 'Messages',
+              icon: {
+                MaterialIconsName: 'chat',
+              },
+              component: Private.Messages,
+            },
+            {
+              route: 'Profile',
+              label: 'Profile',
+              icon: {
+                MaterialIconsName: 'person-4',
+              },
+              component: Private.Profile,
+            },
+          ]),
     ],
-    [],
+    [userData?.role],
   );
   return (
     <Tab.Navigator
