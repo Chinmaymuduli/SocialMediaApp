@@ -77,7 +77,7 @@ const PostFeed = () => {
           <InputField type="text" placeholder="Search for results" />
         </Input>
       </Box>
-      {data?.data?.data?.map((data: any, index: any) => {
+      {postInfo?.map((data: any, index: any) => {
         const [like, setLike] = useState(data.isLiked);
         return (
           <View
@@ -106,7 +106,7 @@ const PostFeed = () => {
                       fontFamily: 'Montserrat-Bold',
                       color: 'black',
                     }}>
-                    {data?.user_id?.name}
+                    {data?.postTitle}
                   </Text>
                   <Text
                     style={{
