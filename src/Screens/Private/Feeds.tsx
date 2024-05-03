@@ -13,7 +13,7 @@ const Feeds = () => {
   const {data, isValidating} = useSwrApi(
     `posts/read-all?per_page=20&page_no=0&require_all=true`,
   );
-  // console.log(data);
+
   return (
     <PrivateContainer
       icons={[

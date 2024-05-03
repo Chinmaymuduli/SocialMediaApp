@@ -5,9 +5,19 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionic from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {IMAGES} from '~/Assets';
-import {HStack, Pressable} from '@gluestack-ui/themed';
+import {
+  Box,
+  HStack,
+  Input,
+  InputField,
+  InputIcon,
+  InputSlot,
+  Pressable,
+} from '@gluestack-ui/themed';
 import {useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
+import AppIcon from '../core/AppIcon';
+import {SearchIcon} from '@gluestack-ui/themed';
 
 const PostFeed = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
@@ -42,8 +52,27 @@ const PostFeed = () => {
     },
   ];
 
+  const hashtag = [
+    {
+      id: '1',
+      tag: 'Singer',
+    },
+    {
+      id: '2',
+      tag: 'Dancer',
+    },
+  ];
+
   return (
     <View>
+      <Box px={'$3'} mb={'$3'} mt={'$6'}>
+        <Input borderRadius={'$lg'}>
+          <InputSlot pl="$3">
+            <InputIcon as={SearchIcon} />
+          </InputSlot>
+          <InputField type="text" placeholder="Search for results" />
+        </Input>
+      </Box>
       {postInfo.map((data, index) => {
         const [like, setLike] = useState(data.isLiked);
         return (
@@ -74,6 +103,14 @@ const PostFeed = () => {
                       color: 'black',
                     }}>
                     {data.postTitle}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontFamily: 'Montserrat-Medium',
+                      color: 'black',
+                    }}>
+                    {'Male, 25'}
                   </Text>
                 </View>
               </View>
@@ -129,13 +166,19 @@ const PostFeed = () => {
               </Text>
               <Text
                 style={{
-                  // fontWeight: '700',
                   fontSize: 13,
                   paddingVertical: 2,
                   fontFamily: 'Montserrat-Medium',
                 }}>
                 If enjoy the video ! Please like and Subscribe :)
               </Text>
+              <HStack>
+                {hashtag?.map(item => (
+                  <Box key={item?.id}>
+                    <Text>#{item?.tag}</Text>
+                  </Box>
+                ))}
+              </HStack>
               <Text style={{opacity: 0.4, paddingVertical: 2}}>
                 View all comments
               </Text>
