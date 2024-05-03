@@ -16,7 +16,7 @@ import {PrivateScreenProps} from '~/Routes/Private/types';
 import {PrivateContainer} from '~/Components/container';
 import AppIcon from '~/Components/core/AppIcon';
 
-const MeetingData = [
+export const MeetingData = [
   {
     id: '1',
     name: 'pratyush kumar',
@@ -31,8 +31,8 @@ const MeetingData = [
     meeting: 'Sales Representative',
     day: 'Friday',
     person: 'Jhone',
+    type: 'Upcoming',
   },
-
   {
     id: '2',
     name: 'pratyush kumar',
@@ -47,6 +47,7 @@ const MeetingData = [
     day: 'Friday',
     meeting: 'For Development',
     person: 'Jhone',
+    type: 'Ongoing',
   },
   {
     id: '3',
@@ -62,6 +63,7 @@ const MeetingData = [
     day: 'Friday',
     meeting: 'Sales Representative',
     person: 'Jhone',
+    type: 'Closed',
   },
   {
     id: '4',
@@ -77,6 +79,7 @@ const MeetingData = [
     day: 'Friday',
     meeting: 'About Salary',
     person: 'Jhone',
+    type: 'Upcoming',
   },
   {
     id: '5',
@@ -92,6 +95,7 @@ const MeetingData = [
     day: 'Friday',
     meeting: 'Client Visit',
     person: 'Jhone',
+    type: 'Ongoing',
   },
   {
     id: '6',
@@ -107,6 +111,7 @@ const MeetingData = [
     day: 'Friday',
     meeting: 'Sales Representative',
     person: 'Jhone',
+    type: 'Closed',
   },
 ];
 

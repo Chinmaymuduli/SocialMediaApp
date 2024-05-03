@@ -12,6 +12,8 @@ import {
 import {WIDTH} from '~/Utils';
 import AppIcon from '~/Components/core/AppIcon';
 import {COLORS} from '~/Styles';
+import {useNavigation} from '@react-navigation/native';
+import {PrivateScreenProps} from '~/Routes/Private/types';
 
 const AdminDashboard = () => {
   const boxData = [
@@ -64,17 +66,18 @@ const AdminDashboard = () => {
       source: IMAGES.USER,
     },
   ];
+  const {navigate} = useNavigation<PrivateScreenProps>();
   return (
     <PrivateContainer
       icons={[
         {
           icon: {IoniconsName: 'notifications'},
-          onPress: () => {},
+          onPress: () => navigate('Notifications'),
           side: 'RIGHT',
         },
         {
           icon: {EntypoName: 'dots-three-vertical'},
-          onPress: () => {},
+          onPress: () => navigate('Settings'),
           side: 'RIGHT',
         },
       ]}
