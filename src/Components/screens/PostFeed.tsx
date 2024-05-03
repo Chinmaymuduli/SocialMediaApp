@@ -18,9 +18,13 @@ import {useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
 import AppIcon from '../core/AppIcon';
 import {SearchIcon} from '@gluestack-ui/themed';
+import {useSwrApi} from '~/Hooks';
 
 const PostFeed = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
+  const {data, isValidating} = useSwrApi(
+    `posts/read-all?per_page=100&page_no=0&require_all=true`,
+  );
   const postInfo = [
     {
       postTitle: 'mr shermon',
@@ -73,7 +77,7 @@ const PostFeed = () => {
           <InputField type="text" placeholder="Search for results" />
         </Input>
       </Box>
-      {postInfo.map((data, index) => {
+      {data?.data?.data?.map((data: any, index: any) => {
         const [like, setLike] = useState(data.isLiked);
         return (
           <View
@@ -102,7 +106,7 @@ const PostFeed = () => {
                       fontFamily: 'Montserrat-Bold',
                       color: 'black',
                     }}>
-                    {data.postTitle}
+                    {data?.user_id?.name}
                   </Text>
                   <Text
                     style={{

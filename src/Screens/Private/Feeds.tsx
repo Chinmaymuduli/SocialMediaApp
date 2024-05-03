@@ -10,9 +10,6 @@ import {useSwrApi} from '~/Hooks';
 
 const Feeds = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
-  const {data, isValidating} = useSwrApi(
-    `posts/read-all?per_page=20&page_no=0&require_all=true`,
-  );
 
   return (
     <PrivateContainer
