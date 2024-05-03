@@ -29,12 +29,12 @@ const AllUsers = () => {
       icons={[
         {
           icon: {IoniconsName: 'notifications'},
-          onPress: () => {},
+          onPress: () => navigate('Notifications'),
           side: 'RIGHT',
         },
         {
           icon: {EntypoName: 'dots-three-vertical'},
-          onPress: () => {},
+          onPress: () => navigate('Settings'),
           side: 'RIGHT',
         },
       ]}

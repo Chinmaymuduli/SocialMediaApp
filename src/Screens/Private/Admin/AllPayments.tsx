@@ -167,12 +167,12 @@ const AllPayments = () => {
       icons={[
         {
           icon: {IoniconsName: 'notifications'},
-          onPress: () => {},
+          onPress: () => navigate('Notifications'),
           side: 'RIGHT',
         },
         {
           icon: {EntypoName: 'dots-three-vertical'},
-          onPress: () => {},
+          onPress: () => navigate('Settings'),
           side: 'RIGHT',
         },
       ]}
@@ -343,5 +343,3 @@ const AllPayments = () => {
 };
 
 export default AllPayments;
-
-const styles = StyleSheet.create({});

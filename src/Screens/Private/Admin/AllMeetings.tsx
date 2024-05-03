@@ -1,119 +1,48 @@
-import {StyleSheet} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import React, {useState} from 'react';
 import {
   Box,
+  FlatList,
   HStack,
+  Input,
+  InputField,
   Pressable,
   ScrollView,
   Text,
   VStack,
 } from '@gluestack-ui/themed';
-import {COLORS} from '~/Styles';
-import {PrivateScreenProps} from '~/Routes/Private/types';
+import React, {useEffect, useState} from 'react';
 import {PrivateContainer} from '~/Components/container';
 import AppIcon from '~/Components/core/AppIcon';
 import {IMAGES} from '~/Assets';
-
-const MeetingData = [
-  {
-    id: '1',
-    name: 'pratyush kumar',
-    starttime: '10:20 Pm',
-    endtime: '2:20 pm',
-    area: 'Bbsr',
-    location: 'india',
-    clientname: 'searchingyard',
-    date: '20 July,2023',
-    img: 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?size=626&ext=jpg&uid=R87654678&ga=GA1.1.2105023192.1667473463&semt=robertav1_2_sidr',
-    designation: 'App Developer',
-    meeting: 'Sales Representative',
-    day: 'Friday',
-    person: 'Jhone',
-  },
-
-  {
-    id: '2',
-    name: 'pratyush kumar',
-    starttime: '10:20 Pm',
-    endtime: '2:20 pm',
-    area: 'Bbsr',
-    location: 'india',
-    clientname: 'searchingyard',
-    date: 'Friday, 20-02-2023',
-    img: 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?size=626&ext=jpg&uid=R87654678&ga=GA1.1.2105023192.1667473463&semt=robertav1_2_sidr',
-    designation: 'App Developer',
-    day: 'Friday',
-    meeting: 'For Development',
-    person: 'Jhone',
-  },
-  {
-    id: '3',
-    name: 'pratyush kumar',
-    starttime: '10:20 Pm',
-    endtime: '2:20 pm',
-    area: 'Bbsr',
-    location: 'india',
-    clientname: 'searchingyard',
-    date: 'Friday, 20-02-2023',
-    img: 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?size=626&ext=jpg&uid=R87654678&ga=GA1.1.2105023192.1667473463&semt=robertav1_2_sidr',
-    designation: 'App Developer',
-    day: 'Friday',
-    meeting: 'Sales Representative',
-    person: 'Jhone',
-  },
-  {
-    id: '4',
-    name: 'pratyush kumar',
-    starttime: '10:20 Pm',
-    endtime: '2:20 pm',
-    area: 'Bbsr',
-    location: 'india',
-    clientname: 'searchingyard',
-    date: 'Friday, 20-02-2023',
-    img: 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?size=626&ext=jpg&uid=R87654678&ga=GA1.1.2105023192.1667473463&semt=robertav1_2_sidr',
-    designation: 'App Developer',
-    day: 'Friday',
-    meeting: 'About Salary',
-    person: 'Jhone',
-  },
-  {
-    id: '5',
-    name: 'pratyush kumar',
-    starttime: '10:20 Pm',
-    endtime: '2:20 pm',
-    area: 'Bbsr',
-    location: 'india',
-    clientname: 'searchingyard',
-    date: 'Friday, 20-02-2023',
-    img: 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?size=626&ext=jpg&uid=R87654678&ga=GA1.1.2105023192.1667473463&semt=robertav1_2_sidr',
-    designation: 'App Developer',
-    day: 'Friday',
-    meeting: 'Client Visit',
-    person: 'Jhone',
-  },
-  {
-    id: '6',
-    name: 'pratyush kumar',
-    starttime: '10:20 Pm',
-    endtime: '2:20 pm',
-    area: 'Bbsr',
-    location: 'india',
-    clientname: 'searchingyard',
-    date: 'Friday, 20-02-2023',
-    designation: 'App Developer',
-    img: 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?size=626&ext=jpg&uid=R87654678&ga=GA1.1.2105023192.1667473463&semt=robertav1_2_sidr',
-    day: 'Friday',
-    meeting: 'Sales Representative',
-    person: 'Jhone',
-  },
-];
-
+import {MeetingData} from '../Settings/Meetings';
+import {StyleSheet} from 'react-native';
+import {COLORS} from '~/Styles';
+import DateTimePicker from 'react-native-modal-datetime-picker';
+import BottomSheet from '~/Components/core/BottomSheet';
+import {useNavigation} from '@react-navigation/native';
+import {PrivateScreenProps} from '~/Routes/Private/types';
+interface Meeting {
+  id: string;
+  name: string;
+  starttime: string;
+  endtime: string;
+  area: string;
+  location: string;
+  clientname: string;
+  date: string;
+  img: string;
+  designation: string;
+  meeting: string;
+  day: string;
+  person: string;
+  type: string;
+}
 const AllMeetings = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [showSearch, setShowSearch] = React.useState(false);
   const [order, setOrder] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [data, setData] = useState<Meeting[]>();
 
   const Sort_Array = [
     {
@@ -133,21 +62,31 @@ const AllMeetings = () => {
     //   title: 'CreatedAt Descending',
     // },
   ];
+
+  useEffect(() => {
+    if (order === 'All Meetings') {
+      setData(MeetingData);
+    } else {
+      const filterData = MeetingData?.filter(item => item?.type === order);
+      setData(filterData);
+    }
+  }, [order?.length]);
   return (
     <PrivateContainer
       icons={[
         {
           icon: {IoniconsName: 'notifications'},
-          onPress: () => {},
+          onPress: () => navigate('Notifications'),
           side: 'RIGHT',
         },
         {
           icon: {EntypoName: 'dots-three-vertical'},
-          onPress: () => {},
+          onPress: () => navigate('Settings'),
           side: 'RIGHT',
         },
       ]}
       image={IMAGES.LOGO}>
+      {/* <Text>Hello</Text> */}
       <HStack
         px={'$3'}
         pt={'$5'}
@@ -158,7 +97,7 @@ const AllMeetings = () => {
           All Meetings
         </Text>
 
-        <Pressable onPress={() => setDatePickerVisibility(true)}>
+        <Pressable onPress={() => setIsOpen(true)}>
           <HStack gap={'$2'} alignItems={'center'}>
             <AppIcon IoniconsName="filter" size={25} color={COLORS.secondary} />
             <Text fontWeight={'semibold'}>FilterBy</Text>
@@ -166,12 +105,10 @@ const AllMeetings = () => {
         </Pressable>
       </HStack>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingBottom: 70,
-        }}>
-        {MeetingData.map(item => (
+      <FlatList
+        mb={'$10'}
+        data={order?.length ? data : MeetingData}
+        renderItem={({item}: any) => (
           <Pressable
             mx={'$3'}
             key={item?.id}
@@ -192,7 +129,7 @@ const AllMeetings = () => {
                 color={COLORS.secondary}
               />
               <Text fontSize={12} fontFamily="Montserrat-Bold">
-                Created by : {'Tim David'}
+                {item?.meeting}
               </Text>
             </HStack>
 
@@ -215,20 +152,9 @@ const AllMeetings = () => {
                   </Text>
                 </VStack>
               </HStack>
-              <HStack gap={'$0.5'} mt={'$3'}>
-                <Text fontFamily="Montserrat-Bold" fontSize={13}>
-                  Meeting Due :
-                </Text>
-                <Text
-                  fontFamily="Montserrat-Bold"
-                  fontSize={13}
-                  color={COLORS.secondary}>
-                  {' 5420.00'}
-                </Text>
-              </HStack>
             </Box>
             <Box borderBottomWidth={1} borderStyle={'dashed'} py={'$2'}></Box>
-            <Box px={'$3'} py={'$3'}>
+            <HStack px={'$3'} py={'$3'}>
               <HStack mr={'$1'} alignItems={'center'}>
                 <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
                   Meeting With :
@@ -241,8 +167,7 @@ const AllMeetings = () => {
                   {'Demo user'}
                 </Text>
               </HStack>
-            </Box>
-
+            </HStack>
             {/* <Box position={'absolute'} bottom={0} right={0}>
               <Box
                 bg={'blue.300'}
@@ -253,31 +178,31 @@ const AllMeetings = () => {
               </Box>
             </Box> */}
           </Pressable>
-        ))}
-      </ScrollView>
+        )}
+      />
 
-      {/* <BottomSheet
+      <BottomSheet
         visible={isOpen}
         onDismiss={() => {
-          onClose();
+          setIsOpen(false);
         }}>
-        <VStack space={2} mt={3}>
+        <VStack gap={2} mt={3}>
           <Text bold fontSize={16} px={2}>
             Status :{' '}
           </Text>
-          <VStack space={3}>
+          <VStack gap={3}>
             {Sort_Array?.map((item, _) => (
               <Pressable
                 key={item?.id}
                 m={1}
                 onPress={() => {
-                  setOrder(item?.title), onClose();
+                  setOrder(item?.title), setIsOpen(false);
                 }}
                 borderWidth={1}
                 borderRadius={20}
                 borderColor={COLORS.primary}
                 bgColor={order === item?.title ? COLORS.primary : 'white'}>
-                <HStack alignItems={'center'} mx={'4'} py={2}>
+                <HStack alignItems={'center'} mx={'$4'} py={2}>
                   <AppIcon
                     AntDesignName="codepen-circle"
                     size={20}
@@ -288,7 +213,7 @@ const AllMeetings = () => {
                   />
                   <Text
                     bold
-                    fontSize={'sm'}
+                    fontSize={12}
                     color={order === item?.title ? 'white' : COLORS.primary}
                     mx={4}
                     width={'70%'}>
@@ -301,7 +226,7 @@ const AllMeetings = () => {
         </VStack>
       </BottomSheet>
 
-      <DateTimePicker
+      {/* <DateTimePicker
         isVisible={isDatePickerVisible}
         mode="date"
         onConfirm={() => setDatePickerVisibility(false)}
