@@ -1,5 +1,10 @@
 import {
+  AddIcon,
   Box,
+  Button,
+  ButtonIcon,
+  ButtonText,
+  Divider,
   FlatList,
   HStack,
   Input,
@@ -118,19 +123,36 @@ const AllMeetings = () => {
             softShadow={'1'}
             bgColor={'white'}>
             <HStack
+              justifyContent={'space-between'}
               alignItems={'center'}
               gap={'$2'}
               bg={'$pink50'}
               px={'$2'}
               py={'$1'}>
-              <AppIcon
-                AntDesignName="calendar"
-                size={20}
-                color={COLORS.secondary}
-              />
-              <Text fontSize={12} fontFamily="Montserrat-Bold">
-                {item?.meeting}
-              </Text>
+              <HStack>
+                <AppIcon
+                  AntDesignName="calendar"
+                  size={20}
+                  color={COLORS.secondary}
+                />
+                <Text fontSize={12} fontFamily="Montserrat-Bold">
+                  {/* {item?.meeting} */}
+                  Payment Date : {'20th April , 2024'}
+                </Text>
+              </HStack>
+              <Box
+                alignItems={'center'}
+                bg={COLORS.secondary}
+                px={'$3'}
+                py={'$0.5'}
+                borderRadius={10}>
+                <Text
+                  fontFamily="Montserrat-SemiBold"
+                  fontSize={13}
+                  color={'$white'}>
+                  1040.00
+                </Text>
+              </Box>
             </HStack>
 
             <Box px={'$3'} mt={'$2'}>
@@ -144,7 +166,7 @@ const AllMeetings = () => {
                   </Text>
                 </VStack>
                 <VStack>
-                  <Text bold fontSize={13}>
+                  <Text fontFamily="Montserrat-Bold" fontSize={13}>
                     Meeting Time
                   </Text>
                   <Text fontFamily="Montserrat-Medium" fontSize={13}>
@@ -154,19 +176,58 @@ const AllMeetings = () => {
               </HStack>
             </Box>
             <Box borderBottomWidth={1} borderStyle={'dashed'} py={'$2'}></Box>
-            <HStack px={'$3'} py={'$3'}>
-              <HStack mr={'$1'} alignItems={'center'}>
+            <HStack px={'$3'} py={'$3'} justifyContent={'space-between'}>
+              <VStack
+                gap={'$1'}
+                alignItems={'center'}
+                justifyContent={'center'}>
                 <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
-                  Meeting With :
+                  Meeting With
                 </Text>
                 <Text
                   fontSize={13}
                   fontFamily="Montserrat-Bold"
                   px={'$2'}
                   color={COLORS.secondary}>
-                  {'Demo user'}
+                  {'Demo user 1'}
                 </Text>
-              </HStack>
+                <Button
+                  size="sm"
+                  h={'$8'}
+                  w={'$24'}
+                  variant="outline"
+                  action="primary"
+                  isDisabled={false}
+                  isFocusVisible={false}>
+                  <ButtonText fontSize={12}>Feedback</ButtonText>
+                </Button>
+              </VStack>
+              <Divider orientation="vertical" />
+              <VStack
+                gap={'$1'}
+                alignItems={'center'}
+                justifyContent={'center'}>
+                <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                  Meeting By
+                </Text>
+                <Text
+                  fontSize={13}
+                  fontFamily="Montserrat-Bold"
+                  px={'$2'}
+                  color={COLORS.secondary}>
+                  {'Demo user 2'}
+                </Text>
+                <Button
+                  size="sm"
+                  h={'$8'}
+                  w={'$24'}
+                  variant="outline"
+                  action="primary"
+                  isDisabled={false}
+                  isFocusVisible={false}>
+                  <ButtonText fontSize={12}>Feedback</ButtonText>
+                </Button>
+              </VStack>
             </HStack>
             {/* <Box position={'absolute'} bottom={0} right={0}>
               <Box

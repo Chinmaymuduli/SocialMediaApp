@@ -8,4 +8,5 @@ export default {
   POST4: require('./post4.jpg'),
   USER: require('./userProfile.png'),
   AADHAAR: require('./aadhar.png'),
+  COMMISSION: require('./setCommision.png'),
 };
