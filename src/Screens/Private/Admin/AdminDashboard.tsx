@@ -1,13 +1,22 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {PrivateContainer} from '~/Components/container';
 import {IMAGES} from '~/Assets';
 import {
   Box,
+  FormControl,
   HStack,
   Image,
+  Input,
+  InputField,
+  InputIcon,
+  InputSlot,
+  MailIcon,
   Pressable,
   ScrollView,
   Text,
+  VStack,
+  Button,
+  ButtonText,
 } from '@gluestack-ui/themed';
 import {WIDTH} from '~/Utils';
 import AppIcon from '~/Components/core/AppIcon';
@@ -22,7 +31,7 @@ const AdminDashboard = () => {
       name: 'Total Users',
       count: '760',
       icon: (
-        <AppIcon IoniconsName={'people'} size={28} color={COLORS.textWhite} />
+        <AppIcon IoniconsName={'people'} size={28} color={COLORS.secondary} />
       ),
       source: IMAGES.USER,
     },
@@ -34,7 +43,7 @@ const AdminDashboard = () => {
         <AppIcon
           MaterialCommunityIconsName={'folder-account'}
           size={28}
-          color={COLORS.textWhite}
+          color={COLORS.secondary}
         />
       ),
       source: IMAGES.USER,
@@ -47,7 +56,7 @@ const AdminDashboard = () => {
         <AppIcon
           MaterialIconsName={'meeting-room'}
           size={28}
-          color={COLORS.textWhite}
+          color={COLORS.secondary}
         />
       ),
       source: IMAGES.USER,
@@ -60,13 +69,17 @@ const AdminDashboard = () => {
         <AppIcon
           AntDesignName={'calendar'}
           size={28}
-          color={COLORS.textWhite}
+          color={COLORS.secondary}
         />
       ),
       source: IMAGES.USER,
     },
   ];
   const {navigate} = useNavigation<PrivateScreenProps>();
+  const [commission, setCommission] = useState('');
+  const handleCommissionChange = (value: any) => {
+    setCommission(value);
+  };
   return (
     <PrivateContainer
       icons={[
@@ -90,7 +103,7 @@ const AdminDashboard = () => {
                 <Pressable key={index}>
                   <Box
                     m={'$2'}
-                    p={'$4'}
+                    p={'$6'}
                     softShadow={'1'}
                     w={WIDTH / 2.31}
                     rounded={'$xl'}
@@ -102,12 +115,13 @@ const AdminDashboard = () => {
                       bg={'white'}
                       rounded={'$full'}
                       borderColor={'blue.300'}>
-                      <Image
+                      {/* <Image
                         source={item?.source}
                         h={'$10'}
                         w={'$10'}
                         alt={item?.name}
-                      />
+                      /> */}
+                      {item?.icon}
                     </Box>
                     <Box alignItems={'center'} my={'$3'}>
                       <Text fontFamily={'Montserrat-Bold'} fontSize={13}>
@@ -125,6 +139,35 @@ const AdminDashboard = () => {
               ))}
             </HStack>
           </Box>
+
+          <FormControl p="$4">
+            <VStack space="xs">
+              <Text fontFamily={'Montserrat-Bold'} fontSize={13}>
+                Add Your Commission
+              </Text>
+              <Input>
+                <InputField
+                  type="text"
+                  value={commission}
+                  onChangeText={handleCommissionChange}
+                />
+                <InputSlot pr="$3">
+                  <AppIcon
+                    MaterialIconsName="percent"
+                    size={25}
+                    color="black"
+                  />
+                </InputSlot>
+              </Input>
+              <Button
+                ml="auto"
+                onPress={() => {
+                  // setShowModal(false);
+                }}>
+                <ButtonText color="$white">Add</ButtonText>
+              </Button>
+            </VStack>
+          </FormControl>
         </Box>
       </ScrollView>
     </PrivateContainer>
