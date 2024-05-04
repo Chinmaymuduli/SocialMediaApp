@@ -123,20 +123,36 @@ const AllMeetings = () => {
             softShadow={'1'}
             bgColor={'white'}>
             <HStack
+              justifyContent={'space-between'}
               alignItems={'center'}
               gap={'$2'}
               bg={'$pink50'}
               px={'$2'}
               py={'$1'}>
-              <AppIcon
-                AntDesignName="calendar"
-                size={20}
-                color={COLORS.secondary}
-              />
-              <Text fontSize={12} fontFamily="Montserrat-Bold">
-                {/* {item?.meeting} */}
-                Payment Date : {'20th April , 2024'}
-              </Text>
+              <HStack>
+                <AppIcon
+                  AntDesignName="calendar"
+                  size={20}
+                  color={COLORS.secondary}
+                />
+                <Text fontSize={12} fontFamily="Montserrat-Bold">
+                  {/* {item?.meeting} */}
+                  Payment Date : {'20th April , 2024'}
+                </Text>
+              </HStack>
+              <Box
+                alignItems={'center'}
+                bg={COLORS.secondary}
+                px={'$3'}
+                py={'$0.5'}
+                borderRadius={10}>
+                <Text
+                  fontFamily="Montserrat-SemiBold"
+                  fontSize={13}
+                  color={'$white'}>
+                  1040.00
+                </Text>
+              </Box>
             </HStack>
 
             <Box px={'$3'} mt={'$2'}>

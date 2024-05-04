@@ -159,13 +159,30 @@ const AdminDashboard = () => {
                   />
                 </InputSlot>
               </Input>
-              <Button
-                ml="auto"
-                onPress={() => {
-                  // setShowModal(false);
-                }}>
-                <ButtonText color="$white">Add</ButtonText>
-              </Button>
+              <HStack justifyContent={'flex-end'} gap={'$2'}>
+                <Button
+                  onPress={() => {
+                    // setShowModal(false);
+                  }}>
+                  <ButtonText color="$white">Add</ButtonText>
+                </Button>
+                <Button
+                  bgColor="red"
+                  onPress={() => {
+                    // setShowModal(false);
+                  }}>
+                  <ButtonText color="$white">Delete</ButtonText>
+                </Button>
+              </HStack>
+              <Image
+                source={IMAGES.COMMISSION}
+                style={{
+                  width: WIDTH,
+                  height: 280,
+                  resizeMode: 'contain',
+                }}
+                alt="Commision_img"
+              />
             </VStack>
           </FormControl>
         </Box>
