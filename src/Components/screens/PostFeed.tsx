@@ -186,7 +186,7 @@ const PostFeed = () => {
             </Text>
             {item?.tags?.length > 0 && (
               <HStack>
-                {item?.tags?.map((tag, index) => (
+                {item?.tags?.map((tag: any, index: any) => (
                   <Box key={index}>
                     <Text>#{tag}</Text>
                   </Box>
