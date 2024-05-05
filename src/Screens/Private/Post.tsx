@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {InteractionManager} from 'react-native';
+import {Alert, InteractionManager} from 'react-native';
 import {
   Box,
   CloseIcon,
@@ -78,6 +78,7 @@ const Post = () => {
         setImages('');
         setCaption('');
         setTags([]);
+        Alert.alert('Success', 'Post Successfully Done');
       }
     } catch (error) {
       console.log(error);
