@@ -3,6 +3,7 @@ export {default as Post} from './Post';
 export {default as Profile} from './Profile';
 export {default as Messages} from './Messages';
 export {default as UserProfile} from './UserProfile';
+export {default as AllComments} from './AllComments';
 export {default as ChatDetails} from './ChatDetails';
 export {default as Settings} from './Settings';
 export {default as Notifications} from './Settings/Notifications';

@@ -11,12 +11,15 @@ type PrivateScreens = {
   [key in keyof typeof Private]: undefined;
 };
 
-type OmittedScreens = '';
+type OmittedScreens = 'AllComments';
 
 export type PrivateNavigationProp = Omit<PrivateScreens, OmittedScreens> & {
   // OtpScreen: {
   //   token: string;
   // };
+  AllComments: {
+    post_id: string;
+  };
 };
 
 export type PrivateRoutesTypes = {

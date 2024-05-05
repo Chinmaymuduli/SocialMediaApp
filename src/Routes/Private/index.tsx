@@ -30,6 +30,7 @@ export default function PrivateRoutes({initialRouteName}: PrivateRouteProps) {
       />
       {/* Admin Panel */}
       <Stack.Screen name="AdminDashboard" component={Private.AdminDashboard} />
+      <Stack.Screen name="AllComments" component={Private.AllComments} />
     </Stack.Navigator>
   );
 }
