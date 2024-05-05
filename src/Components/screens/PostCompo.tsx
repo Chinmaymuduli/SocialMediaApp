@@ -63,11 +63,11 @@ const PostCompo = ({item, mutate}: any) => {
     }
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      likeMutate();
-    }, []),
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     likeMutate();
+  //   }, []),
+  // );
   return (
     <View>
       <View
