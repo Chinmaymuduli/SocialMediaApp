@@ -70,10 +70,10 @@ const PhotoPicker = ({
         <Text bold style={styles.uploadText}>
           Upload Photo
         </Text>
-        <HStack alignItems={'center'} gap={'$1'} my={5}>
+        <HStack alignItems={'center'} gap={'$8'} my={5}>
           <Pressable onPress={handleTakePhoto}>
             <VStack alignItems={'center'} gap={'$1'}>
-              <Box bg={'rose.500'} borderRadius={30}>
+              <Box bg={'$rose500'} borderRadius={30}>
                 <AppIcon
                   MaterialIconsName="camera"
                   size={20}
@@ -83,13 +83,13 @@ const PhotoPicker = ({
                   }}
                 />
               </Box>
-              <Text fontWeight={'medium'}>Camera</Text>
+              <Text fontFamily="Montserrat-Medium">Camera</Text>
             </VStack>
           </Pressable>
 
           <Pressable onPress={handleChoosePhoto}>
             <VStack alignItems={'center'} gap={'$1'}>
-              <Box bg={'pink.500'} borderRadius={30}>
+              <Box bg={'$pink500'} borderRadius={30}>
                 <AppIcon
                   MaterialCommunityIconsName="folder-multiple-image"
                   size={20}
@@ -99,7 +99,7 @@ const PhotoPicker = ({
                   }}
                 />
               </Box>
-              <Text fontWeight={'medium'}>Gallery</Text>
+              <Text fontFamily="Montserrat-Medium">Gallery</Text>
             </VStack>
           </Pressable>
         </HStack>
