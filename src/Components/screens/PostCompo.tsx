@@ -68,6 +68,7 @@ const PostCompo = ({item, mutate}: any) => {
   //     likeMutate();
   //   }, []),
   // );
+  // console.log(item?.tags);
   return (
     <View>
       <View
@@ -175,8 +176,6 @@ const PostCompo = ({item, mutate}: any) => {
               setShowModal(true);
             }}>
             <Text style={{fontFamily: 'Montserrat-Medium', fontSize: 13}}>
-              {/* Liked by {like ? 'you and' : ''}{' '}
-              {like ? data.likes + 1 : data.likes} others */}
               Liked by {item?.total_likes} others
             </Text>
           </Pressable>
@@ -192,7 +191,7 @@ const PostCompo = ({item, mutate}: any) => {
             <HStack>
               {item?.tags?.map((tag: any, index: any) => (
                 <Box key={index}>
-                  <Text>#{tag}</Text>
+                  <Text>#{tag?.title}</Text>
                 </Box>
               ))}
             </HStack>

@@ -74,7 +74,7 @@ const Post = () => {
         isFormData: true,
       });
       console.log({res});
-      if (res?.status === 200) {
+      if (res?.status === 201) {
         setImages('');
         setCaption('');
         setTags([]);

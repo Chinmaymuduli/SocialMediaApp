@@ -22,7 +22,7 @@ import {
   CloseIcon,
   Text,
 } from '@gluestack-ui/themed';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
 import AppIcon from '../core/AppIcon';
 import {SearchIcon} from '@gluestack-ui/themed';
@@ -40,7 +40,7 @@ const PostFeed = () => {
   const [postId, setPostId] = useState<string>('');
   const {userData} = useAppContext();
   const {data, isValidating, mutate} = useSwrApi(
-    `posts/read-all?per_page=100&page_no=0&require_all=true`,
+    `posts/read-all?per_page=100&page_no=0&require_all=true&user_id=${userData?._id}`,
   );
   const {
     data: allLikeData,
@@ -51,6 +51,11 @@ const PostFeed = () => {
   );
 
   const {mutation, isLoading} = useMutation();
+  useFocusEffect(
+    React.useCallback(() => {
+      mutate();
+    }, []),
+  );
 
   // const giveLikeDislike = async (id: string) => {
   //   try {
