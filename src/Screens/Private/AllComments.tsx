@@ -52,7 +52,7 @@ const AllComments = ({route: {params}}: Props) => {
   };
 
   return (
-    <PrivateContainer title="All Comments" bg={'purple.50'} hasBackIcon={true}>
+    <PrivateContainer title="All Questions" bg={'purple.50'} hasBackIcon={true}>
       <Box flex={1} mt={'$3'}>
         <FlatList
           data={data?.data?.data}
@@ -66,7 +66,7 @@ const AllComments = ({route: {params}}: Props) => {
         <Input borderRadius={'$lg'} flex={1}>
           <InputField
             type="text"
-            placeholder="Write a comment"
+            placeholder="Write a question"
             value={comment}
             onChangeText={txt => setComments(txt)}
           />

@@ -37,6 +37,7 @@ const PostCompo = ({item, mutate}: any) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
   const [showModal, setShowModal] = useState(false);
   const [postId, setPostId] = useState<string>('');
+  console.log('post id----', postId);
   const {userData} = useAppContext();
   const {
     data: allLikeData,
@@ -69,6 +70,7 @@ const PostCompo = ({item, mutate}: any) => {
   //   }, []),
   // );
   // console.log(item?.tags);
+  console.log('allLikeData----->', allLikeData);
   return (
     <View>
       <View
@@ -202,7 +204,7 @@ const PostCompo = ({item, mutate}: any) => {
           <Pressable
             onPress={() => navigate('AllComments', {post_id: item?._id})}>
             <Text style={{opacity: 0.4, paddingVertical: 2}}>
-              View all comments
+              View all questions
             </Text>
           </Pressable>
           <View
@@ -234,7 +236,7 @@ const PostCompo = ({item, mutate}: any) => {
                   fontSize={13}
                   py={'$0.5'}
                   fontFamily="Montserrat-Medium">
-                  Add a comments
+                  Ask a questions
                 </Text>
               </Pressable>
             </View>
