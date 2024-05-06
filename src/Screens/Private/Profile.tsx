@@ -4,15 +4,36 @@ import {IMAGES} from '~/Assets';
 import {PrivateScreenProps} from '~/Routes/Private/types';
 import {useNavigation} from '@react-navigation/native';
 import {
+  AlertCircleIcon,
   Avatar,
   AvatarFallbackText,
   AvatarGroup,
   AvatarImage,
   Box,
+  ChevronDownIcon,
+  FormControl,
+  FormControlError,
+  FormControlErrorIcon,
+  FormControlErrorText,
+  FormControlHelper,
+  FormControlHelperText,
+  FormControlLabel,
+  FormControlLabelText,
   HStack,
+  Icon,
   Image,
   InputField,
   Pressable,
+  Select,
+  SelectBackdrop,
+  SelectContent,
+  SelectDragIndicator,
+  SelectDragIndicatorWrapper,
+  SelectIcon,
+  SelectInput,
+  SelectItem,
+  SelectPortal,
+  SelectTrigger,
   Text,
 } from '@gluestack-ui/themed';
 import {ScrollView} from '@gluestack-ui/themed';
@@ -20,7 +41,7 @@ import {COLORS} from '~/Styles';
 import {VStack} from '@gluestack-ui/themed';
 import {Input} from '@gluestack-ui/themed';
 import Fontisto from 'react-native-vector-icons/Fontisto';
-import {Button} from '~/Components/core';
+import {Button, PhotoPicker} from '~/Components/core';
 import AppIcon from '~/Components/core/AppIcon';
 import {useAppContext} from '~/Contexts';
 import {useMutation} from '~/Hooks';
@@ -33,7 +54,8 @@ const Profile = () => {
   const [phone, setPhone] = useState('');
   const [nickName, setNickName] = useState('');
   const [gender, setGender] = useState('');
-
+  const [visiblePhoto, setVisiblePhoto] = useState(false);
+  const [profileImage, setProfileImage] = useState<any>();
   const {mutation, isLoading} = useMutation();
 
   useEffect(() => {
@@ -72,6 +94,7 @@ const Profile = () => {
       console.log(error);
     }
   };
+  console.log(profileImage?.path);
 
   return (
     <PrivateContainer
@@ -98,15 +121,27 @@ const Profile = () => {
             rounded={'$lg'}
             alignSelf={'center'}
             alignItems={'center'}>
-            <Image
-              source={IMAGES.USER}
-              style={{
-                height: 100,
-                width: 100,
-              }}
-              alt={'Choose Image'}
-              rounded={'$lg'}
-            />
+            {profileImage ? (
+              <Image
+                source={profileImage?.path}
+                style={{
+                  height: 100,
+                  width: 100,
+                }}
+                alt={'Choose Image'}
+                rounded={'$lg'}
+              />
+            ) : (
+              <Image
+                source={IMAGES.USER}
+                style={{
+                  height: 100,
+                  width: 100,
+                }}
+                alt={'Choose Image'}
+                rounded={'$lg'}
+              />
+            )}
           </Pressable>
           <Box position="absolute" right={55} top={50}>
             <Pressable>
@@ -119,7 +154,10 @@ const Profile = () => {
             </Pressable>
           </Box>
 
-          <Pressable alignItems="center" justifyContent="center">
+          <Pressable
+            alignItems="center"
+            justifyContent="center"
+            onPress={() => setVisiblePhoto(true)}>
             <HStack
               alignItems="center"
               gap={'$1'}
@@ -377,7 +415,7 @@ const Profile = () => {
             </Text>
           </Box>
           <Box px={'$3'} mt={'$2'}>
-            <VStack gap={'$2'}>
+            {/* <VStack gap={'$2'}>
               <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
                 Expertise *
               </Text>
@@ -392,13 +430,13 @@ const Profile = () => {
                 isReadOnly={false}>
                 <InputField placeholder="Enter Name" fontSize={12} />
               </Input>
-            </VStack>
+            </VStack> */}
 
             <VStack gap={'$2'} mt={'$2'}>
               <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
                 Interested In *
               </Text>
-              <Input
+              {/* <Input
                 flex={1}
                 variant="outline"
                 size="md"
@@ -408,7 +446,101 @@ const Profile = () => {
                 isInvalid={false}
                 isReadOnly={false}>
                 <InputField placeholder="Enter Text here" fontSize={12} />
-              </Input>
+              </Input> */}
+
+              {/* <FormControl isRequired isInvalid>
+                <FormControlLabel>
+                  <FormControlLabelText>Personal</FormControlLabelText>
+                </FormControlLabel>
+                <Select>
+                  <SelectTrigger>
+                    <SelectInput placeholder="Select option" />
+                    <SelectIcon mr="$3">
+                      <Icon as={ChevronDownIcon} />
+                    </SelectIcon>
+                  </SelectTrigger>
+                  <SelectPortal>
+                    <SelectBackdrop />
+                    <SelectContent>
+                      <SelectDragIndicatorWrapper>
+                        <SelectDragIndicator />
+                      </SelectDragIndicatorWrapper>
+                      <SelectItem label="Red" value="red" />
+                      <SelectItem label="Blue" value="blue" />
+                      <SelectItem label="Black" value="black" />
+                      <SelectItem label="Pink" value="pink" isDisabled={true} />
+                      <SelectItem label="Green" value="green" />
+                    </SelectContent>
+                  </SelectPortal>
+                </Select>
+                <FormControlHelper>
+                  <FormControlHelperText>
+                    You can only select one option
+                  </FormControlHelperText>
+                </FormControlHelper>
+                <FormControlError>
+                  <FormControlErrorIcon as={AlertCircleIcon} />
+                  <FormControlErrorText>Mandatory field</FormControlErrorText>
+                </FormControlError>
+              </FormControl> */}
+              <HStack justifyContent={'space-between'} mt={2}>
+                <VStack gap={'$2'} w={'45%'}>
+                  <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
+                    Personal
+                  </Text>
+                  <Select>
+                    <SelectTrigger variant="outline" size="md">
+                      <SelectInput placeholder="Select option" />
+                      <SelectIcon>
+                        <Icon as={ChevronDownIcon} />
+                      </SelectIcon>
+                    </SelectTrigger>
+                    <SelectPortal>
+                      <SelectBackdrop />
+                      <SelectContent>
+                        <SelectDragIndicatorWrapper>
+                          <SelectDragIndicator />
+                        </SelectDragIndicatorWrapper>
+                        <SelectItem label="Dancing" value="dance" />
+                        <SelectItem label="Singing" value="sing" />
+                        <SelectItem label="Drawing" value="draw" />
+                      </SelectContent>
+                    </SelectPortal>
+                  </Select>
+                </VStack>
+                <VStack w={'45%'} gap={'$2'}>
+                  <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
+                    Professional
+                  </Text>
+                  <Select>
+                    <SelectTrigger variant="outline" size="md">
+                      <SelectInput placeholder="Select option" />
+                      <SelectIcon>
+                        <Icon as={ChevronDownIcon} />
+                      </SelectIcon>
+                    </SelectTrigger>
+                    <SelectPortal>
+                      <SelectBackdrop />
+                      <SelectContent>
+                        <SelectDragIndicatorWrapper>
+                          <SelectDragIndicator />
+                        </SelectDragIndicatorWrapper>
+                        <SelectItem label="UX Research" value="ux" />
+                        <SelectItem label="Web Development" value="web" />
+                        <SelectItem
+                          label="Cross Platform Development Process"
+                          value="cross-platform"
+                        />
+                        <SelectItem label="UI Designing" value="ui" />
+                        <SelectItem
+                          label="Backend Development"
+                          value="backend"
+                        />
+                      </SelectContent>
+                    </SelectPortal>
+                  </Select>
+                </VStack>
+              </HStack>
             </VStack>
           </Box>
         </Box>
@@ -426,6 +558,13 @@ const Profile = () => {
             </Text>
           </Button>
         </Box>
+        <PhotoPicker
+          visible={visiblePhoto}
+          onDismiss={() => setVisiblePhoto(false)}
+          setImageUrl={setProfileImage}
+          cropperCircleOverlay={true}
+          postImages={true}
+        />
       </ScrollView>
     </PrivateContainer>
   );

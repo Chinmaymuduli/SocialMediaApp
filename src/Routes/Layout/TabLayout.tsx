@@ -65,6 +65,14 @@ export default function TabLayout() {
               component: Private.Post,
             },
             {
+              route: 'Connections',
+              label: 'Connections',
+              icon: {
+                MaterialIconsName: 'diversity-1',
+              },
+              component: Private.MyConnections,
+            },
+            {
               route: 'Messages',
               label: 'Messages',
               icon: {

@@ -129,7 +129,7 @@ const AllMeetings = () => {
               bg={'$pink50'}
               px={'$2'}
               py={'$1'}>
-              <HStack>
+              <HStack gap={'$2'} alignItems={'center'}>
                 <AppIcon
                   AntDesignName="calendar"
                   size={20}
