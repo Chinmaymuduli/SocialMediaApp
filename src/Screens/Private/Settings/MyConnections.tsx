@@ -25,6 +25,8 @@ const MyConnections = () => {
   );
   if (isValidating) <FetchLoader />;
 
+  // console.log(data?.data?.data?.[0]);
+
   return (
     <PrivateContainer title={'My Connections'} hasBackIcon={true}>
       <Box mt={'$4'}>
@@ -55,7 +57,9 @@ const MyConnections = () => {
                 </HStack>
                 <HStack gap={'$10'} mt={'$1'} px={'$10'} alignItems="center">
                   <Button
-                    onPress={() => navigate('UserProfile')}
+                    onPress={() =>
+                      navigate('UserProfile', {user_id: item?.sender_id?._id})
+                    }
                     size="sm"
                     h={20}
                     variant="outline"
@@ -68,7 +72,14 @@ const MyConnections = () => {
                     </ButtonText>
                   </Button>
                   <Button
-                    onPress={() => navigate('ChatDetails')}
+                    onPress={() =>
+                      navigate('ChatDetails', {
+                        connection_id: item?._id,
+                        userNickName: item?.sender_id?.nick_Name || 'Unknown',
+                        email: item?.sender_id?.email || 'Not Found',
+                        name: item?.sender_id?.name || 'Demo',
+                      })
+                    }
                     size="md"
                     h={20}
                     w={'$24'}

@@ -11,7 +11,7 @@ type PrivateScreens = {
   [key in keyof typeof Private]: undefined;
 };
 
-type OmittedScreens = 'AllComments';
+type OmittedScreens = 'AllComments' | 'UserProfile' | 'ChatDetails';
 
 export type PrivateNavigationProp = Omit<PrivateScreens, OmittedScreens> & {
   // OtpScreen: {
@@ -19,6 +19,15 @@ export type PrivateNavigationProp = Omit<PrivateScreens, OmittedScreens> & {
   // };
   AllComments: {
     post_id: string;
+  };
+  UserProfile: {
+    user_id: string;
+  };
+  ChatDetails: {
+    connection_id: string;
+    userNickName?: string;
+    email?: string;
+    name?: string;
   };
 };
 

@@ -1,47 +1,54 @@
 import React, {useState} from 'react';
 import {
-  Avatar,
   Box,
-  Center,
   FlatList,
   HStack,
-  Heading,
-  Icon,
   Input,
   InputField,
   Pressable,
-  ScrollView,
   Text,
-  VStack,
 } from '@gluestack-ui/themed';
-import {COLORS} from '~/Styles';
-import {IMAGES} from '~/Assets';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Entypo from 'react-native-vector-icons/Entypo';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
-import {PrivateScreenProps} from '~/routes/private/types';
+import {PrivateRoutesTypes, PrivateScreenProps} from '~/routes/private/types';
 import AppIcon from '~/Components/core/AppIcon';
 import {PrivateContainer} from '~/Components/container';
-import LinearGradient from 'react-native-linear-gradient';
 import {StyleSheet} from 'react-native';
+import {useMutation, useSwrApi} from '~/Hooks';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
-const ChatDetails = () => {
+type Props = NativeStackScreenProps<PrivateRoutesTypes, 'ChatDetails'>;
+const ChatDetails = ({route: {params}}: Props) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
-  const messageArray = [
-    {
-      id: '1',
-      message: 'Hello',
-      time: '10:00 AM',
-      senderText: 'Hy, I am fine',
-    },
-  ];
+  const {data, mutate} = useSwrApi(
+    `chats/read-all?connection_id=${params?.connection_id}`,
+  );
+  const [message, setMessage] = useState('');
+  const {mutation, isLoading} = useMutation();
+
+  const handelChat = async () => {
+    try {
+      const res = await mutation(`chats/send-message`, {
+        method: 'POST',
+        body: {
+          message_type: 'text',
+          connection_id: params?.connection_id,
+          text: message,
+        },
+      });
+      console.log({res});
+      if (res?.status === 201) {
+        mutate();
+        setMessage('');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <PrivateContainer
       hasBackIcon={true}
-      title={'Demo User'}
+      title={params?.name || params?.userNickName}
       icons={[
         {
           icon: {MaterialIconsName: 'add-call'},
@@ -56,13 +63,22 @@ const ChatDetails = () => {
       ]}>
       <Box flex={1} mt={'$3'}>
         <FlatList
-          data={messageArray}
+          data={data?.data?.data}
           renderItem={({item}: any) => (
-            <Box mt={'$1'}>
-              <Text ml={'$2'}>{item?.senderText}</Text>
-              <Box alignSelf="flex-end" pr={'$4'}>
-                <Text>{item?.message}</Text>
+            <Box my={'$2'}>
+              <Box alignItems="center">
+                <Text fontSize={13} fontFamily="Montserrat-Medium">
+                  {item?.date}
+                </Text>
               </Box>
+              {item?.messages?.map((msg: any, key: any) => (
+                <Box key={key} my={'$1'}>
+                  <Text ml={'$2'}>{msg?.text}</Text>
+                  {/* <Box alignSelf="flex-end" pr={'$4'}>
+                <Text>{item?.message}</Text>
+              </Box> */}
+                </Box>
+              ))}
             </Box>
           )}
         />
@@ -78,16 +94,26 @@ const ChatDetails = () => {
               borderColor="$coolGray300"
               isInvalid={false}
               isReadOnly={false}>
-              <InputField placeholder="Enter Text here" fontSize={12} />
+              <InputField
+                placeholder="Enter Text here"
+                fontSize={12}
+                value={message}
+                onChangeText={text => setMessage(text)}
+              />
             </Input>
             <Pressable
               borderRadius={20}
+              onPress={isLoading ? () => {} : () => handelChat()}
               h={'$10'}
               w={'$10'}
-              bg={'$blue200'}
+              bg={isLoading ? '$coolGray300' : '$blue200'}
               alignItems={'center'}
               justifyContent={'center'}>
-              <AppIcon IoniconsName="send" size={22} color={'blue'} />
+              <AppIcon
+                IoniconsName="send"
+                size={22}
+                color={isLoading ? 'gray' : 'blue'}
+              />
             </Pressable>
           </HStack>
         </Box>

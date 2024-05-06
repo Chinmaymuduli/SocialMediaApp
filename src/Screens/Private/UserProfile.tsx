@@ -1,24 +1,44 @@
+import {TextareaInput} from '@gluestack-ui/themed';
+import {
+  ButtonText,
+  CloseIcon,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  Textarea,
+} from '@gluestack-ui/themed';
 import {
   Box,
   FlatList,
   HStack,
+  Heading,
+  Icon,
   Image,
+  ModalBackdrop,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
   Pressable,
   ScrollView,
   Text,
   VStack,
 } from '@gluestack-ui/themed';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useState} from 'react';
-import {Dimensions} from 'react-native';
+import {Alert, Dimensions} from 'react-native';
 import {IMAGES} from '~/Assets';
 import {PrivateContainer} from '~/Components/container';
 import {Button} from '~/Components/core';
 import AppIcon from '~/Components/core/AppIcon';
 import {UserCaption, UserPost} from '~/Components/screens';
+import {useMutation} from '~/Hooks';
+import {PrivateRoutesTypes} from '~/Routes/Private/types';
 import {COLORS} from '~/Styles';
-
-const UserProfile = () => {
+type Props = NativeStackScreenProps<PrivateRoutesTypes, 'UserProfile'>;
+const UserProfile = ({route: {params}, navigation}: Props) => {
   const [selectSwitch, setSelectSwitch] = useState<string>('Posts');
+  const [showModal, setShowModal] = useState(false);
+  const [message, setMessage] = useState('');
   const HEADER_BTN = [
     {
       id: 'b1',
@@ -31,7 +51,25 @@ const UserProfile = () => {
       icon: {AntDesignName: 'edit'},
     },
   ];
-
+  const {mutation, isLoading} = useMutation();
+  const handelConnectRequest = async () => {
+    try {
+      const res = await mutation(`connections/send-request`, {
+        method: 'POST',
+        body: {
+          message,
+          receiver_id: params?.user_id,
+        },
+      });
+      console.log({res: res?.results?.error});
+      if (res?.status === 201) {
+        setShowModal(false);
+        Alert.alert('success', 'Connection request sent successfully');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <PrivateContainer title="Demo User" bg={'purple.50'} hasBackIcon={true}>
       <ScrollView contentContainerStyle={{paddingBottom: 70}}>
@@ -98,7 +136,12 @@ const UserProfile = () => {
           </Text>
         </VStack>
         <HStack px={'$4'} gap={'$10'} mt={'$4'}>
-          <Button borderRadius={5} py={'$2'}>
+          <Button
+            borderRadius={5}
+            py={'$2'}
+            onPress={() => {
+              setShowModal(true);
+            }}>
             <Text color="$white" fontFamily="Montserrat-Medium" fontSize={13}>
               Connect
             </Text>
@@ -162,6 +205,58 @@ const UserProfile = () => {
         {selectSwitch === 'Posts' && <UserPost />}
         {selectSwitch === 'Captions' && <UserCaption />}
       </ScrollView>
+      {/* Modal */}
+      <Modal
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+        }}>
+        <ModalBackdrop />
+        <ModalContent>
+          <ModalHeader>
+            <Heading size="lg">Reason for connect</Heading>
+            <ModalCloseButton>
+              <Icon as={CloseIcon} />
+            </ModalCloseButton>
+          </ModalHeader>
+          <ModalBody>
+            <Textarea
+              size="md"
+              isReadOnly={false}
+              isInvalid={false}
+              isDisabled={false}
+              w="$64">
+              <TextareaInput
+                placeholder="Your reason goes here..."
+                value={message}
+                onChangeText={txt => setMessage(txt)}
+              />
+            </Textarea>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              borderRadius={5}
+              py={'$2'}
+              onPress={() => {
+                setShowModal(false);
+              }}>
+              <Text color="$white" fontFamily="Montserrat-Medium" fontSize={13}>
+                Cancel
+              </Text>
+            </Button>
+            <Button
+              isLoading={isLoading}
+              isDisabled={!message}
+              borderRadius={5}
+              py={'$2'}
+              onPress={() => handelConnectRequest()}>
+              <Text color="$white" fontFamily="Montserrat-Medium" fontSize={13}>
+                Connect
+              </Text>
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </PrivateContainer>
   );
 };

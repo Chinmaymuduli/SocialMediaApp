@@ -112,7 +112,10 @@ const PostCompo = ({item, mutate}: any) => {
               </Text>
             </View>
           </View>
-          <Pressable onPress={() => navigate('UserProfile')}>
+          <Pressable
+            onPress={() =>
+              navigate('UserProfile', {user_id: item?.user_id?._id})
+            }>
             <Feather name="more-vertical" style={{fontSize: 20}} />
           </Pressable>
         </View>
