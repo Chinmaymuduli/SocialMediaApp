@@ -31,7 +31,7 @@ import {PrivateContainer} from '~/Components/container';
 import {Button} from '~/Components/core';
 import AppIcon from '~/Components/core/AppIcon';
 import {UserCaption, UserPost} from '~/Components/screens';
-import {useMutation} from '~/Hooks';
+import {useMutation, useSwrApi} from '~/Hooks';
 import {PrivateRoutesTypes} from '~/Routes/Private/types';
 import {COLORS} from '~/Styles';
 type Props = NativeStackScreenProps<PrivateRoutesTypes, 'UserProfile'>;
@@ -52,6 +52,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
     },
   ];
   const {mutation, isLoading} = useMutation();
+  const {data} = useSwrApi(`connections/check-is-connected/${params?.user_id}`);
   const handelConnectRequest = async () => {
     try {
       const res = await mutation(`connections/send-request`, {
@@ -70,6 +71,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
       console.log(error);
     }
   };
+  // console.log(data?.data?.data);
   return (
     <PrivateContainer title="Demo User" bg={'purple.50'} hasBackIcon={true}>
       <ScrollView contentContainerStyle={{paddingBottom: 70}}>
@@ -136,74 +138,120 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
           </Text>
         </VStack>
         <HStack px={'$4'} gap={'$10'} mt={'$4'}>
-          <Button
-            borderRadius={5}
-            py={'$2'}
-            onPress={() => {
-              setShowModal(true);
-            }}>
-            <Text color="$white" fontFamily="Montserrat-Medium" fontSize={13}>
-              Connect
-            </Text>
-          </Button>
-          <Button borderRadius={5} py={'$2'}>
+          {!data?.data?.data?.connection?._id ? (
+            <Button
+              borderRadius={5}
+              py={'$2'}
+              onPress={() => {
+                setShowModal(true);
+              }}>
+              <Text color="$white" fontFamily="Montserrat-Medium" fontSize={13}>
+                Connect
+              </Text>
+            </Button>
+          ) : (
+            <Button
+              borderRadius={5}
+              py={'$2'}
+              onPress={() => {
+                setShowModal(true);
+              }}>
+              {data?.data?.data?.connection?.is_accepted ? (
+                <Text
+                  color="$white"
+                  fontFamily="Montserrat-Medium"
+                  fontSize={13}>
+                  Remove
+                </Text>
+              ) : (
+                <Text
+                  color="$white"
+                  fontFamily="Montserrat-Medium"
+                  fontSize={13}>
+                  Pending
+                </Text>
+              )}
+            </Button>
+          )}
+
+          <Button borderRadius={5} py={'$2'} onPress={() => {}}>
             <Text color="$white" fontFamily="Montserrat-Medium" fontSize={13}>
               Message
             </Text>
           </Button>
         </HStack>
-        <Box mt={'$8'} flex={1}>
-          <FlatList
-            data={HEADER_BTN}
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-            renderItem={({item}: any) => (
-              <>
-                <Pressable
-                  w={Dimensions.get('window').width / 2}
-                  mb={'$4'}
-                  justifyContent="center"
-                  alignItems="center"
-                  onPress={() => {
-                    setSelectSwitch(item?.title);
-                  }}>
-                  <HStack alignItems={'center'} px={'$3'} gap={'$3'}>
-                    <AppIcon {...item.icon} size={20} />
-                    <Text
-                      color={'black'}
-                      fontFamily="Montserrat-Medium"
-                      fontSize={13}
-                      fontWeight={
-                        selectSwitch === item?.title ? 'bold' : 'medium'
-                      }
-                      py={1}>
-                      {item?.title}
-                    </Text>
-                  </HStack>
-                </Pressable>
-              </>
+        {data?.data?.data?.connection?.is_accepted && (
+          <Box mt={'$8'} flex={1}>
+            <FlatList
+              data={HEADER_BTN}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              renderItem={({item}: any) => (
+                <>
+                  <Pressable
+                    w={Dimensions.get('window').width / 2}
+                    mb={'$4'}
+                    justifyContent="center"
+                    alignItems="center"
+                    onPress={() => {
+                      setSelectSwitch(item?.title);
+                    }}>
+                    <HStack alignItems={'center'} px={'$3'} gap={'$3'}>
+                      <AppIcon {...item.icon} size={20} />
+                      <Text
+                        color={'black'}
+                        fontFamily="Montserrat-Medium"
+                        fontSize={13}
+                        fontWeight={
+                          selectSwitch === item?.title ? 'bold' : 'medium'
+                        }
+                        py={1}>
+                        {item?.title}
+                      </Text>
+                    </HStack>
+                  </Pressable>
+                </>
+              )}
+            />
+            <Box w={'100%'} h={'$0.5'} bgColor="$coolGray200"></Box>
+            {selectSwitch === 'Posts' ? (
+              <Box
+                w={'50%'}
+                h={'$0.5'}
+                bgColor={COLORS.secondary}
+                position="absolute"
+                top={'$9'}></Box>
+            ) : (
+              <Box
+                w={'50%'}
+                h={'$0.5'}
+                bgColor={COLORS.secondary}
+                position="absolute"
+                top={'$9'}
+                left={'50%'}></Box>
             )}
-          />
-          <Box w={'100%'} h={'$0.5'} bgColor="$coolGray200"></Box>
-          {selectSwitch === 'Posts' ? (
-            <Box
-              w={'50%'}
-              h={'$0.5'}
-              bgColor={COLORS.secondary}
-              position="absolute"
-              top={'$9'}></Box>
-          ) : (
-            <Box
-              w={'50%'}
-              h={'$0.5'}
-              bgColor={COLORS.secondary}
-              position="absolute"
-              top={'$9'}
-              left={'50%'}></Box>
-          )}
-        </Box>
-        {selectSwitch === 'Posts' && <UserPost />}
-        {selectSwitch === 'Captions' && <UserCaption />}
+          </Box>
+        )}
+        {data?.data?.data?.connection?.is_accepted ? (
+          <Box>
+            {selectSwitch === 'Posts' && <UserPost />}
+            {selectSwitch === 'Captions' && <UserCaption />}
+          </Box>
+        ) : (
+          <Box mt={'$20'} alignItems="center">
+            <Image
+              source={IMAGES.CONNECT}
+              style={{
+                height: 150,
+                width: 150,
+              }}
+              alt="img"
+            />
+            <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$4'}>
+              After connected with user you can see their posts
+            </Text>
+          </Box>
+        )}
       </ScrollView>
       {/* Modal */}
       <Modal

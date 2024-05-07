@@ -76,7 +76,7 @@ const MyConnections = () => {
                       navigate('ChatDetails', {
                         connection_id: item?._id,
                         userNickName: item?.sender_id?.nick_Name || 'Unknown',
-                        email: item?.sender_id?.email || 'Not Found',
+                        isReceived: true,
                         name: item?.sender_id?.name || 'Demo',
                       })
                     }

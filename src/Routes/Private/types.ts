@@ -26,7 +26,7 @@ export type PrivateNavigationProp = Omit<PrivateScreens, OmittedScreens> & {
   ChatDetails: {
     connection_id: string;
     userNickName?: string;
-    email?: string;
+    isReceived?: boolean;
     name?: string;
   };
 };
