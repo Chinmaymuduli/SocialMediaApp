@@ -27,13 +27,16 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {Modal} from '@gluestack-ui/themed';
 import {Button} from '~/Components/core';
 import DateTimePicker from 'react-native-modal-datetime-picker';
+import RazorpayCheckout from 'react-native-razorpay';
 import moment from 'moment';
+import {useAppContext} from '~/Contexts';
 
 type Props = NativeStackScreenProps<PrivateRoutesTypes, 'ChatDetails'>;
 const ChatDetails = ({route: {params}}: Props) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
   const [showModal, setShowModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const {userData} = useAppContext();
   const {data, mutate} = useSwrApi(
     `chats/read-all?connection_id=${params?.connection_id}`,
   );
@@ -48,7 +51,6 @@ const ChatDetails = ({route: {params}}: Props) => {
   const [selectedDate, setSelectedDate] = useState('');
   const {mutation, isLoading} = useMutation();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  // console.log(data?.data?.data[0]?.messages);
   const handelChat = async () => {
     try {
       const res = await mutation(`chats/send-message`, {
@@ -98,6 +100,28 @@ const ChatDetails = ({route: {params}}: Props) => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const makePayment = () => {
+    const options = {
+      description: 'Feveal',
+      currency: 'INR',
+      key: 'rzp_test_LVpIWeJeXjNeF2', // Your api key
+      amount: 2450,
+      name: userData?.name,
+      prefill: {
+        email: userData?.email || 'demo@gmail.com',
+        contact: userData?.phoneNumber || 8956325102,
+        name: userData?.name,
+      },
+    };
+    RazorpayCheckout.open(options)
+      .then(async (data: any) => {
+        console.log({data});
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
   };
   return (
     <PrivateContainer
@@ -364,22 +388,11 @@ const ChatDetails = ({route: {params}}: Props) => {
                   <InputField type="text" placeholder="Enter State" />
                 </Input>
               </VStack>
-              <VStack gap={'$0.5'}>
-                <Text fontFamily="Montserrat-Medium">Latitude</Text>
-                <Input borderRadius={'$lg'}>
-                  <InputField type="text" placeholder="Enter Latitude" />
-                </Input>
-              </VStack>
-              <VStack gap={'$0.5'}>
-                <Text fontFamily="Montserrat-Medium">Longitude</Text>
-                <Input borderRadius={'$lg'}>
-                  <InputField type="text" placeholder="Enter Longitude" />
-                </Input>
-              </VStack>
+
               <Button
                 borderRadius={5}
                 py={'$2'}
-                onPress={() => {}}
+                onPress={() => makePayment()}
                 btnWidth={'100%'}>
                 <Text
                   color="$white"

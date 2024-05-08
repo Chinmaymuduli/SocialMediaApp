@@ -89,7 +89,7 @@ const SettingScreen = () => {
     //   text: 'Edit Profile',
     //   action: navigateToEditProfile,
     // }
-    {icon: 'lock-outline', text: 'Verify Aadhar', action: navigateToAadhar},
+    // {icon: 'lock-outline', text: 'Verify Aadhar', action: navigateToAadhar},
 
     {
       icon: 'security',

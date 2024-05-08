@@ -50,9 +50,9 @@ const MyConnections = () => {
                     borderRadius={20}
                   />
                   <Text fontFamily="Montserrat-SemiBold" fontSize={12}>
-                    {item?.sender_id?.name
-                      ? item?.sender_id?.name
-                      : item?.sender_id?.phone}
+                    {item?.sender_id?.nick_name ||
+                      item?.sender_id?.name ||
+                      item?.sender_id?.phone}
                   </Text>
                 </HStack>
                 <HStack gap={'$10'} mt={'$1'} px={'$10'} alignItems="center">

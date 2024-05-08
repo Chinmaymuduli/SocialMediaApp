@@ -190,7 +190,7 @@ const Meetings = () => {
 
             <Box px={'$3'} mt={'$2'}>
               <HStack justifyContent={'space-between'}>
-                <VStack gap={'$0.5'}>
+                <VStack gap={'$1'}>
                   <Text fontFamily="Montserrat-Bold" fontSize={13}>
                     Meeting Date
                   </Text>
@@ -198,7 +198,7 @@ const Meetings = () => {
                     {moment(item?.date).format('ll')}
                   </Text>
                 </VStack>
-                <VStack>
+                <VStack gap={'$1'}>
                   <Text bold fontSize={13}>
                     Meeting Time
                   </Text>
