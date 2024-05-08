@@ -53,6 +53,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
   ];
   const {mutation, isLoading} = useMutation();
   const {data} = useSwrApi(`connections/check-is-connected/${params?.user_id}`);
+  const {data: userData} = useSwrApi(`users/read/${params?.user_id}`);
   const handelConnectRequest = async () => {
     try {
       const res = await mutation(`connections/send-request`, {
@@ -71,9 +72,12 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
       console.log(error);
     }
   };
-  // console.log(data?.data?.data);
+  console.log(userData?.data?.data);
   return (
-    <PrivateContainer title="Demo User" bg={'purple.50'} hasBackIcon={true}>
+    <PrivateContainer
+      title={userData?.data?.data?.name}
+      bg={'purple.50'}
+      hasBackIcon={true}>
       <ScrollView contentContainerStyle={{paddingBottom: 70}}>
         <HStack
           px={'$4'}
@@ -82,7 +86,11 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
           alignItems="center">
           <Box borderWidth={2} borderRadius={50} borderColor={COLORS.secondary}>
             <Image
-              source={IMAGES.USER}
+              source={
+                userData?.data?.data?.avatar
+                  ? {uri: userData?.data?.data?.avatar}
+                  : IMAGES.USER
+              }
               alt="image"
               style={{height: 70, width: 70, borderRadius: 50}}
             />
@@ -93,7 +101,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                 color={'$black'}
                 fontFamily="Montserrat-Medium"
                 fontSize={13}>
-                1215
+                {userData?.data?.data?.total_posts}
               </Text>
               <Text color={'$black'} fontSize={12} fontFamily="Montserrat-Bold">
                 Posts
@@ -104,7 +112,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                 color={'$black'}
                 fontFamily="Montserrat-Medium"
                 fontSize={13}>
-                956
+                {userData?.data?.data?.total_followers}
               </Text>
               <Text color={'$black'} fontFamily="Montserrat-Bold" fontSize={12}>
                 Followers
@@ -115,7 +123,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                 color={'$black'}
                 fontFamily="Montserrat-Medium"
                 fontSize={13}>
-                566
+                {userData?.data?.data?.total_followings}
               </Text>
               <Text color={'$black'} fontFamily="Montserrat-Bold" fontSize={12}>
                 Following
@@ -125,16 +133,20 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
         </HStack>
         <VStack px={'$4'}>
           <Text fontFamily="Montserrat-Medium" fontSize={13}>
-            Chinmay Muduli
+            {userData?.data?.data?.nick_name || userData?.data?.data?.name}
+          </Text>
+          {userData?.data?.data?.interests?.map((item: any) => (
+            <Text fontFamily="Montserrat-Medium" fontSize={13} key={item?._id}>
+              {item?.label},
+            </Text>
+          ))}
+          <Text fontFamily="Montserrat-Medium" fontSize={13}>
+            {userData?.data?.data?.location_details?.city +
+              ' | ' +
+              userData?.data?.data?.location_details?.state}
           </Text>
           <Text fontFamily="Montserrat-Medium" fontSize={13}>
-            Coding
-          </Text>
-          <Text fontFamily="Montserrat-Medium" fontSize={13}>
-            Hyderabad | Fitness | Perfectional Coder
-          </Text>
-          <Text fontFamily="Montserrat-Medium" fontSize={13}>
-            demo@gmail.com
+            {userData?.data?.data?.email}
           </Text>
         </VStack>
         <HStack px={'$4'} gap={'$10'} mt={'$4'}>

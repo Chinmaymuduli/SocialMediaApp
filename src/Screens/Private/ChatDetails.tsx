@@ -80,9 +80,9 @@ const ChatDetails = ({route: {params}}: Props) => {
         method: 'POST',
         body: {
           connection_id: params?.connection_id,
-          amount: Number(amount),
+          amount: amount,
           date: selectedDate,
-          locationDetails: {
+          location_details: {
             address: address,
             city: city,
             state: state,
@@ -91,7 +91,7 @@ const ChatDetails = ({route: {params}}: Props) => {
           },
         },
       });
-      console.log({res: res?.results?.error});
+      console.log({res: res?.results});
       if (res?.status === 201) {
         setShowModal(false);
       }
@@ -290,6 +290,7 @@ const ChatDetails = ({route: {params}}: Props) => {
               </VStack>
               <Button
                 borderRadius={5}
+                isLoading={isLoading}
                 py={'$2'}
                 onPress={() => handelCreatePayment()}
                 btnWidth={'100%'}>

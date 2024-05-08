@@ -15,6 +15,9 @@ import {COLORS} from '~/Styles';
 import {PrivateScreenProps} from '~/Routes/Private/types';
 import {PrivateContainer} from '~/Components/container';
 import AppIcon from '~/Components/core/AppIcon';
+import {useSwrApi} from '~/Hooks';
+import {useAppContext} from '~/Contexts';
+import moment from 'moment';
 
 export const MeetingData = [
   {
@@ -120,25 +123,13 @@ const Meetings = () => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [showSearch, setShowSearch] = React.useState(false);
   const [order, setOrder] = useState('');
+  const {userData} = useAppContext();
+  const {data, isValidating} = useSwrApi(
+    `meetings?require_all=true&user_id=${userData?._id}`,
+  );
 
-  const Sort_Array = [
-    {
-      id: '13',
-      title: 'Ongoing',
-    },
-    {
-      id: '15',
-      title: 'Closed',
-    },
-    {
-      id: '16',
-      title: 'Upcoming',
-    },
-    // {
-    //   id: '19',
-    //   title: 'CreatedAt Descending',
-    // },
-  ];
+  // console.log(data?.data?.data);
+
   return (
     <PrivateContainer title={'Meetings'} bg={'purple.50'} hasBackIcon={true}>
       <HStack
@@ -151,12 +142,12 @@ const Meetings = () => {
           All Meetings
         </Text>
 
-        <Pressable onPress={() => setDatePickerVisibility(true)}>
+        {/* <Pressable onPress={() => setDatePickerVisibility(true)}>
           <HStack gap={'$2'} alignItems={'center'}>
             <AppIcon IoniconsName="filter" size={25} color={COLORS.secondary} />
             <Text fontWeight={'semibold'}>FilterBy</Text>
           </HStack>
-        </Pressable>
+        </Pressable> */}
       </HStack>
 
       <ScrollView
@@ -164,29 +155,37 @@ const Meetings = () => {
         contentContainerStyle={{
           paddingBottom: 20,
         }}>
-        {MeetingData.map(item => (
+        {data?.data?.data?.map((item: any) => (
           <Pressable
             mx={'$3'}
-            key={item?.id}
+            key={item?._id}
             mt={'$4'}
             borderRadius={5}
             borderColor={COLORS.textSecondary}
             softShadow={'1'}
             bgColor={'white'}>
             <HStack
-              alignItems={'center'}
-              gap={'$2'}
+              justifyContent="space-between"
               bg={'$pink50'}
-              px={'$2'}
-              py={'$1'}>
-              <AppIcon
-                AntDesignName="calendar"
-                size={20}
-                color={COLORS.secondary}
-              />
-              <Text fontSize={12} fontFamily="Montserrat-Bold">
-                {item?.meeting}
-              </Text>
+              alignItems={'center'}>
+              <HStack alignItems={'center'} gap={'$2'} px={'$2'} py={'$1'}>
+                <AppIcon
+                  AntDesignName="calendar"
+                  size={20}
+                  color={COLORS.secondary}
+                />
+                <Text fontSize={12} fontFamily="Montserrat-Bold">
+                  {'Amount' + ' : ' + item?.amount}
+                </Text>
+              </HStack>
+              <Box px={'$4'}>
+                <Text
+                  fontFamily="Montserrat-SemiBold"
+                  fontSize={13}
+                  color={item?.is_accepted ? '$green500' : COLORS.secondary}>
+                  {item?.is_accepted ? 'Accepted' : 'Pending'}
+                </Text>
+              </Box>
             </HStack>
 
             <Box px={'$3'} mt={'$2'}>
@@ -196,7 +195,7 @@ const Meetings = () => {
                     Meeting Date
                   </Text>
                   <Text fontFamily="Montserrat-Medium" fontSize={13}>
-                    {item?.date}
+                    {moment(item?.date).format('ll')}
                   </Text>
                 </VStack>
                 <VStack>
@@ -204,23 +203,43 @@ const Meetings = () => {
                     Meeting Time
                   </Text>
                   <Text fontFamily="Montserrat-Medium" fontSize={13}>
-                    {item?.starttime}
+                    {moment(item?.date).format('LT')}
                   </Text>
                 </VStack>
+              </HStack>
+              <HStack pt={'$3'}>
+                <HStack mr={'$1'} alignItems={'center'}>
+                  <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                    Meeting With :
+                  </Text>
+                  <Text
+                    fontSize={13}
+                    fontFamily="Montserrat-Bold"
+                    px={'$2'}
+                    color={COLORS.secondary}>
+                    {item?.sender_id?.name || item?.sender_id?.phone}
+                  </Text>
+                </HStack>
               </HStack>
             </Box>
             <Box borderBottomWidth={1} borderStyle={'dashed'} py={'$2'}></Box>
             <HStack px={'$3'} py={'$3'}>
-              <HStack mr={'$1'} alignItems={'center'}>
+              <HStack mr={'$1'} w={'$80'}>
                 <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
-                  Meeting With :
+                  Location :
                 </Text>
                 <Text
-                  fontSize={13}
-                  fontFamily="Montserrat-Bold"
+                  fontSize={12}
+                  fontFamily="Montserrat-Medium"
                   px={'$2'}
                   color={COLORS.secondary}>
-                  {'Demo user'}
+                  {item?.location_details?.address +
+                    ' , ' +
+                    item?.location_details?.city +
+                    ' , ' +
+                    item?.location_details?.state +
+                    ' , ' +
+                    item?.location_details?.pincode}
                 </Text>
               </HStack>
             </HStack>
