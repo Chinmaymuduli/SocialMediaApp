@@ -37,7 +37,7 @@ const ChatDetails = ({route: {params}}: Props) => {
   const [showModal, setShowModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const {userData} = useAppContext();
-  const {data, mutate} = useSwrApi(
+  const {data, mutate, isValidating} = useSwrApi(
     `chats/read-all?connection_id=${params?.connection_id}`,
   );
   const [message, setMessage] = useState('');
@@ -145,6 +145,8 @@ const ChatDetails = ({route: {params}}: Props) => {
       ]}>
       <Box flex={1} mt={'$3'}>
         <FlatList
+          onRefresh={() => mutate()}
+          refreshing={isValidating}
           data={data?.data?.data}
           renderItem={({item}: any) => (
             <Box my={'$2'}>

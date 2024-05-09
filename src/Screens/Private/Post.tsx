@@ -33,9 +33,7 @@ import {ButtonText} from '@gluestack-ui/themed';
 const Post = () => {
   const {navigate, goBack} = useNavigation<PrivateScreenProps>();
 
-  const {data} = useSwrApi(
-    `tags?require_all=true&search=chilling&is_active=true`,
-  );
+  const {data} = useSwrApi(`tags?require_all=true&is_active=true`);
   const [showModal, setShowModal] = useState(false);
   const [imagesPicker, setImagesPicker] = useState(false);
   const [images, setImages] = useState<any>([]);
@@ -84,6 +82,7 @@ const Post = () => {
       console.log(error);
     }
   };
+  console.log(data?.data?.data);
   return (
     <PrivateContainer
       icons={[

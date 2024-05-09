@@ -37,7 +37,6 @@ const PostCompo = ({item, mutate}: any) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
   const [showModal, setShowModal] = useState(false);
   const [postId, setPostId] = useState<string>('');
-  console.log('post id----', postId);
   const {userData} = useAppContext();
   const {
     data: allLikeData,
@@ -70,7 +69,7 @@ const PostCompo = ({item, mutate}: any) => {
   //   }, []),
   // );
   // console.log(item?.tags);
-  console.log('allLikeData----->', allLikeData);
+  // console.log('allLikeData----->', allLikeData?.data?.data);
   return (
     <View>
       <View
@@ -144,21 +143,11 @@ const PostCompo = ({item, mutate}: any) => {
           gap={'$2'}>
           <TouchableOpacity onPress={() => giveLikeDislike(item?._id)}>
             <AntDesign
-              name={
-                allLikeData?.data?.data?.find(
-                  (i: any) => i?.user_id?._id === userData?._id,
-                )
-                  ? 'heart'
-                  : 'hearto'
-              }
+              name={item?.is_liked ? 'heart' : 'hearto'}
               style={{
                 paddingRight: 10,
                 fontSize: 20,
-                color: allLikeData?.data?.data?.find(
-                  (i: any) => i?.user_id?._id === userData?._id,
-                )
-                  ? 'red'
-                  : 'black',
+                color: item?.is_liked ? 'red' : 'black',
               }}
             />
           </TouchableOpacity>
@@ -178,7 +167,7 @@ const PostCompo = ({item, mutate}: any) => {
         <View style={{paddingHorizontal: 15}}>
           <Pressable
             onPress={() => {
-              setShowModal(true);
+              setPostId(item?._id), setShowModal(true);
             }}>
             <Text style={{fontFamily: 'Montserrat-Medium', fontSize: 13}}>
               Liked by {item?.total_likes} others
@@ -290,9 +279,11 @@ const PostCompo = ({item, mutate}: any) => {
                       <Text fontFamily="Montserrat-SemiBold" fontSize={12}>
                         {likeData?.user_id?.nick_name}
                       </Text>
-                      <Text fontFamily="Montserrat-SemiBold" fontSize={12}>
-                        {likeData?.user_id?.email}
-                      </Text>
+                      {likeData?.user_id?.email !== 'undefined' ? (
+                        <Text fontFamily="Montserrat-SemiBold" fontSize={12}>
+                          {likeData?.user_id?.email}
+                        </Text>
+                      ) : null}
                     </VStack>
                   </HStack>
                 </VStack>

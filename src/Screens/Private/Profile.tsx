@@ -4,6 +4,11 @@ import {IMAGES} from '~/Assets';
 import {PrivateScreenProps} from '~/Routes/Private/types';
 import {useNavigation} from '@react-navigation/native';
 import {
+  ActionsheetBackdrop,
+  ActionsheetContent,
+  ActionsheetDragIndicator,
+  ActionsheetDragIndicatorWrapper,
+  ActionsheetItem,
   AlertCircleIcon,
   Avatar,
   AvatarFallbackText,
@@ -11,6 +16,7 @@ import {
   AvatarImage,
   Box,
   ChevronDownIcon,
+  CircleIcon,
   FormControl,
   FormControlError,
   FormControlErrorIcon,
@@ -24,6 +30,8 @@ import {
   Image,
   InputField,
   Pressable,
+  RadioIcon,
+  RadioIndicator,
   Select,
   SelectBackdrop,
   SelectContent,
@@ -41,10 +49,18 @@ import {COLORS} from '~/Styles';
 import {VStack} from '@gluestack-ui/themed';
 import {Input} from '@gluestack-ui/themed';
 import Fontisto from 'react-native-vector-icons/Fontisto';
-import {Button, PhotoPicker} from '~/Components/core';
+import {Button, PhotoPicker, StatePicker} from '~/Components/core';
 import AppIcon from '~/Components/core/AppIcon';
 import {useAppContext} from '~/Contexts';
-import {useMutation} from '~/Hooks';
+import {useMutation, useSwrApi} from '~/Hooks';
+import DateTimePicker from 'react-native-modal-datetime-picker';
+import moment from 'moment';
+import {Radio} from '@gluestack-ui/themed';
+import {RadioLabel} from '@gluestack-ui/themed';
+import {RadioGroup} from '@gluestack-ui/themed';
+import {Actionsheet} from '@gluestack-ui/themed';
+import {ActionsheetItemText} from '@gluestack-ui/themed';
+import {Alert} from 'react-native';
 
 const Profile = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
@@ -54,12 +70,25 @@ const Profile = () => {
   const [phone, setPhone] = useState('');
   const [nickName, setNickName] = useState('');
   const [gender, setGender] = useState('');
+  const [city, setCity] = useState('');
+  const [area, setArea] = useState('');
+  const [expertise, setExpertise] = useState<any>();
+  const [expertiseFor, setExpertiseFor] = useState<any>();
+  const [state, setState] = useState<any>();
   const [visiblePhoto, setVisiblePhoto] = useState(false);
+  const [showStatePicker, setShowStatePicker] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [selectedDate, setSelectedDate] = useState('');
   const [profileImage, setProfileImage] = useState<any>();
   const {mutation, isLoading} = useMutation();
+  const {data} = useSwrApi(`interests?type=personal`);
+  const {data: professionalData} = useSwrApi(
+    `interests?type=professional&search=${expertise}`,
+  );
 
   useEffect(() => {
     setEmail(userData?.email);
+    setPhone(userData?.phone);
   }, [userData]);
 
   const avatars = [
@@ -81,20 +110,71 @@ const Profile = () => {
   const remainingCount = extraAvatars.length;
   const handelUpdateProfile = async () => {
     try {
+      const locationDetails = {
+        pincode: '',
+        address: area,
+        city: city,
+        state: state?.title,
+        coordinates: [12.988, 77.6895],
+      };
+      const interests = [expertise?._id, expertiseFor?._id];
+      const locationDetailsString = JSON.stringify(locationDetails);
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('nick_name', nickName);
+      formData.append('gender', gender);
+      formData.append('dob', moment(selectedDate).toISOString());
+      interests.forEach(interest => {
+        formData.append('interests', interest);
+      });
+      formData.append('location_details', locationDetailsString);
+      profileImage?.path &&
+        formData.append('avatar', {
+          uri: profileImage?.path,
+          name: 'image.png',
+          fileName: 'image',
+          type: 'image/png',
+        });
+
+      !userData?.phone_verify?.is_verified && formData.append('phone', phone);
+      !userData?.email_verify?.is_verified && formData.append('email', email);
+      // formData.append('dob', email);
+
       const updateData = await mutation(`users/self/update`, {
         method: 'PUT',
-        body: {
-          name,
-          nickName,
-          gender,
-        },
+        body: formData,
+        isFormData: true,
       });
-      console.log(updateData?.results?.error);
+      console.log(updateData);
+      if (updateData?.status === 200) {
+        Alert.alert('Success', 'Profile Updated Successfully');
+      }
     } catch (error) {
       console.log(error);
     }
   };
-  console.log(profileImage?.path);
+
+  // console.log({expertise, expertiseFor});
+  const handleStateSelect = (state: any) => {
+    setShowStatePicker(false);
+    setState(state);
+  };
+  const handleConfirm = (date: any) => {
+    setSelectedDate(date);
+    setDatePickerVisibility(false);
+  };
+
+  const [showActionsheet, setShowActionsheet] = React.useState(false);
+  const [showActionsheet2, setShowActionsheet2] = React.useState(false);
+
+  const handleSelect = (data: any) => {
+    setShowActionsheet(false);
+    setExpertise(data);
+  };
+  const handleSelect2 = (data: any) => {
+    setShowActionsheet2(false);
+    setExpertiseFor(data);
+  };
 
   return (
     <PrivateContainer
@@ -133,7 +213,9 @@ const Profile = () => {
               />
             ) : (
               <Image
-                source={IMAGES.USER}
+                source={
+                  profileImage?.path ? {uri: profileImage?.path} : IMAGES.USER
+                }
                 style={{
                   height: 100,
                   width: 100,
@@ -143,7 +225,7 @@ const Profile = () => {
               />
             )}
           </Pressable>
-          <Box position="absolute" right={55} top={50}>
+          {/* <Box position="absolute" right={55} top={50}>
             <Pressable>
               <HStack alignItems="center" gap={'$1'}>
                 <AppIcon AntDesignName={'plus'} size={15} color={'black'} />
@@ -152,7 +234,7 @@ const Profile = () => {
                 </Text>
               </HStack>
             </Pressable>
-          </Box>
+          </Box> */}
 
           <Pressable
             alignItems="center"
@@ -228,7 +310,7 @@ const Profile = () => {
                 isInvalid={false}
                 isReadOnly={false}>
                 <InputField
-                  placeholder="Enter Text here"
+                  placeholder="Enter nick name here"
                   fontSize={12}
                   value={nickName}
                   onChangeText={txt => setNickName(txt)}
@@ -242,8 +324,8 @@ const Profile = () => {
                 <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
                   Gender *
                 </Text>
-                <Pressable
-                  // onPress={onOpen}
+                {/* <Pressable
+                
                   borderWidth={1}
                   borderRadius={5}
                   bg={'white'}
@@ -254,14 +336,38 @@ const Profile = () => {
                       {'Select Gender'}
                     </Text>
                   </Box>
-                </Pressable>
+                </Pressable> */}
+                <RadioGroup value={gender} onChange={setGender}>
+                  <HStack gap={'$2'}>
+                    <Radio
+                      value="male"
+                      size="md"
+                      isInvalid={false}
+                      isDisabled={false}>
+                      <RadioIndicator mr="$2">
+                        <RadioIcon as={CircleIcon} strokeWidth={1} />
+                      </RadioIndicator>
+                      <RadioLabel>Male</RadioLabel>
+                    </Radio>
+                    <Radio
+                      value="female"
+                      size="md"
+                      isInvalid={false}
+                      isDisabled={false}>
+                      <RadioIndicator mr="$2">
+                        <RadioIcon as={CircleIcon} strokeWidth={1} />
+                      </RadioIndicator>
+                      <RadioLabel>Female</RadioLabel>
+                    </Radio>
+                  </HStack>
+                </RadioGroup>
               </VStack>
               <VStack w={'48%'} gap={'$2'}>
                 <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
                   Date of Birth *
                 </Text>
                 <Pressable
-                  // onPress={() => setBirthDatePickerVisibility(true)}
+                  onPress={() => setDatePickerVisibility(true)}
                   px={'$1'}
                   borderRadius={5}
                   borderWidth={1}
@@ -271,7 +377,9 @@ const Profile = () => {
                       fontWeight={'semibold'}
                       fontSize={13}
                       color={'$coolGray500'}>
-                      {'DD - MM - YYYY'}
+                      {selectedDate
+                        ? moment(selectedDate).format('DD - MM - YYYY')
+                        : 'DD - MM - YYYY'}
                     </Text>
                     <Fontisto name="date" size={18} color={'#0d9488'} />
                   </HStack>
@@ -299,7 +407,7 @@ const Profile = () => {
                 flex={1}
                 variant="outline"
                 size="md"
-                isDisabled={false}
+                isDisabled={userData?.phone_verify?.is_verified ? true : false}
                 alignItems="center"
                 borderColor="$coolGray300"
                 isInvalid={false}
@@ -327,7 +435,7 @@ const Profile = () => {
                 isInvalid={false}
                 isReadOnly={false}>
                 <InputField
-                  placeholder="Enter Text here"
+                  placeholder="Enter email here"
                   fontSize={12}
                   value={email}
                   onChangeText={txt => setEmail(txt)}
@@ -340,7 +448,7 @@ const Profile = () => {
                 State *
               </Text>
               <Pressable
-                // onPress={onOpen}
+                onPress={() => setShowStatePicker(true)}
                 borderWidth={1}
                 borderRadius={5}
                 style={{
@@ -353,19 +461,19 @@ const Profile = () => {
                   fontSize={'$sm'}
                   color={'$coolGray500'}
                   p={'$3'}>
-                  {'Select State'}
+                  {state?.title ? state?.title : 'Select State'}
                 </Text>
               </Pressable>
             </VStack>
 
             {/* Select Gender and date of birth */}
-            <HStack justifyContent={'space-between'} mt={2}>
+            <Box justifyContent={'space-between'} mt={2}>
               <VStack gap={'$2'}>
                 <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
                   City *
                 </Text>
-                <Pressable
-                  // onPress={onOpen}
+                {/* <Pressable
+       
                   borderWidth={1}
                   borderRadius={5}
                   bg={'white'}
@@ -379,29 +487,46 @@ const Profile = () => {
                       {'Select City'}
                     </Text>
                   </Box>
-                </Pressable>
+                </Pressable> */}
+                <Input
+                  // flex={1}
+                  variant="outline"
+                  size="md"
+                  isDisabled={false}
+                  alignItems="center"
+                  borderColor="$coolGray300"
+                  isInvalid={false}
+                  isReadOnly={false}>
+                  <InputField
+                    placeholder="Enter City"
+                    fontSize={12}
+                    value={city}
+                    onChangeText={txt => setCity(txt)}
+                  />
+                </Input>
               </VStack>
-              <VStack w={'48%'} gap={'$2'}>
-                <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
-                  Area *
-                </Text>
-                <Pressable
-                  // onPress={() => setBirthDatePickerVisibility(true)}
-                  px={'$1'}
-                  borderRadius={5}
-                  borderWidth={1}
-                  borderColor={'$coolGray300'}>
-                  <HStack justifyContent={'space-between'} py={'$2.5'}>
-                    <Text
-                      fontWeight={'semibold'}
-                      fontSize={13}
-                      color={'$coolGray500'}>
-                      {'Select Area'}
-                    </Text>
-                  </HStack>
-                </Pressable>
-              </VStack>
-            </HStack>
+            </Box>
+            <VStack gap={'$2'}>
+              <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
+                Area *
+              </Text>
+              <Input
+                // flex={1}
+                variant="outline"
+                size="md"
+                isDisabled={false}
+                alignItems="center"
+                borderColor="$coolGray300"
+                isInvalid={false}
+                isReadOnly={false}>
+                <InputField
+                  placeholder="Enter Area"
+                  fontSize={12}
+                  value={area}
+                  onChangeText={txt => setArea(txt)}
+                />
+              </Input>
+            </VStack>
           </VStack>
         </Box>
         {/* Unique Details */}
@@ -488,57 +613,47 @@ const Profile = () => {
                   <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
                     Personal
                   </Text>
-                  <Select>
-                    <SelectTrigger variant="outline" size="md">
-                      <SelectInput placeholder="Select option" />
-                      <SelectIcon>
-                        <Icon as={ChevronDownIcon} />
-                      </SelectIcon>
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent>
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        <SelectItem label="Dancing" value="dance" />
-                        <SelectItem label="Singing" value="sing" />
-                        <SelectItem label="Drawing" value="draw" />
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
+                  <Pressable
+                    onPress={() => setShowActionsheet(true)}
+                    borderWidth={1}
+                    borderRadius={5}
+                    style={{
+                      height: 45,
+                    }}
+                    bg={'white'}
+                    borderColor={'$coolGray300'}>
+                    <Text
+                      fontWeight={'semibold'}
+                      fontSize={'$sm'}
+                      color={'$coolGray500'}
+                      p={'$3'}>
+                      {expertise?.label ? expertise?.label : 'Select Personal'}
+                    </Text>
+                  </Pressable>
                 </VStack>
                 <VStack w={'45%'} gap={'$2'}>
                   <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
                     Professional
                   </Text>
-                  <Select>
-                    <SelectTrigger variant="outline" size="md">
-                      <SelectInput placeholder="Select option" />
-                      <SelectIcon>
-                        <Icon as={ChevronDownIcon} />
-                      </SelectIcon>
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent>
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        <SelectItem label="UX Research" value="ux" />
-                        <SelectItem label="Web Development" value="web" />
-                        <SelectItem
-                          label="Cross Platform Development Process"
-                          value="cross-platform"
-                        />
-                        <SelectItem label="UI Designing" value="ui" />
-                        <SelectItem
-                          label="Backend Development"
-                          value="backend"
-                        />
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
+                  <Pressable
+                    onPress={() => setShowActionsheet2(true)}
+                    borderWidth={1}
+                    borderRadius={5}
+                    style={{
+                      height: 45,
+                    }}
+                    bg={'white'}
+                    borderColor={'$coolGray300'}>
+                    <Text
+                      fontWeight={'semibold'}
+                      fontSize={'$sm'}
+                      color={'$coolGray500'}
+                      p={'$3'}>
+                      {expertiseFor?.label
+                        ? expertiseFor?.label
+                        : 'Select Personal'}
+                    </Text>
+                  </Pressable>
                 </VStack>
               </HStack>
             </VStack>
@@ -566,6 +681,57 @@ const Profile = () => {
           postImages={true}
         />
       </ScrollView>
+      {/* state modal */}
+      <StatePicker
+        onClose={() => setShowStatePicker(false)}
+        onSelect={(state: any) => {
+          handleStateSelect(state);
+        }}
+        visible={showStatePicker}
+      />
+      {/* date picker */}
+      <DateTimePicker
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={date => handleConfirm(date)}
+        onCancel={() => setDatePickerVisibility(false)}
+      />
+      {/* ActionSheet */}
+      <Actionsheet
+        isOpen={showActionsheet}
+        onClose={() => setShowActionsheet(false)}
+        zIndex={999}>
+        <ActionsheetBackdrop />
+        <ActionsheetContent h="$72" zIndex={999}>
+          <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper>
+          {data?.data?.data?.map(item => (
+            <ActionsheetItem onPress={() => handleSelect(item)} key={item?._id}>
+              <ActionsheetItemText>{item?.label}</ActionsheetItemText>
+            </ActionsheetItem>
+          ))}
+        </ActionsheetContent>
+      </Actionsheet>
+      {/* 2nd */}
+      <Actionsheet
+        isOpen={showActionsheet2}
+        onClose={() => setShowActionsheet2(false)}
+        zIndex={999}>
+        <ActionsheetBackdrop />
+        <ActionsheetContent h="$72" zIndex={999}>
+          <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper>
+          {professionalData?.data?.data?.map((item: any) => (
+            <ActionsheetItem
+              onPress={() => handleSelect2(item)}
+              key={item?._id}>
+              <ActionsheetItemText>{item?.label}</ActionsheetItemText>
+            </ActionsheetItem>
+          ))}
+        </ActionsheetContent>
+      </Actionsheet>
     </PrivateContainer>
   );
 };
