@@ -86,9 +86,28 @@ const Profile = () => {
     `interests?type=professional&search=${expertise}`,
   );
 
+  // console.log('kikiki', userData?.interests);
+
   useEffect(() => {
     setEmail(userData?.email);
     setPhone(userData?.phone);
+    setName(userData?.name);
+    setNickName(userData?.nick_name);
+    setCity(userData?.location_details?.city);
+    setArea(userData?.location_details?.address);
+    setGender(userData?.gender);
+    setSelectedDate(userData?.dob);
+    setState({
+      title: userData?.location_details?.state,
+      state: userData?.location_details?.state,
+    });
+    setProfileImage(userData?.profileImage);
+    setExpertise(
+      userData?.interests?.find((item: any) => item?.type === 'personal'),
+    );
+    setExpertiseFor(
+      userData?.interests?.find((item: any) => item?.type === 'professional'),
+    );
   }, [userData]);
 
   const avatars = [
@@ -304,7 +323,7 @@ const Profile = () => {
                 flex={1}
                 variant="outline"
                 size="md"
-                isDisabled={false}
+                isDisabled={userData?.nick_name ? true : false}
                 alignItems="center"
                 borderColor="$coolGray300"
                 isInvalid={false}
@@ -345,7 +364,7 @@ const Profile = () => {
                       isInvalid={false}
                       isDisabled={false}>
                       <RadioIndicator mr="$2">
-                        <RadioIcon as={CircleIcon} strokeWidth={1} />
+                        <RadioIcon as={CircleIcon} />
                       </RadioIndicator>
                       <RadioLabel>Male</RadioLabel>
                     </Radio>
@@ -355,7 +374,7 @@ const Profile = () => {
                       isInvalid={false}
                       isDisabled={false}>
                       <RadioIndicator mr="$2">
-                        <RadioIcon as={CircleIcon} strokeWidth={1} />
+                        <RadioIcon as={CircleIcon} />
                       </RadioIndicator>
                       <RadioLabel>Female</RadioLabel>
                     </Radio>

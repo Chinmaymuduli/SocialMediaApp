@@ -1,9 +1,17 @@
 import React, {useState} from 'react';
-import {View, Image, TouchableOpacity, TextInput} from 'react-native';
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+  Share,
+} from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionic from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {IMAGES} from '~/Assets';
 import {
   Box,
@@ -37,6 +45,7 @@ const PostCompo = ({item, mutate}: any) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
   const [showModal, setShowModal] = useState(false);
   const [postId, setPostId] = useState<string>('');
+  const [loading, setLoading] = useState(false);
   const {userData} = useAppContext();
   const {
     data: allLikeData,
@@ -62,14 +71,49 @@ const PostCompo = ({item, mutate}: any) => {
       console.log(error);
     }
   };
+  const DeletePost = async (id: string) => {
+    try {
+      setLoading(true);
+      const response = await mutation(`posts/remove/${id}`, {
+        method: 'DELETE',
+      });
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     likeMutate();
-  //   }, []),
-  // );
-  // console.log(item?.tags);
-  // console.log('allLikeData----->', allLikeData?.data?.data);
+      if (response?.status === 200) {
+        Alert.alert('Success', 'Post Successfully Deleted', [
+          {
+            text: 'OK',
+            onPress: () => {
+              setLoading(false), mutate();
+            },
+          },
+        ]);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message: 'Share the post',
+        url: 'https://reactnative.dev/',
+        title: 'React Native',
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error: any) {
+      Alert.alert(error.message);
+    }
+  };
+
   return (
     <View>
       <View
@@ -101,7 +145,7 @@ const PostCompo = ({item, mutate}: any) => {
                   fontFamily: 'Montserrat-Bold',
                   color: 'black',
                 }}>
-                {item?.user_id?.name}
+                {item?.user_id?.nick_name}
               </Text>
               <Text
                 style={{
@@ -113,12 +157,23 @@ const PostCompo = ({item, mutate}: any) => {
               </Text>
             </View>
           </View>
-          <Pressable
-            onPress={() =>
-              navigate('UserProfile', {user_id: item?.user_id?._id})
-            }>
-            <Feather name="more-vertical" style={{fontSize: 20}} />
-          </Pressable>
+          {item?.user_id?._id === userData?._id ? (
+            <Pressable
+              onPress={loading ? () => {} : () => DeletePost(item?._id)}>
+              <MaterialCommunityIcons
+                name="delete-empty"
+                style={{fontSize: 20}}
+                color={loading ? 'gray' : 'red'}
+              />
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={() =>
+                navigate('UserProfile', {user_id: item?.user_id?._id})
+              }>
+              <Feather name="more-vertical" style={{fontSize: 20}} />
+            </Pressable>
+          )}
         </View>
         {item?.media?.length > 0 && (
           <View
@@ -159,7 +214,7 @@ const PostCompo = ({item, mutate}: any) => {
               color={'black'}
             />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => onShare()}>
             <Feather name="navigation" style={{fontSize: 20}} />
           </TouchableOpacity>
         </HStack>

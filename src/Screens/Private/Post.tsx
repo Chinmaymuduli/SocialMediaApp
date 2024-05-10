@@ -7,12 +7,14 @@ import {
   Heading,
   Icon,
   Image,
+  Input,
   Modal,
   ModalBackdrop,
   ModalBody,
   ModalContent,
   Pressable,
   ScrollView,
+  Spinner,
   Text,
   Textarea,
   TextareaInput,
@@ -29,15 +31,19 @@ import {ModalCloseButton} from '@gluestack-ui/themed';
 import {useMutation, useSwrApi} from '~/Hooks';
 import {COLORS} from '~/Styles';
 import {ButtonText} from '@gluestack-ui/themed';
+import {InputField} from '@gluestack-ui/themed';
+import {useAppContext} from '~/Contexts';
 
 const Post = () => {
   const {navigate, goBack} = useNavigation<PrivateScreenProps>();
-
-  const {data} = useSwrApi(`tags?require_all=true&is_active=true`);
+  const {userData} = useAppContext();
+  const {data, mutate} = useSwrApi(`tags?require_all=true&is_active=true`);
   const [showModal, setShowModal] = useState(false);
+  const [showTagModal, setShowTagModal] = useState(false);
   const [imagesPicker, setImagesPicker] = useState(false);
   const [images, setImages] = useState<any>([]);
   const [cation, setCaption] = useState<any>('');
+  const [createTag, setCreateTag] = useState<any>('');
   const [tags, setTags] = useState<any>([]);
   const {mutation, isLoading} = useMutation();
   const handelTags = (i: any) => {
@@ -58,31 +64,53 @@ const Post = () => {
       let formData = new FormData();
       formData.append('caption', cation);
       formData.append('media_type', 'image');
-      tags?.forEach(tg => formData.append('tags', tg?._id));
-      images?.forEach(img => {
+      tags?.forEach((tg: any) => formData.append('tags', tg?._id));
+      images?.forEach((img: any) => {
         formData.append('media', {
           uri: img?.path,
           name: `file.jpg`,
           type: 'image/jpeg',
         });
       });
-      const res = await mutation(`posts/create`, {
-        method: 'POST',
-        body: formData,
-        isFormData: true,
-      });
-      console.log({res});
-      if (res?.status === 201) {
-        setImages('');
-        setCaption('');
-        setTags([]);
-        Alert.alert('Success', 'Post Successfully Done');
+      if (userData?.is_profile_completed) {
+        const res = await mutation(`posts/create`, {
+          method: 'POST',
+          body: formData,
+          isFormData: true,
+        });
+
+        if (res?.status === 201) {
+          setImages('');
+          setCaption('');
+          setTags([]);
+          Alert.alert('Success', 'Post Successfully Done');
+        }
+      } else {
+        Alert.alert('Error', 'Please Complete Your Profile First Before Post');
       }
     } catch (error) {
       console.log(error);
     }
   };
-  console.log(data?.data?.data);
+
+  const CreateTags = async () => {
+    try {
+      const response = await mutation(`tags`, {
+        method: 'POST',
+        body: {
+          title: createTag,
+        },
+      });
+      console.log({response});
+      if (response?.status === 201) {
+        mutate();
+        setShowTagModal(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <PrivateContainer
       icons={[
@@ -166,9 +194,30 @@ const Post = () => {
             </Pressable> */}
           </HStack>
 
-          <Text my={'$2'} fontFamily="Montserrat-Bold" fontSize={13}>
-            Select Tags
-          </Text>
+          <HStack
+            justifyContent="space-between"
+            alignItems={'center'}
+            mt={'$2'}
+            mb={'$1'}>
+            <Text my={'$2'} fontFamily="Montserrat-Bold" fontSize={13}>
+              Select Tags
+            </Text>
+            <Pressable onPress={() => setShowTagModal(true)}>
+              <HStack gap={'$2'} alignItems={'center'}>
+                <AppIcon
+                  AntDesignName="plus"
+                  size={18}
+                  color={COLORS.primary}
+                />
+                <Text
+                  fontFamily="Montserrat-Bold"
+                  fontSize={13}
+                  color={COLORS.primary}>
+                  Add Tag
+                </Text>
+              </HStack>
+            </Pressable>
+          </HStack>
           <Pressable
             onPress={() => setShowModal(true)}
             bgColor={'white'}
@@ -181,20 +230,20 @@ const Post = () => {
               <AppIcon AntDesignName="caretdown" size={20} />
             </HStack>
           </Pressable>
-          <Box>
+          <HStack gap={'$1.5'} mt={'$1'} flexWrap="wrap">
             {tags?.map((tag: any) => (
               <Box
-                my={'$2'}
+                my={'$0.5'}
                 px={'$2'}
-                bg={'$pink100'}
+                bg={'$pink50'}
                 borderRadius={15}
                 key={tag?._id}>
-                <Text fontFamily="Montserrat-Medium" py={'$2'}>
-                  {tag?.title}
+                <Text fontFamily="Montserrat-Medium" py={'$1'} fontSize={13}>
+                  # {tag?.title}
                 </Text>
               </Box>
             ))}
-          </Box>
+          </HStack>
         </Box>
 
         <Box mt={'$7'}>
@@ -227,31 +276,33 @@ const Post = () => {
             </ModalCloseButton>
           </ModalHeader>
           <ModalBody>
-            {data?.data?.data?.map((item: any) => (
-              <Pressable
-                mt={'$3'}
-                key={item?._id}
-                onPress={() => handelTags(item)}
-                borderWidth={1}
-                borderColor="$coolGray400"
-                bgColor={
-                  tags?.find(i => i?._id === item?._id)
-                    ? COLORS.secondary
-                    : '$white'
-                }
-                borderRadius={20}>
-                <Text
-                  fontFamily="Montserrat-SemiBold"
-                  p={'$2'}
-                  color={
-                    tags?.find((i: any) => i?._id === item?._id)
-                      ? '$white'
-                      : '$black'
-                  }>
-                  {item?.title}
-                </Text>
-              </Pressable>
-            ))}
+            <ScrollView>
+              {data?.data?.data?.map((item: any) => (
+                <Pressable
+                  mt={'$3'}
+                  key={item?._id}
+                  onPress={() => handelTags(item)}
+                  borderWidth={1}
+                  borderColor="$coolGray400"
+                  bgColor={
+                    tags?.find(i => i?._id === item?._id)
+                      ? COLORS.secondary
+                      : '$white'
+                  }
+                  borderRadius={20}>
+                  <Text
+                    fontFamily="Montserrat-SemiBold"
+                    p={'$2'}
+                    color={
+                      tags?.find((i: any) => i?._id === item?._id)
+                        ? '$white'
+                        : '$black'
+                    }>
+                    {item?.title}
+                  </Text>
+                </Pressable>
+              ))}
+            </ScrollView>
             <Pressable
               mt={'$5'}
               onPress={() => setShowModal(false)}
@@ -265,10 +316,59 @@ const Post = () => {
           </ModalBody>
         </ModalContent>
       </Modal>
+      {/* Create Tags */}
+      <Modal
+        isOpen={showTagModal}
+        onClose={() => {
+          setShowTagModal(false);
+        }}>
+        <ModalBackdrop />
+        <ModalContent>
+          <ModalHeader>
+            <Heading size="lg">Create Tags</Heading>
+            <ModalCloseButton>
+              <Icon as={CloseIcon} />
+            </ModalCloseButton>
+          </ModalHeader>
+          <ModalBody h={'$56'}>
+            <Box borderBottomWidth={1} borderStyle="dashed"></Box>
+            <VStack mt={'$7'} gap={'$3'}>
+              <Text fontFamily="Montserrat-Bold" fontSize={13}>
+                Enter Tag Name
+              </Text>
+              <Input borderRadius={'$lg'}>
+                <InputField
+                  type="text"
+                  placeholder="Enter Tags"
+                  value={createTag}
+                  onChangeText={txt => setCreateTag(txt)}
+                />
+              </Input>
+            </VStack>
+            <Pressable
+              mt={'$10'}
+              onPress={() => CreateTags()}
+              borderRadius={7}
+              bgColor={COLORS.primary}
+              alignItems="center">
+              {isLoading ? (
+                <Spinner size={'large'} color={'white'} />
+              ) : (
+                <Text
+                  fontFamily="Montserrat-SemiBold"
+                  py={'$2'}
+                  color={'white'}>
+                  Create
+                </Text>
+              )}
+            </Pressable>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
       <PhotoPicker
         visible={imagesPicker}
         onDismiss={() => setImagesPicker(false)}
-        setImageUrl={img => handelImages(img)}
+        setImageUrl={(img: any) => handelImages(img)}
         cropperCircleOverlay={true}
         postImages={false}
       />

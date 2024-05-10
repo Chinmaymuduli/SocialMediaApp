@@ -26,11 +26,13 @@ import {
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useState} from 'react';
 import {Alert, Dimensions} from 'react-native';
+import CircularProgress from 'react-native-circular-progress-indicator';
 import {IMAGES} from '~/Assets';
 import {PrivateContainer} from '~/Components/container';
 import {Button} from '~/Components/core';
 import AppIcon from '~/Components/core/AppIcon';
 import {UserCaption, UserPost} from '~/Components/screens';
+import {useAppContext} from '~/Contexts';
 import {useMutation, useSwrApi} from '~/Hooks';
 import {PrivateRoutesTypes} from '~/Routes/Private/types';
 import {COLORS} from '~/Styles';
@@ -52,6 +54,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
     },
   ];
   const {mutation, isLoading} = useMutation();
+  const {userData: userDetails} = useAppContext();
   const {data} = useSwrApi(`connections/check-is-connected/${params?.user_id}`);
   const {data: userData} = useSwrApi(`users/read/${params?.user_id}`);
   const handelConnectRequest = async () => {
@@ -72,10 +75,10 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
       console.log(error);
     }
   };
-  console.log(userData?.data?.data);
+
   return (
     <PrivateContainer
-      title={userData?.data?.data?.name}
+      title={userData?.data?.data?.nick_name}
       bg={'purple.50'}
       hasBackIcon={true}>
       <ScrollView contentContainerStyle={{paddingBottom: 70}}>
@@ -149,49 +152,110 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
             {userData?.data?.data?.email}
           </Text>
         </VStack>
-        <HStack px={'$4'} gap={'$10'} mt={'$4'}>
-          {!data?.data?.data?.connection?._id ? (
-            <Button
-              borderRadius={5}
-              py={'$2'}
-              onPress={() => {
-                setShowModal(true);
-              }}>
+        {userDetails?.is_profile_completed ? (
+          <HStack px={'$4'} gap={'$10'} mt={'$4'}>
+            {!data?.data?.data?.connection?._id ? (
+              <Button
+                borderRadius={5}
+                py={'$2'}
+                onPress={() => {
+                  setShowModal(true);
+                }}>
+                <Text
+                  color="$white"
+                  fontFamily="Montserrat-Medium"
+                  fontSize={13}>
+                  Connect
+                </Text>
+              </Button>
+            ) : (
+              <Button
+                borderRadius={5}
+                py={'$2'}
+                onPress={() => {
+                  setShowModal(true);
+                }}>
+                {data?.data?.data?.connection?.is_accepted ? (
+                  <Text
+                    color="$white"
+                    fontFamily="Montserrat-Medium"
+                    fontSize={13}>
+                    Remove
+                  </Text>
+                ) : (
+                  <Text
+                    color="$white"
+                    fontFamily="Montserrat-Medium"
+                    fontSize={13}>
+                    Pending
+                  </Text>
+                )}
+              </Button>
+            )}
+
+            <Button borderRadius={5} py={'$2'} onPress={() => {}}>
               <Text color="$white" fontFamily="Montserrat-Medium" fontSize={13}>
-                Connect
+                Message
               </Text>
             </Button>
-          ) : (
-            <Button
-              borderRadius={5}
-              py={'$2'}
-              onPress={() => {
-                setShowModal(true);
-              }}>
-              {data?.data?.data?.connection?.is_accepted ? (
-                <Text
-                  color="$white"
-                  fontFamily="Montserrat-Medium"
-                  fontSize={13}>
-                  Remove
-                </Text>
-              ) : (
-                <Text
-                  color="$white"
-                  fontFamily="Montserrat-Medium"
-                  fontSize={13}>
-                  Pending
-                </Text>
-              )}
-            </Button>
-          )}
+          </HStack>
+        ) : (
+          <Box px={'$3'} mt={'$2'}>
+            <Box bg={'$pink50'} py={'$2'} px={'$2'}>
+              <Text fontFamily="Montserrat-SemiBold" fontSize={12}>
+                Please complete your profile to connect and message !
+              </Text>
+            </Box>
+          </Box>
+        )}
+        {/* Indicator */}
+        <Box px={'$3'} mt={'$3'}>
+          <Box bg="$white" borderRadius={8} softShadow="2">
+            <Box px={'$3'} py={'$3'}>
+              <Text fontFamily="Montserrat-SemiBold">
+                Profile Match Percentage
+              </Text>
+            </Box>
+            <Box borderBottomWidth={1} borderStyle="dashed"></Box>
+            <HStack justifyContent={'space-around'} py={'$5'}>
+              <Box alignItems={'center'}>
+                <CircularProgress
+                  value={
+                    userData?.data?.data?.personal_matching_percentage || 0
+                  }
+                  radius={35}
+                  duration={2500}
+                  progressValueColor={COLORS.primary}
+                  maxValue={100}
+                  activeStrokeColor={COLORS.primary}
+                  activeStrokeSecondaryColor={COLORS.secondary}
+                  valueSuffix={'%'}
+                />
+                <VStack alignItems={'center'} pt={'$2'}>
+                  <Text fontFamily="Montserrat-Medium">Personal</Text>
+                </VStack>
+              </Box>
+              <Box alignItems={'center'}>
+                <CircularProgress
+                  value={
+                    userData?.data?.data?.professional_matching_percentage || 0
+                  }
+                  radius={35}
+                  duration={2500}
+                  progressValueColor={COLORS.secondary}
+                  maxValue={100}
+                  activeStrokeColor={COLORS.secondary}
+                  activeStrokeSecondaryColor={'#C25AFF'}
+                  valueSuffix={'%'}
+                />
+                <VStack alignItems={'center'} pt={'$2'}>
+                  <Text fontFamily="Montserrat-Medium">Professional</Text>
+                </VStack>
+              </Box>
+            </HStack>
+          </Box>
+        </Box>
 
-          <Button borderRadius={5} py={'$2'} onPress={() => {}}>
-            <Text color="$white" fontFamily="Montserrat-Medium" fontSize={13}>
-              Message
-            </Text>
-          </Button>
-        </HStack>
         {data?.data?.data?.connection?.is_accepted && (
           <Box mt={'$8'} flex={1}>
             <FlatList
@@ -250,12 +314,12 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
             {selectSwitch === 'Captions' && <UserCaption />}
           </Box>
         ) : (
-          <Box mt={'$20'} alignItems="center">
+          <Box mt={'$16'} alignItems="center">
             <Image
               source={IMAGES.CONNECT}
               style={{
-                height: 150,
-                width: 150,
+                height: 120,
+                width: 120,
               }}
               alt="img"
             />
