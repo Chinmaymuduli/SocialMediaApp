@@ -17,6 +17,7 @@ import {useSwrApi} from '~/Hooks';
 import FetchLoader from '~/Components/core/FetchLoader';
 import {useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
+import {LinearComponent} from '~/Components/core';
 
 const MyConnections = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
@@ -25,80 +26,82 @@ const MyConnections = () => {
   );
   if (isValidating) <FetchLoader />;
 
-  // console.log(data?.data?.data?.[0]);
+  console.log(data?.data?.data?.[0]);
 
   return (
     <PrivateContainer title={'My Connections'} hasBackIcon={true}>
-      <Box mt={'$4'}>
-        <FlatList
-          data={data?.data?.data}
-          renderItem={({item}: any) => (
-            <Box py={'$1'}>
-              <VStack px={'$4'}>
-                <HStack gap={'$1'} alignItems="center">
-                  <Image
-                    source={
-                      item?.sender_id?.image
-                        ? {uri: item?.sender_id?.image}
-                        : IMAGES.USER
-                    }
-                    alt="img"
-                    style={{
-                      height: 40,
-                      width: 40,
-                    }}
-                    borderRadius={20}
-                  />
-                  <Text fontFamily="Montserrat-SemiBold" fontSize={12}>
-                    {item?.sender_id?.nick_name ||
-                      item?.sender_id?.name ||
-                      item?.sender_id?.phone}
-                  </Text>
-                </HStack>
-                <HStack gap={'$10'} mt={'$1'} px={'$10'} alignItems="center">
-                  <Button
-                    onPress={() =>
-                      navigate('UserProfile', {user_id: item?.sender_id?._id})
-                    }
-                    size="sm"
-                    h={20}
-                    variant="outline"
-                    action="primary"
-                    borderColor={'$green400'}
-                    isDisabled={false}
-                    isFocusVisible={false}>
-                    <ButtonText fontSize={12} color={'$green600'}>
-                      Visit Profile{' '}
-                    </ButtonText>
-                  </Button>
-                  <Button
-                    onPress={() =>
-                      navigate('ChatDetails', {
-                        connection_id: item?._id,
-                        userNickName: item?.sender_id?.nick_Name || 'Unknown',
-                        isReceived: true,
-                        name: item?.sender_id?.name || 'Demo',
-                      })
-                    }
-                    size="md"
-                    h={20}
-                    w={'$24'}
-                    variant="outline"
-                    action="primary"
-                    borderColor={'$pink400'}
-                    isDisabled={false}
-                    isFocusVisible={false}>
-                    <ButtonText fontSize={12} color={'$pink600'}>
-                      Message{' '}
-                    </ButtonText>
-                  </Button>
-                </HStack>
-              </VStack>
-              <Divider mt={'$4'} />
-            </Box>
-          )}
-        />
-      </Box>
+      <LinearComponent>
+        <Box mt={'$4'}>
+          <FlatList
+            data={data?.data?.data}
+            renderItem={({item}: any) => (
+              <Box py={'$1'}>
+                <VStack px={'$4'}>
+                  <HStack gap={'$1'} alignItems="center">
+                    <Image
+                      source={
+                        item?.sender_id?.image
+                          ? {uri: item?.sender_id?.image}
+                          : IMAGES.USER
+                      }
+                      alt="img"
+                      style={{
+                        height: 40,
+                        width: 40,
+                      }}
+                      borderRadius={20}
+                    />
+                    <Text fontFamily="Montserrat-SemiBold" fontSize={12}>
+                      {item?.sender_id?.nick_name ||
+                        item?.sender_id?.name ||
+                        item?.sender_id?.phone}
+                    </Text>
+                  </HStack>
+                  <HStack gap={'$10'} mt={'$1'} px={'$10'} alignItems="center">
+                    <Button
+                      onPress={() =>
+                        navigate('UserProfile', {user_id: item?.sender_id?._id})
+                      }
+                      size="sm"
+                      h={20}
+                      variant="outline"
+                      action="primary"
+                      borderColor={'$green400'}
+                      isDisabled={false}
+                      isFocusVisible={false}>
+                      <ButtonText fontSize={12} color={'$green600'}>
+                        Visit Profile{' '}
+                      </ButtonText>
+                    </Button>
+                    <Button
+                      onPress={() =>
+                        navigate('ChatDetails', {
+                          connection_id: item?._id,
+                          userNickName: item?.sender_id?.nick_name,
+                          isReceived: true,
+                          name: item?.sender_id?.name || 'Demo',
+                        })
+                      }
+                      size="md"
+                      h={20}
+                      w={'$24'}
+                      variant="outline"
+                      action="primary"
+                      borderColor={'$pink400'}
+                      isDisabled={false}
+                      isFocusVisible={false}>
+                      <ButtonText fontSize={12} color={'$pink600'}>
+                        Message{' '}
+                      </ButtonText>
+                    </Button>
+                  </HStack>
+                </VStack>
+                <Divider mt={'$4'} />
+              </Box>
+            )}
+          />
+        </Box>
+      </LinearComponent>
     </PrivateContainer>
   );
 };

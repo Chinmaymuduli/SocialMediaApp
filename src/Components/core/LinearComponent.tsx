@@ -6,6 +6,8 @@ const LinearComponent = ({children}: any) => {
   return (
     <LinearGradient
       colors={['#F6F6F6', '#F5E3E6']}
+      // start={{x: 0, y: 0}}
+      // end={{x: 0, y: 10}}
       style={styles.linearGradient}>
       {children}
     </LinearGradient>
