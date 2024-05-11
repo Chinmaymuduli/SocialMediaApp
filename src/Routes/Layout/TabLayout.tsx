@@ -9,7 +9,6 @@ const Tab = createBottomTabNavigator();
 
 export default function TabLayout() {
   const {userData} = useAppContext();
-  console.log({userData});
   const TabArr: any = useMemo(
     () => [
       ...(userData?.role === 'admin'

@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  Avatar,
   Box,
   CloseIcon,
   FlatList,
@@ -30,6 +31,7 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import RazorpayCheckout from 'react-native-razorpay';
 import moment from 'moment';
 import {useAppContext} from '~/Contexts';
+import LinearGradient from 'react-native-linear-gradient';
 
 type Props = NativeStackScreenProps<PrivateRoutesTypes, 'ChatDetails'>;
 const ChatDetails = ({route: {params}}: Props) => {
@@ -126,11 +128,16 @@ const ChatDetails = ({route: {params}}: Props) => {
   return (
     <PrivateContainer
       hasBackIcon={true}
-      title={params?.name || params?.userNickName}
+      title={params?.userNickName}
       icons={[
         {
           icon: {MaterialIconsName: 'add-call'},
-          onPress: () => {},
+          onPress: () => {
+            navigate('AgoraVoiceCall', {
+              avatar: params?.avatar,
+              nickName: params?.userNickName,
+            });
+          },
           side: 'RIGHT',
         },
         {
@@ -139,72 +146,82 @@ const ChatDetails = ({route: {params}}: Props) => {
             ? () => {
                 setShowModal(true);
               }
-            : () => {},
+            : () => {
+                setShowPaymentModal(true);
+              },
           side: 'RIGHT',
         },
       ]}>
-      <Box flex={1} mt={'$3'}>
-        <FlatList
-          onRefresh={() => mutate()}
-          refreshing={isValidating}
-          data={data?.data?.data}
-          renderItem={({item}: any) => (
-            <Box my={'$2'}>
-              <Box alignItems="center">
-                <Text fontSize={13} fontFamily="Montserrat-Medium">
-                  {item?.date}
-                </Text>
-              </Box>
-              {item?.messages?.map((msg: any, key: any) => (
-                <Box key={key} my={'$1'}>
-                  {msg?.is_received ? (
-                    <Text ml={'$2'}>{msg?.text}</Text>
-                  ) : (
-                    <Box alignSelf="flex-end" pr={'$4'}>
-                      <Text>{msg?.text}</Text>
-                    </Box>
-                  )}
+      <LinearGradient
+        colors={['#F5E3E6', '#F6F6F6']}
+        style={styles.linearGradient}>
+        <Box flex={1} mt={'$3'}>
+          <FlatList
+            onRefresh={() => mutate()}
+            refreshing={isValidating}
+            data={data?.data?.data}
+            renderItem={({item}: any) => (
+              <Box my={'$2'}>
+                <Box alignItems="center">
+                  <Text fontSize={13} fontFamily="Montserrat-SemiBold">
+                    {item?.date === new Date().toDateString()
+                      ? 'Today'
+                      : item?.date}
+                  </Text>
                 </Box>
-              ))}
-            </Box>
-          )}
-        />
-        <Box mb="$3" px={'$3'}>
-          <HStack gap={'$2'}>
-            <Input
-              flex={1}
-              variant="outline"
-              size="md"
-              isDisabled={false}
-              borderRadius={20}
-              alignItems="center"
-              borderColor="$coolGray300"
-              isInvalid={false}
-              isReadOnly={false}>
-              <InputField
-                placeholder="Enter Text here"
-                fontSize={12}
-                value={message}
-                onChangeText={text => setMessage(text)}
-              />
-            </Input>
-            <Pressable
-              borderRadius={20}
-              onPress={isLoading ? () => {} : () => handelChat()}
-              h={'$10'}
-              w={'$10'}
-              bg={isLoading ? '$coolGray300' : '$blue200'}
-              alignItems={'center'}
-              justifyContent={'center'}>
-              <AppIcon
-                IoniconsName="send"
-                size={22}
-                color={isLoading ? 'gray' : 'blue'}
-              />
-            </Pressable>
-          </HStack>
+                {item?.messages?.map((msg: any, key: any) => (
+                  <Box key={key} my={'$1'}>
+                    {msg?.is_received ? (
+                      <Text ml={'$2'} fontFamily="Montserrat-Medium">
+                        {msg?.text}
+                      </Text>
+                    ) : (
+                      <Box alignSelf="flex-end" pr={'$4'}>
+                        <Text fontFamily="Montserrat-Medium">{msg?.text}</Text>
+                      </Box>
+                    )}
+                  </Box>
+                ))}
+              </Box>
+            )}
+          />
+          <Box mb="$3" px={'$3'} mt={'$2'}>
+            <HStack gap={'$2'}>
+              <Input
+                flex={1}
+                variant="outline"
+                size="md"
+                isDisabled={false}
+                borderRadius={20}
+                alignItems="center"
+                borderColor="$coolGray300"
+                isInvalid={false}
+                isReadOnly={false}>
+                <InputField
+                  placeholder="Enter Text here"
+                  fontSize={12}
+                  value={message}
+                  onChangeText={text => setMessage(text)}
+                />
+              </Input>
+              <Pressable
+                borderRadius={20}
+                onPress={isLoading ? () => {} : () => handelChat()}
+                h={'$10'}
+                w={'$10'}
+                bg={isLoading ? '$coolGray300' : '$blue200'}
+                alignItems={'center'}
+                justifyContent={'center'}>
+                <AppIcon
+                  IoniconsName="send"
+                  size={22}
+                  color={isLoading ? 'gray' : 'blue'}
+                />
+              </Pressable>
+            </HStack>
+          </Box>
         </Box>
-      </Box>
+      </LinearGradient>
       {/* Modal */}
       <Modal
         isOpen={showModal}
@@ -426,13 +443,5 @@ var styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 15,
     borderRadius: 5,
-  },
-  buttonText: {
-    fontSize: 18,
-    fontFamily: 'Gill Sans',
-    textAlign: 'center',
-    margin: 10,
-    color: '#ffffff',
-    backgroundColor: 'transparent',
   },
 });

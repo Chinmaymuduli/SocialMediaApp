@@ -20,3 +20,6 @@ export {default as AllUsers} from './Admin/AllUsers';
 export {default as AllSupports} from './Admin/AllSupports';
 export {default as AllPayments} from './Admin/AllPayments';
 export {default as AllMeetings} from './Admin/AllMeetings';
+export {default as CompleteProfile} from './CompleteProfile';
+// voice call
+export {default as AgoraVoiceCall} from './Agora';

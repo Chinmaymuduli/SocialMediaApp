@@ -10,12 +10,14 @@ type PublicRouteProps = {
 };
 
 export default function PublicRoutes({
-  initialRouteName = 'Login',
+  initialRouteName = 'AuthScreen',
 }: PublicRouteProps) {
   return (
     <Stack.Navigator
       initialRouteName={initialRouteName}
       screenOptions={{headerShown: false}}>
+      <Stack.Screen name="AuthScreen" component={Auth.AuthScreen} />
+      <Stack.Screen name="AuthRoute" component={Auth.AuthRoute} />
       <Stack.Screen name="Login" component={Auth.Login} />
       <Stack.Screen name="SignUp" component={Auth.SignUp} />
       <Stack.Screen name="OtpScreen" component={Auth.OtpScreen} />

@@ -11,7 +11,11 @@ type PrivateScreens = {
   [key in keyof typeof Private]: undefined;
 };
 
-type OmittedScreens = 'AllComments' | 'UserProfile' | 'ChatDetails';
+type OmittedScreens =
+  | 'AllComments'
+  | 'UserProfile'
+  | 'ChatDetails'
+  | 'AgoraVoiceCall';
 
 export type PrivateNavigationProp = Omit<PrivateScreens, OmittedScreens> & {
   // OtpScreen: {
@@ -28,6 +32,11 @@ export type PrivateNavigationProp = Omit<PrivateScreens, OmittedScreens> & {
     userNickName?: string;
     isReceived?: boolean;
     name?: string;
+    avatar?: any;
+  };
+  AgoraVoiceCall: {
+    avatar?: any;
+    nickName?: string;
   };
 };
 

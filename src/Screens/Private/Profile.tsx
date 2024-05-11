@@ -688,7 +688,7 @@ const Profile = () => {
             py={'$2'}
             onPress={() => handelUpdateProfile()}>
             <Text color="$white" fontFamily="Montserrat-Bold" fontSize={13}>
-              Post
+              Update
             </Text>
           </Button>
         </Box>

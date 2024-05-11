@@ -1,5 +1,6 @@
 export default {
   LOGO: require('./LOGO.jpeg'),
+  LOGO2: require('./LOGO2.png'),
   OTP: require('./Otp.png'),
   PLUS: require('./plus.png'),
   POST1: require('./post1.jpg'),

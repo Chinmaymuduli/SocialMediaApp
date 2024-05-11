@@ -9,7 +9,7 @@ import {SplashScreen} from './Screens/Public';
 const Route = () => {
   const [token, setToken] = React.useState<string | null>();
   const {getUser} = useBasicFunction();
-  const {isLoggedIn, setIsLoggedIn, setUserData} = useAppContext();
+  const {isLoggedIn, setIsLoggedIn, userData} = useAppContext();
   const getAuthStatus = async () => {
     try {
       const value = await AsyncStorage.getItem('isLoggedIn');

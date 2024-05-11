@@ -57,6 +57,9 @@ const Messages = () => {
                   userNickName: item?.is_received
                     ? item?.sender_id?.nick_name || ''
                     : item?.receiver_id?.nick_name || '',
+                  avatar: item?.is_received
+                    ? item?.sender_id?.avatar
+                    : item?.receiver_id?.avatar,
                 })
               }>
               <HStack gap={'$3'} alignItems={'center'}>
@@ -69,7 +72,11 @@ const Messages = () => {
                           item?.receiver_id?.name}
                     </AvatarFallbackText>
                     <AvatarImage
-                      source={IMAGES.USER}
+                      source={{
+                        uri: item?.is_received
+                          ? item?.sender_id?.avatar
+                          : item?.receiver_id?.avatar,
+                      }}
                       alt="img"
                       h={'$12'}
                       w={'$12'}
