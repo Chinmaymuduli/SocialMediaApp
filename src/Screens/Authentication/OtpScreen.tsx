@@ -45,7 +45,7 @@ const OtpScreen = ({route: {params}}: Props) => {
       console.log(error);
     }
   };
-  // 285012
+
   const verifyOtp = async () => {
     try {
       const bodyData = {
@@ -58,8 +58,8 @@ const OtpScreen = ({route: {params}}: Props) => {
       });
 
       if (otpVerify?.results?.success === true) {
-        handleLogin();
         getUser();
+        handleLogin();
       } else {
         Alert.alert('Error', 'Invalid OTP');
       }

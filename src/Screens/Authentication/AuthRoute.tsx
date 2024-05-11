@@ -39,46 +39,50 @@ const AuthRoute = ({route: {params}, navigation}: Props) => {
           />
         </Center>
         <Box mt={'$6'} px={'$10'}>
-          {isRegister ? (
-            <Box>
+          <Box>
+            {isRegister ? (
               <Text
                 fontSize={28}
                 fontFamily={'Montserrat-Bold'}
                 textAlign="center">
                 Create Account
               </Text>
+            ) : (
               <Text
-                mt={'$3'}
-                textAlign="center"
-                fontFamily={'Montserrat-Medium'}
-                lineHeight={'$md'}>
-                By creating an account you agree to our{' '}
+                fontSize={28}
+                fontFamily={'Montserrat-Bold'}
+                textAlign="center">
+                Get Started
+              </Text>
+            )}
+            <Text
+              mt={'$3'}
+              textAlign="center"
+              fontFamily={'Montserrat-Medium'}
+              lineHeight={'$md'}>
+              By {isRegister ? 'creating' : 'login'} an account you agree to our{' '}
+              <Text
+                color={COLORS.primary}
+                fontFamily={'Montserrat-SemiBold'}
+                textDecorationLine={'underline'}>
+                Terms & Conditions
+              </Text>
+              <Text>
+                {' '}
+                and{' '}
                 <Text
                   color={COLORS.primary}
                   fontFamily={'Montserrat-SemiBold'}
                   textDecorationLine={'underline'}>
-                  Terms & Conditions
-                </Text>
-                <Text>
-                  {' '}
-                  and{' '}
-                  <Text
-                    color={COLORS.primary}
-                    fontFamily={'Montserrat-SemiBold'}
-                    textDecorationLine={'underline'}>
-                    Privacy Policy
-                  </Text>
+                  Privacy Policy
                 </Text>
               </Text>
-            </Box>
-          ) : (
-            <></>
-          )}
+            </Text>
+          </Box>
         </Box>
         <Box position={'absolute'} bottom={'$5'} w={'$full'} px={'$3'}>
           <VStack gap={'$3'}>
             <Button
-              //   onPress={() => navigate('Login')}
               bgColor={COLORS.secondary}
               borderRadius={20}
               gap={'$1'}
@@ -92,7 +96,7 @@ const AuthRoute = ({route: {params}, navigation}: Props) => {
               borderRadius={20}
               gap={'$1'}
               w={'100%'}
-              onPress={() => navigation.navigate('SignUp')}>
+              onPress={() => navigation.navigate('Login')}>
               <ButtonIcon as={PhoneIcon} mr="$2" />
               <ButtonText color="$white" fontFamily={'Montserrat-Bold'}>
                 Continue with phone number

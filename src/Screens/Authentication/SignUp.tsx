@@ -139,7 +139,7 @@ const SignUp = () => {
             />
           </Center>
           <Box mt={'$2'}>
-            <Box>
+            <Box mb={'$3'}>
               <Text fontSize={30} fontFamily={'Montserrat-Bold'}>
                 Welcome,
               </Text>
@@ -147,7 +147,18 @@ const SignUp = () => {
                 Please create account to continue.
               </Text>
             </Box>
-            {isPhoneLogin ? (
+            <PhoneLogin
+              selectedCountry={selectedCountry}
+              setSelectedCountry={setSelectedCountry}
+              phoneNumber={phoneNumber}
+              setPhoneNumber={setPhoneNumber}
+            />
+            <Box mt={'$3'}>
+              <Text fontFamily={'Montserrat-Medium'} fontSize={14}>
+                We'll send you a verification code to verify you're really you.
+              </Text>
+            </Box>
+            {/* {isPhoneLogin ? (
               <PhoneLogin
                 selectedCountry={selectedCountry}
                 setSelectedCountry={setSelectedCountry}
@@ -163,10 +174,10 @@ const SignUp = () => {
                 email={email}
                 password={password}
               />
-            )}
+            )} */}
           </Box>
 
-          <VStack gap={'$5'} mt={'$9'}>
+          {/* <VStack gap={'$5'} mt={'$9'}>
             <Button
               bgColor={COLORS.secondary}
               isDisabled={isLoading}
@@ -191,7 +202,7 @@ const SignUp = () => {
               </Text>
               <Box h={'$0.5'} bgColor={'$coolGray200'} w={'40%'}></Box>
             </HStack>
-
+            
             {!isPhoneLogin ? (
               <HStack justifyContent={'space-between'} alignItems={'center'}>
                 <Button
@@ -266,9 +277,9 @@ const SignUp = () => {
                 </Button>
               </HStack>
             )}
-          </VStack>
+          </VStack> */}
         </Box>
-        <Box alignItems="center" justifyContent="center" mt={'$10'}>
+        {/* <Box alignItems="center" justifyContent="center" mt={'$10'}>
           <HStack gap={'$2'}>
             <Text fontFamily={'Montserrat-Medium'}>Have an account ?</Text>
             <Pressable onPress={() => navigate('Login')}>
@@ -277,8 +288,21 @@ const SignUp = () => {
               </Text>
             </Pressable>
           </HStack>
-        </Box>
+        </Box> */}
       </ScrollView>
+      <Box mb={'$5'} px={'$3'}>
+        <Button
+          bgColor={COLORS.secondary}
+          isDisabled={isLoading}
+          borderRadius={20}
+          onPress={isPhoneLogin ? () => handelPhoneLogin() : () => onSubmit()}
+          gap={'$1'}>
+          <ButtonText color="$white" fontFamily={'Montserrat-Bold'}>
+            Save & Continue
+          </ButtonText>
+          <ButtonIcon as={ArrowRightIcon} mt={'$0.5'} />
+        </Button>
+      </Box>
     </SafeAreaView>
   );
 };

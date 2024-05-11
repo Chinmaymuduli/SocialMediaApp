@@ -135,7 +135,18 @@ const Login = () => {
                 Please enter your credential to continue.
               </Text>
             </Box>
-            {isPhoneLogin ? (
+            <PhoneLogin
+              phoneNumber={phoneNumber!}
+              setPhoneNumber={setPhoneNumber}
+              selectedCountry={selectedCountry}
+              setSelectedCountry={setSelectedCountry}
+            />
+            <Box mt={'$3'}>
+              <Text fontFamily={'Montserrat-Medium'} fontSize={14}>
+                We'll send you a verification code to verify you're really you.
+              </Text>
+            </Box>
+            {/* {isPhoneLogin ? (
               <PhoneLogin
                 phoneNumber={phoneNumber!}
                 setPhoneNumber={setPhoneNumber}
@@ -151,10 +162,10 @@ const Login = () => {
                 password={password}
                 setPassword={setPassword}
               />
-            )}
+            )} */}
           </Box>
 
-          <VStack gap={'$5'} mt={'$9'}>
+          {/* <VStack gap={'$5'} mt={'$9'}>
             <Button
               bgColor={COLORS.secondary}
               borderRadius={8}
@@ -258,9 +269,9 @@ const Login = () => {
                 </Button>
               </HStack>
             )}
-          </VStack>
+          </VStack> */}
         </Box>
-        <Box alignItems="center" justifyContent="center" mt={'$10'}>
+        {/* <Box alignItems="center" justifyContent="center" mt={'$10'}>
           <HStack gap={'$2'}>
             <Text fontFamily={'Montserrat-Medium'}>
               Don't have an account ?
@@ -271,8 +282,25 @@ const Login = () => {
               </Text>
             </Pressable>
           </HStack>
-        </Box>
+        </Box> */}
       </ScrollView>
+      <Box mb={'$3'} px={'$2'}>
+        <Button
+          bgColor={COLORS.secondary}
+          borderRadius={8}
+          isDisabled={isLoading}
+          onPress={() => handelPhoneLogin()}
+          gap={'$1'}>
+          <ButtonText color="$white" fontFamily={'Montserrat-Bold'}>
+            Sign In
+          </ButtonText>
+          {isLoading ? (
+            <ButtonSpinner />
+          ) : (
+            <ButtonIcon as={ArrowRightIcon} mt={'$0.5'} />
+          )}
+        </Button>
+      </Box>
     </SafeAreaView>
   );
 };

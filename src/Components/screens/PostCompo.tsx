@@ -208,14 +208,14 @@ const PostCompo = ({item, mutate}: any) => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigate('AllComments', {post_id: item?._id})}>
-            <Ionic
-              name="chatbubble-outline"
+            <MaterialCommunityIcons
+              name="comment-outline"
               style={{fontSize: 20, paddingRight: 10}}
               color={'black'}
             />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => onShare()}>
-            <Feather name="navigation" style={{fontSize: 20}} />
+            <Feather name="repeat" style={{fontSize: 20}} />
           </TouchableOpacity>
         </HStack>
 

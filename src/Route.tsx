@@ -40,8 +40,19 @@ const Route = () => {
     };
     getTokenData();
   }, []);
-  if (isLoggedIn === null) return <SplashScreen />;
-  return isLoggedIn ? <PrivateRoutes /> : <PublicRoutes />;
+
+  console.log('=======>', userData);
+
+  if (userData === null) return <SplashScreen />;
+  return userData?._id ? (
+    <PrivateRoutes
+      initialRouteName={
+        userData?.is_profile_completed ? 'TabLayout' : 'CompleteProfile'
+      }
+    />
+  ) : (
+    <PublicRoutes />
+  );
 };
 
 export default Route;
