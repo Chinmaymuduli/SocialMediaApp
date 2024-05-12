@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {PrivateContainer} from '~/Components/container';
 import {
   Box,
@@ -7,6 +7,7 @@ import {
   FlatList,
   HStack,
   Image,
+  Pressable,
   Spinner,
   VStack,
 } from '@gluestack-ui/themed';
@@ -18,21 +19,62 @@ import FetchLoader from '~/Components/core/FetchLoader';
 import {useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
 import {LinearComponent} from '~/Components/core';
+import {COLORS} from '~/Styles';
+import MyConnectionCompo from './MyConnectionCompo';
+import RequestCompo from './RequestCompo';
 
 const MyConnections = () => {
-  const {navigate} = useNavigation<PrivateScreenProps>();
-  const {data, isValidating} = useSwrApi(
+  const [selectTab, setSelectTab] = useState('1');
+  const {data, isValidating, mutate} = useSwrApi(
     `connections/read-all?type=all&is_accepted=true&require_all=true`,
   );
-  if (isValidating) <FetchLoader />;
+  const {
+    data: requestData,
+    isValidating: requestLoading,
+    mutate: requestMutate,
+  } = useSwrApi(
+    `connections/read-all?type=receive&is_accepted=false&require_all=true`,
+  );
 
-  console.log(data?.data?.data?.[0]);
+  const btnArray = [
+    {
+      id: '1',
+      title: 'My Connections',
+    },
+    {
+      id: '2',
+      title: 'Request Connections',
+    },
+  ];
+  if (isValidating) <FetchLoader />;
 
   return (
     <PrivateContainer title={'My Connections'} hasBackIcon={true}>
       <LinearComponent>
+        <Box px={'$3'} mt={'$4'}>
+          <Box bg="$white" softShadow="1" borderRadius={10}>
+            <HStack justifyContent="space-between">
+              {btnArray?.map(btn => (
+                <Pressable
+                  onPress={() => setSelectTab(btn?.id)}
+                  py={'$3'}
+                  bg={selectTab === btn.id ? COLORS.primary : '$white'}
+                  w={'50%'}
+                  alignItems="center"
+                  borderRadius={10}>
+                  <Text
+                    fontFamily="Montserrat-SemiBold"
+                    fontSize={13}
+                    color={selectTab === btn.id ? '$white' : COLORS.primary}>
+                    {btn?.title}
+                  </Text>
+                </Pressable>
+              ))}
+            </HStack>
+          </Box>
+        </Box>
         <Box mt={'$4'}>
-          <FlatList
+          {/* <FlatList
             data={data?.data?.data}
             renderItem={({item}: any) => (
               <Box py={'$1'}>
@@ -99,7 +141,15 @@ const MyConnections = () => {
                 <Divider mt={'$4'} />
               </Box>
             )}
-          />
+          /> */}
+          {selectTab === '1' && <MyConnectionCompo data={data?.data?.data} />}
+          {selectTab === '2' && (
+            <RequestCompo
+              data={requestData?.data?.data}
+              requestMutate={requestMutate}
+              mutate={mutate}
+            />
+          )}
         </Box>
       </LinearComponent>
     </PrivateContainer>

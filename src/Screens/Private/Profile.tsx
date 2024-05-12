@@ -1,206 +1,75 @@
 import React, {useEffect, useState} from 'react';
 import {PrivateContainer} from '~/Components/container';
-import {IMAGES} from '~/Assets';
-import {PrivateScreenProps} from '~/Routes/Private/types';
 import {useNavigation} from '@react-navigation/native';
 import {
-  ActionsheetBackdrop,
-  ActionsheetContent,
-  ActionsheetDragIndicator,
-  ActionsheetDragIndicatorWrapper,
-  ActionsheetItem,
-  AlertCircleIcon,
-  Avatar,
-  AvatarFallbackText,
-  AvatarGroup,
-  AvatarImage,
+  PrivateNavigationProp,
+  PrivateScreenProps,
+} from '~/Routes/Private/types';
+import {IMAGES} from '~/Assets';
+import {
+  AddIcon,
   Box,
-  ChevronDownIcon,
-  CircleIcon,
-  FormControl,
-  FormControlError,
-  FormControlErrorIcon,
-  FormControlErrorText,
-  FormControlHelper,
-  FormControlHelperText,
-  FormControlLabel,
-  FormControlLabelText,
+  Button,
+  ButtonIcon,
+  ButtonText,
+  Center,
+  FlatList,
   HStack,
-  Icon,
-  Image,
-  InputField,
-  Pressable,
-  RadioIcon,
-  RadioIndicator,
-  Select,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicator,
-  SelectDragIndicatorWrapper,
-  SelectIcon,
-  SelectInput,
-  SelectItem,
-  SelectPortal,
-  SelectTrigger,
-  Text,
+  ScrollView,
+  VStack,
 } from '@gluestack-ui/themed';
-import {ScrollView} from '@gluestack-ui/themed';
-import {COLORS} from '~/Styles';
-import {VStack} from '@gluestack-ui/themed';
-import {Input} from '@gluestack-ui/themed';
-import Fontisto from 'react-native-vector-icons/Fontisto';
-import {Button, PhotoPicker, StatePicker} from '~/Components/core';
-import AppIcon from '~/Components/core/AppIcon';
-import {useAppContext} from '~/Contexts';
+import {Image} from '@gluestack-ui/themed';
 import {useMutation, useSwrApi} from '~/Hooks';
-import DateTimePicker from 'react-native-modal-datetime-picker';
+import {Text} from '@gluestack-ui/themed';
+import {COLORS} from '~/Styles';
 import moment from 'moment';
-import {Radio} from '@gluestack-ui/themed';
-import {RadioLabel} from '@gluestack-ui/themed';
-import {RadioGroup} from '@gluestack-ui/themed';
-import {Actionsheet} from '@gluestack-ui/themed';
-import {ActionsheetItemText} from '@gluestack-ui/themed';
-import {Alert} from 'react-native';
+import AppIcon from '~/Components/core/AppIcon';
+import {PhotoPicker} from '~/Components/core';
+import {Alert, Pressable} from 'react-native';
 
 const Profile = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
-  const {userData} = useAppContext();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [nickName, setNickName] = useState('');
-  const [gender, setGender] = useState('');
-  const [city, setCity] = useState('');
-  const [area, setArea] = useState('');
-  const [expertise, setExpertise] = useState<any>();
-  const [expertiseFor, setExpertiseFor] = useState<any>();
-  const [state, setState] = useState<any>();
-  const [visiblePhoto, setVisiblePhoto] = useState(false);
-  const [showStatePicker, setShowStatePicker] = useState(false);
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [selectedDate, setSelectedDate] = useState('');
-  const [profileImage, setProfileImage] = useState<any>();
+  const [imagesPicker, setImagesPicker] = useState(false);
+  const [isImagePick, setIsImagePick] = useState(false);
+  const [images, setImages] = useState<any>([]);
+  const {data, isValidating, mutate} = useSwrApi(`users/self`);
+  const handelImages = (img: any) => {
+    console.log({img});
+    setImages((prev: any) => [...prev, img]);
+  };
   const {mutation, isLoading} = useMutation();
-  const {data} = useSwrApi(`interests?type=personal`);
-  const {data: professionalData} = useSwrApi(
-    `interests?type=professional&search=${expertise}`,
-  );
-
-  // console.log('kikiki', userData?.interests);
-
-  useEffect(() => {
-    setEmail(userData?.email);
-    setPhone(userData?.phone);
-    setName(userData?.name);
-    setNickName(userData?.nick_name);
-    setCity(userData?.location_details?.city);
-    setArea(userData?.location_details?.address);
-    setGender(userData?.gender);
-    setSelectedDate(userData?.dob);
-    setState({
-      title: userData?.location_details?.state,
-      state: userData?.location_details?.state,
-    });
-    setProfileImage(userData?.profileImage);
-    setExpertise(
-      userData?.interests?.find((item: any) => item?.type === 'personal'),
-    );
-    setExpertiseFor(
-      userData?.interests?.find((item: any) => item?.type === 'professional'),
-    );
-  }, [userData]);
-
-  const avatars = [
-    {
-      src: 'https://example.com.jpg',
-      alt: 'Sandeep Srivastva',
-      color: '$emerald600',
-    },
-    {src: 'https://example.com.jpg', alt: 'Arjun Kapoor', color: '$cyan600'},
-    {
-      src: 'https://example.com.jpg',
-      alt: 'Ritik Sharma ',
-      color: '$indigo600',
-    },
-    {src: 'https://example.com.jpg', alt: 'Akhil Sharma', color: '$gray600'},
-    {src: 'https://example.com.jpg', alt: 'Rahul Sharma ', color: '$red400'},
-  ];
-  const extraAvatars = avatars.slice(1);
-  const remainingCount = extraAvatars.length;
-  const handelUpdateProfile = async () => {
+  const handelMultipleImage = async () => {
     try {
-      const locationDetails = {
-        pincode: '',
-        address: area,
-        city: city,
-        state: state?.title,
-        coordinates: [12.988, 77.6895],
-      };
-      const interests = [expertise?._id, expertiseFor?._id];
-      const locationDetailsString = JSON.stringify(locationDetails);
       const formData = new FormData();
-      formData.append('name', name);
-      formData.append('nick_name', nickName);
-      formData.append('gender', gender);
-      formData.append('dob', moment(selectedDate).toISOString());
-      interests.forEach(interest => {
-        formData.append('interests', interest);
-      });
-      formData.append('location_details', locationDetailsString);
-      profileImage?.path &&
+      images.forEach((img: any) => {
         formData.append('avatar', {
-          uri: profileImage?.path,
-          name: 'image.png',
-          fileName: 'image',
-          type: 'image/png',
+          uri: img?.path,
+          name: `file.jpg`,
+          type: 'image/jpeg',
         });
-
-      !userData?.phone_verify?.is_verified && formData.append('phone', phone);
-      !userData?.email_verify?.is_verified && formData.append('email', email);
-      // formData.append('dob', email);
-
-      const updateData = await mutation(`users/self/update`, {
-        method: 'PUT',
-        body: formData,
-        isFormData: true,
       });
-      console.log(updateData);
-      if (updateData?.status === 200) {
-        Alert.alert('Success', 'Profile Updated Successfully');
+      const res = await mutation(`users/add-avatars`, {
+        method: 'POST',
+        isFormData: true,
+        body: formData,
+      });
+      if (res?.status === 201) {
+        mutate();
+        Alert.alert('Success', 'Images Added Successfully');
       }
     } catch (error) {
       console.log(error);
     }
   };
-
-  // console.log({expertise, expertiseFor});
-  const handleStateSelect = (state: any) => {
-    setShowStatePicker(false);
-    setState(state);
-  };
-  const handleConfirm = (date: any) => {
-    setSelectedDate(date);
-    setDatePickerVisibility(false);
-  };
-
-  const [showActionsheet, setShowActionsheet] = React.useState(false);
-  const [showActionsheet2, setShowActionsheet2] = React.useState(false);
-
-  const handleSelect = (data: any) => {
-    setShowActionsheet(false);
-    setExpertise(data);
-  };
-  const handleSelect2 = (data: any) => {
-    setShowActionsheet2(false);
-    setExpertiseFor(data);
-  };
-
+  useEffect(() => {
+    setImages(data?.data?.data?.avatars);
+  });
   return (
     <PrivateContainer
       icons={[
         {
           icon: {IoniconsName: 'notifications'},
-          onPress: () => navigate('Profile'),
+          onPress: () => navigate('Notifications'),
           side: 'RIGHT',
         },
         {
@@ -210,547 +79,270 @@ const Profile = () => {
         },
       ]}
       image={IMAGES.LOGO}>
-      <ScrollView contentContainerStyle={{paddingBottom: 50}}>
-        {/* Profile Picture */}
-        <Box mt={'$4'}>
-          <Pressable
-            bg={'$coolGray200'}
-            // borderWidth={2}
-            // borderColor={'$coolGray300'}
-            rounded={'$lg'}
-            alignSelf={'center'}
-            alignItems={'center'}>
-            {profileImage ? (
-              <Image
-                source={profileImage?.path}
-                style={{
-                  height: 100,
-                  width: 100,
-                }}
-                alt={'Choose Image'}
-                rounded={'$lg'}
-              />
-            ) : (
+      <ScrollView contentContainerStyle={{paddingBottom: 60}}>
+        <Box mt={'$5'}>
+          <Center>
+            <VStack gap={'$2'} alignItems="center">
               <Image
                 source={
-                  profileImage?.path ? {uri: profileImage?.path} : IMAGES.USER
+                  data?.data?.data?.avatar
+                    ? {uri: data?.data?.data?.avatar}
+                    : IMAGES.USER
                 }
-                style={{
-                  height: 100,
-                  width: 100,
-                }}
-                alt={'Choose Image'}
-                rounded={'$lg'}
+                alt="image"
+                style={{height: 100, width: 100}}
+                borderRadius={7}
               />
-            )}
-          </Pressable>
-          {/* <Box position="absolute" right={55} top={50}>
-            <Pressable>
-              <HStack alignItems="center" gap={'$1'}>
-                <AppIcon AntDesignName={'plus'} size={15} color={'black'} />
-                <Text fontFamily="Montserrat-Bold" fontSize={13}>
-                  2 more
-                </Text>
-              </HStack>
-            </Pressable>
-          </Box> */}
-
-          <Pressable
-            alignItems="center"
-            justifyContent="center"
-            onPress={() => setVisiblePhoto(true)}>
-            <HStack
-              alignItems="center"
-              gap={'$1'}
-              borderWidth={1}
-              borderRadius={7}
-              borderColor={COLORS.secondary}
-              px={'$2'}
-              mt={'$2'}
-              py={'$1'}>
-              <AppIcon
-                AntDesignName={'plus'}
-                size={16}
-                color={COLORS.secondary}
-              />
-              <Text
-                fontFamily="Montserrat-Medium"
-                fontSize={12}
-                color={COLORS.secondary}>
-                Add Photos
+              <Text fontFamily={'Montserrat-SemiBold'}>
+                {data?.data?.data?.nick_name}
               </Text>
-            </HStack>
-          </Pressable>
-        </Box>
-        <Box mt={'$2'}>
-          {/* Primary Details */}
-          <Box py={'$2'} px={'$3'} bg={'$pink50'} mt={'$3'}>
-            <Text
-              fontFamily="Montserrat-Bold"
-              fontSize={13}
-              color={COLORS.secondary}>
-              Primary Details
-            </Text>
-          </Box>
-          <VStack gap={'$2'} px={'$3'} mt={'$2'}>
-            <VStack gap={'$2'}>
-              <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
-                Employee Name *
-              </Text>
-              <Input
-                flex={1}
-                variant="outline"
-                size="md"
-                isDisabled={false}
-                alignItems="center"
-                borderColor="$coolGray300"
-                isInvalid={false}
-                isReadOnly={false}>
-                <InputField
-                  placeholder="Enter Name"
-                  fontSize={12}
-                  value={name}
-                  onChangeText={txt => setName(txt)}
-                />
-              </Input>
             </VStack>
-
-            <VStack gap={'$2'}>
-              <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
-                Nick Name *
-              </Text>
-              <Input
-                flex={1}
-                variant="outline"
-                size="md"
-                isDisabled={userData?.nick_name ? true : false}
-                alignItems="center"
-                borderColor="$coolGray300"
-                isInvalid={false}
-                isReadOnly={false}>
-                <InputField
-                  placeholder="Enter nick name here"
-                  fontSize={12}
-                  value={nickName}
-                  onChangeText={txt => setNickName(txt)}
-                />
-              </Input>
-            </VStack>
-
-            {/* Select Gender and date of birth */}
-            <HStack justifyContent={'space-between'} mt={2}>
-              <VStack gap={'$2'}>
-                <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
-                  Gender *
-                </Text>
-                {/* <Pressable
-                
-                  borderWidth={1}
-                  borderRadius={5}
-                  bg={'white'}
-                  borderColor={'$coolGray300'}
-                  minWidth={160}>
-                  <Box py={'$2.5'} px={'$2'}>
-                    <Text fontSize={12} color={'$coolGray500'}>
-                      {'Select Gender'}
-                    </Text>
-                  </Box>
-                </Pressable> */}
-                <RadioGroup value={gender} onChange={setGender}>
-                  <HStack gap={'$2'}>
-                    <Radio
-                      value="male"
-                      size="md"
-                      isInvalid={false}
-                      isDisabled={false}>
-                      <RadioIndicator mr="$2">
-                        <RadioIcon as={CircleIcon} />
-                      </RadioIndicator>
-                      <RadioLabel>Male</RadioLabel>
-                    </Radio>
-                    <Radio
-                      value="female"
-                      size="md"
-                      isInvalid={false}
-                      isDisabled={false}>
-                      <RadioIndicator mr="$2">
-                        <RadioIcon as={CircleIcon} />
-                      </RadioIndicator>
-                      <RadioLabel>Female</RadioLabel>
-                    </Radio>
-                  </HStack>
-                </RadioGroup>
-              </VStack>
-              <VStack w={'48%'} gap={'$2'}>
-                <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
-                  Date of Birth *
+          </Center>
+          <Box mt={'$2'}>
+            <Box py={'$2'} px={'$3'} bg={'$pink50'} mt={'$3'}>
+              <HStack justifyContent="space-between">
+                <Text
+                  fontFamily="Montserrat-Bold"
+                  fontSize={13}
+                  color={COLORS.secondary}>
+                  Add More Images
                 </Text>
                 <Pressable
-                  onPress={() => setDatePickerVisibility(true)}
-                  px={'$1'}
-                  borderRadius={5}
-                  borderWidth={1}
-                  borderColor={'$coolGray300'}>
-                  <HStack justifyContent={'space-between'} py={'$2.5'}>
+                  onPress={() => {
+                    setIsImagePick(true), setImagesPicker(true);
+                  }}>
+                  <HStack alignItems="center" gap={'$2'}>
+                    <AppIcon
+                      AntDesignName="plussquare"
+                      size={20}
+                      color={COLORS.secondary}
+                    />
                     <Text
-                      fontWeight={'semibold'}
+                      fontFamily="Montserrat-Bold"
                       fontSize={13}
-                      color={'$coolGray500'}>
-                      {selectedDate
-                        ? moment(selectedDate).format('DD - MM - YYYY')
-                        : 'DD - MM - YYYY'}
+                      color={COLORS.secondary}>
+                      Add Images
                     </Text>
-                    <Fontisto name="date" size={18} color={'#0d9488'} />
                   </HStack>
                 </Pressable>
-              </VStack>
-            </HStack>
-          </VStack>
-        </Box>
-        {/* Personal Details */}
-        <Box mt={'$2'}>
-          <Box py={'$2'} px={'$3'} bg={'$pink50'} mt={'$3'}>
-            <Text
-              fontFamily="Montserrat-Bold"
-              fontSize={13}
-              color={COLORS.secondary}>
-              Personal Details
-            </Text>
-          </Box>
-          <VStack gap={'$2'} px={'$3'} mt={'$2'}>
-            <VStack gap={'$2'}>
-              <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
-                Phone Number *
-              </Text>
-              <Input
-                flex={1}
-                variant="outline"
-                size="md"
-                isDisabled={userData?.phone_verify?.is_verified ? true : false}
-                alignItems="center"
-                borderColor="$coolGray300"
-                isInvalid={false}
-                isReadOnly={false}>
-                <InputField
-                  placeholder="Enter Name"
-                  fontSize={12}
-                  value={phone}
-                  onChangeText={txt => setPhone(txt)}
-                />
-              </Input>
-            </VStack>
-
-            <VStack gap={'$2'}>
-              <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
-                Email *
-              </Text>
-              <Input
-                flex={1}
-                variant="outline"
-                size="md"
-                isDisabled={userData?.email_verify?.is_verified ? true : false}
-                alignItems="center"
-                borderColor="$coolGray300"
-                isInvalid={false}
-                isReadOnly={false}>
-                <InputField
-                  placeholder="Enter email here"
-                  fontSize={12}
-                  value={email}
-                  onChangeText={txt => setEmail(txt)}
-                />
-              </Input>
-            </VStack>
-            {/* State */}
-            <VStack gap={'$2'}>
-              <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
-                State *
-              </Text>
-              <Pressable
-                onPress={() => setShowStatePicker(true)}
-                borderWidth={1}
-                borderRadius={5}
-                style={{
-                  height: 45,
-                }}
-                bg={'white'}
-                borderColor={'$coolGray300'}>
-                <Text
-                  fontWeight={'semibold'}
-                  fontSize={'$sm'}
-                  color={'$coolGray500'}
-                  p={'$3'}>
-                  {state?.title ? state?.title : 'Select State'}
-                </Text>
-              </Pressable>
-            </VStack>
-
-            {/* Select Gender and date of birth */}
-            <Box justifyContent={'space-between'} mt={2}>
-              <VStack gap={'$2'}>
-                <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
-                  City *
-                </Text>
-                {/* <Pressable
-       
-                  borderWidth={1}
-                  borderRadius={5}
-                  bg={'white'}
-                  borderColor={'$coolGray300'}
-                  minWidth={160}>
-                  <Box py={'$2.5'}>
-                    <Text
-                      fontWeight={'semibold'}
-                      fontSize={'$sm'}
-                      color={'$coolGray500'}>
-                      {'Select City'}
-                    </Text>
-                  </Box>
-                </Pressable> */}
-                <Input
-                  // flex={1}
-                  variant="outline"
-                  size="md"
-                  isDisabled={false}
-                  alignItems="center"
-                  borderColor="$coolGray300"
-                  isInvalid={false}
-                  isReadOnly={false}>
-                  <InputField
-                    placeholder="Enter City"
-                    fontSize={12}
-                    value={city}
-                    onChangeText={txt => setCity(txt)}
-                  />
-                </Input>
-              </VStack>
+              </HStack>
             </Box>
-            <VStack gap={'$2'}>
-              <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
-                Area *
-              </Text>
-              <Input
-                // flex={1}
-                variant="outline"
-                size="md"
-                isDisabled={false}
-                alignItems="center"
-                borderColor="$coolGray300"
-                isInvalid={false}
-                isReadOnly={false}>
-                <InputField
-                  placeholder="Enter Area"
-                  fontSize={12}
-                  value={area}
-                  onChangeText={txt => setArea(txt)}
+            {images?.length > 0 ? (
+              <Box px={'$3'} mt={'$4'}>
+                <FlatList
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  data={images}
+                  renderItem={({item}: any) => (
+                    <Box mr={'$2'}>
+                      <Image
+                        source={{uri: item?.path ? item?.path : item?.avatar}}
+                        alt="user"
+                        style={{height: 100, width: 100}}
+                        borderRadius={6}
+                      />
+                    </Box>
+                  )}
                 />
-              </Input>
-            </VStack>
-          </VStack>
-        </Box>
-        {/* Unique Details */}
-        <Box mt={'$2'}>
-          <Box py={'$2'} px={'$3'} bg={'$pink50'} mt={'$3'}>
-            <Text
-              fontFamily="Montserrat-Bold"
-              fontSize={13}
-              color={COLORS.secondary}>
-              Unique Details
-            </Text>
+
+                {isImagePick && (
+                  <Button
+                    onPress={() => handelMultipleImage()}
+                    mt={'$2'}
+                    size="md"
+                    variant="solid"
+                    action="primary"
+                    bgColor={COLORS.primary}
+                    isDisabled={isLoading ? true : false}
+                    isFocusVisible={false}>
+                    <ButtonIcon as={AddIcon} />
+                    <ButtonText ml={'$1'}>Save Images</ButtonText>
+                  </Button>
+                )}
+              </Box>
+            ) : (
+              <Box alignItems={'center'} justifyContent="center" mt={'$2'}>
+                <Text fontFamily="Montserrat-Bold" fontSize={13}>
+                  No Images Found
+                </Text>
+              </Box>
+            )}
           </Box>
-          <Box px={'$3'} mt={'$2'}>
-            {/* <VStack gap={'$2'}>
-              <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
-                Expertise *
-              </Text>
-              <Input
-                flex={1}
-                variant="outline"
-                size="md"
-                isDisabled={false}
-                alignItems="center"
-                borderColor="$coolGray300"
-                isInvalid={false}
-                isReadOnly={false}>
-                <InputField placeholder="Enter Name" fontSize={12} />
-              </Input>
-            </VStack> */}
 
-            <VStack gap={'$2'} mt={'$2'}>
-              <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
-                Interested In *
+          {/* Details */}
+          <Box mt={'$2'}>
+            {/* Primary Details */}
+            <Box py={'$2'} px={'$3'} bg={'$pink50'} mt={'$3'}>
+              <Text
+                fontFamily="Montserrat-Bold"
+                fontSize={13}
+                color={COLORS.secondary}>
+                Primary Details
               </Text>
-              {/* <Input
-                flex={1}
-                variant="outline"
-                size="md"
-                isDisabled={false}
-                alignItems="center"
-                borderColor="$coolGray300"
-                isInvalid={false}
-                isReadOnly={false}>
-                <InputField placeholder="Enter Text here" fontSize={12} />
-              </Input> */}
+            </Box>
+            <VStack gap={'$2'} px={'$3'} mt={'$2'}>
+              <VStack gap={'$2'}>
+                <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
+                  Employee Name
+                </Text>
+                <Text>{data?.data?.data?.name}</Text>
+              </VStack>
 
-              {/* <FormControl isRequired isInvalid>
-                <FormControlLabel>
-                  <FormControlLabelText>Personal</FormControlLabelText>
-                </FormControlLabel>
-                <Select>
-                  <SelectTrigger>
-                    <SelectInput placeholder="Select option" />
-                    <SelectIcon mr="$3">
-                      <Icon as={ChevronDownIcon} />
-                    </SelectIcon>
-                  </SelectTrigger>
-                  <SelectPortal>
-                    <SelectBackdrop />
-                    <SelectContent>
-                      <SelectDragIndicatorWrapper>
-                        <SelectDragIndicator />
-                      </SelectDragIndicatorWrapper>
-                      <SelectItem label="Red" value="red" />
-                      <SelectItem label="Blue" value="blue" />
-                      <SelectItem label="Black" value="black" />
-                      <SelectItem label="Pink" value="pink" isDisabled={true} />
-                      <SelectItem label="Green" value="green" />
-                    </SelectContent>
-                  </SelectPortal>
-                </Select>
-                <FormControlHelper>
-                  <FormControlHelperText>
-                    You can only select one option
-                  </FormControlHelperText>
-                </FormControlHelper>
-                <FormControlError>
-                  <FormControlErrorIcon as={AlertCircleIcon} />
-                  <FormControlErrorText>Mandatory field</FormControlErrorText>
-                </FormControlError>
-              </FormControl> */}
+              <VStack gap={'$2'}>
+                <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
+                  Nick Name
+                </Text>
+                <Text>{data?.data?.data?.nick_name}</Text>
+              </VStack>
+
+              {/* Select Gender and date of birth */}
               <HStack justifyContent={'space-between'} mt={2}>
-                <VStack gap={'$2'} w={'45%'}>
+                <VStack gap={'$2'}>
                   <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
-                    Personal
+                    Gender
                   </Text>
-                  <Pressable
-                    onPress={() => setShowActionsheet(true)}
-                    borderWidth={1}
-                    borderRadius={5}
-                    style={{
-                      height: 45,
-                    }}
-                    bg={'white'}
-                    borderColor={'$coolGray300'}>
-                    <Text
-                      fontWeight={'semibold'}
-                      fontSize={'$sm'}
-                      color={'$coolGray500'}
-                      p={'$3'}>
-                      {expertise?.label ? expertise?.label : 'Select Personal'}
-                    </Text>
-                  </Pressable>
+                  <Text>{data?.data?.data?.gender}</Text>
                 </VStack>
-                <VStack w={'45%'} gap={'$2'}>
+                <VStack w={'48%'} gap={'$2'}>
                   <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
-                    Professional
+                    Date of Birth
                   </Text>
-                  <Pressable
-                    onPress={() => setShowActionsheet2(true)}
-                    borderWidth={1}
-                    borderRadius={5}
-                    style={{
-                      height: 45,
-                    }}
-                    bg={'white'}
-                    borderColor={'$coolGray300'}>
-                    <Text
-                      fontWeight={'semibold'}
-                      fontSize={'$sm'}
-                      color={'$coolGray500'}
-                      p={'$3'}>
-                      {expertiseFor?.label
-                        ? expertiseFor?.label
-                        : 'Select Personal'}
-                    </Text>
-                  </Pressable>
+                  <Text>
+                    {data?.data?.data?.dob
+                      ? moment(data?.data?.data?.dob).format(`DD-MM-YYYY`)
+                      : 'Not Provided'}
+                  </Text>
                 </VStack>
               </HStack>
             </VStack>
           </Box>
-        </Box>
+          {/* Personal Details */}
+          <Box mt={'$2'}>
+            <Box py={'$2'} px={'$3'} bg={'$pink50'} mt={'$3'}>
+              <Text
+                fontFamily="Montserrat-Bold"
+                fontSize={13}
+                color={COLORS.secondary}>
+                Personal Details
+              </Text>
+            </Box>
+            <VStack gap={'$2'} px={'$3'} mt={'$2'}>
+              <VStack gap={'$2'}>
+                <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
+                  Phone Number
+                </Text>
+                <HStack gap={'$3'} alignItems="center">
+                  <Text>{data?.data?.data?.phone}</Text>
+                  {data?.data?.data?.phone_verify?.is_verified && (
+                    <AppIcon
+                      MaterialIconsName="verified"
+                      size={20}
+                      color={COLORS.secondary}
+                    />
+                  )}
+                </HStack>
+              </VStack>
 
-        <Box mt={'$7'} mb={'$4'}>
-          <Button
-            borderRadius={5}
-            isLoading={isLoading}
-            btnWidth={'full'}
-            mx={'$4'}
-            py={'$2'}
-            onPress={() => handelUpdateProfile()}>
-            <Text color="$white" fontFamily="Montserrat-Bold" fontSize={13}>
-              Update
-            </Text>
-          </Button>
+              <VStack gap={'$2'}>
+                <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
+                  Email
+                </Text>
+                <HStack>
+                  <Text>{data?.data?.data?.email}</Text>
+                  {data?.data?.data?.email_verify?.is_verified && (
+                    <AppIcon
+                      MaterialIconsName="verified"
+                      size={20}
+                      color={COLORS.secondary}
+                    />
+                  )}
+                </HStack>
+              </VStack>
+              {/* State */}
+              <VStack gap={'$2'}>
+                <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
+                  State
+                </Text>
+                <Text>{data?.data?.data?.location_details?.state}</Text>
+              </VStack>
+
+              {/* Select Gender and date of birth */}
+              <Box justifyContent={'space-between'} mt={2}>
+                <VStack gap={'$2'}>
+                  <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
+                    City
+                  </Text>
+                  <Text>{data?.data?.data?.location_details?.city}</Text>
+                </VStack>
+              </Box>
+              <VStack gap={'$2'}>
+                <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
+                  Address
+                </Text>
+                <Text>{data?.data?.data?.location_details?.address}</Text>
+              </VStack>
+            </VStack>
+          </Box>
+          {/* Unique Details */}
+          <Box mt={'$2'}>
+            <Box py={'$2'} px={'$3'} bg={'$pink50'} mt={'$3'}>
+              <Text
+                fontFamily="Montserrat-Bold"
+                fontSize={13}
+                color={COLORS.secondary}>
+                Unique Details
+              </Text>
+            </Box>
+            <Box px={'$3'} mt={'$2'}>
+              <VStack gap={'$2'} mt={'$2'}>
+                <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
+                  Interested/Skills
+                </Text>
+                <HStack justifyContent={'space-between'} mt={2}>
+                  <VStack gap={'$2'} w={'45%'}>
+                    <Text
+                      fontFamily="Montserrat-Medium"
+                      fontSize={13}
+                      mt={'$1'}>
+                      Personal
+                    </Text>
+                    <Text>
+                      {
+                        data?.data?.data?.interests?.find(
+                          (i: any) => i?.type === 'personal',
+                        )?.label
+                      }
+                    </Text>
+                  </VStack>
+                  <VStack w={'45%'} gap={'$2'}>
+                    <Text
+                      fontFamily="Montserrat-Medium"
+                      fontSize={13}
+                      mt={'$1'}>
+                      Professional
+                    </Text>
+                    <Text>
+                      {
+                        data?.data?.data?.interests?.find(
+                          (i: any) => i?.type === 'professional',
+                        )?.label
+                      }
+                    </Text>
+                  </VStack>
+                </HStack>
+              </VStack>
+            </Box>
+          </Box>
         </Box>
-        <PhotoPicker
-          visible={visiblePhoto}
-          onDismiss={() => setVisiblePhoto(false)}
-          setImageUrl={setProfileImage}
-          cropperCircleOverlay={true}
-          postImages={true}
-        />
       </ScrollView>
-      {/* state modal */}
-      <StatePicker
-        onClose={() => setShowStatePicker(false)}
-        onSelect={(state: any) => {
-          handleStateSelect(state);
-        }}
-        visible={showStatePicker}
+      {/* Photo Picker */}
+      <PhotoPicker
+        visible={imagesPicker}
+        onDismiss={() => setImagesPicker(false)}
+        setImageUrl={(img: any) => handelImages(img)}
+        cropperCircleOverlay={true}
+        postImages={false}
       />
-      {/* date picker */}
-      <DateTimePicker
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={date => handleConfirm(date)}
-        onCancel={() => setDatePickerVisibility(false)}
-      />
-      {/* ActionSheet */}
-      <Actionsheet
-        isOpen={showActionsheet}
-        onClose={() => setShowActionsheet(false)}
-        zIndex={999}>
-        <ActionsheetBackdrop />
-        <ActionsheetContent h="$72" zIndex={999}>
-          <ActionsheetDragIndicatorWrapper>
-            <ActionsheetDragIndicator />
-          </ActionsheetDragIndicatorWrapper>
-          {data?.data?.data?.map(item => (
-            <ActionsheetItem onPress={() => handleSelect(item)} key={item?._id}>
-              <ActionsheetItemText>{item?.label}</ActionsheetItemText>
-            </ActionsheetItem>
-          ))}
-        </ActionsheetContent>
-      </Actionsheet>
-      {/* 2nd */}
-      <Actionsheet
-        isOpen={showActionsheet2}
-        onClose={() => setShowActionsheet2(false)}
-        zIndex={999}>
-        <ActionsheetBackdrop />
-        <ActionsheetContent h="$72" zIndex={999}>
-          <ActionsheetDragIndicatorWrapper>
-            <ActionsheetDragIndicator />
-          </ActionsheetDragIndicatorWrapper>
-          {professionalData?.data?.data?.map((item: any) => (
-            <ActionsheetItem
-              onPress={() => handleSelect2(item)}
-              key={item?._id}>
-              <ActionsheetItemText>{item?.label}</ActionsheetItemText>
-            </ActionsheetItem>
-          ))}
-        </ActionsheetContent>
-      </Actionsheet>
     </PrivateContainer>
   );
 };

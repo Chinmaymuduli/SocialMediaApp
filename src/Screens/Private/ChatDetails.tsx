@@ -105,10 +105,14 @@ const ChatDetails = ({route: {params}}: Props) => {
   };
 
   const makePayment = () => {
+    paymentMethod();
+  };
+
+  const paymentMethod = () => {
     const options = {
       description: 'Feveal',
       currency: 'INR',
-      key: 'rzp_test_LVpIWeJeXjNeF2', // Your api key
+      key: 'rzp_test_hs7GKWV7szSVEA', // Your api key
       amount: 2450,
       name: userData?.name,
       prefill: {

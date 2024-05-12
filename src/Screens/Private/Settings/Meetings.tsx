@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+import {Alert, StyleSheet} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {
@@ -8,6 +8,7 @@ import {
   InputField,
   Pressable,
   ScrollView,
+  Spinner,
   Text,
   VStack,
 } from '@gluestack-ui/themed';
@@ -15,121 +16,85 @@ import {COLORS} from '~/Styles';
 import {PrivateScreenProps} from '~/Routes/Private/types';
 import {PrivateContainer} from '~/Components/container';
 import AppIcon from '~/Components/core/AppIcon';
-import {useSwrApi} from '~/Hooks';
+import {useMutation, useSwrApi} from '~/Hooks';
 import {useAppContext} from '~/Contexts';
 import moment from 'moment';
-
-export const MeetingData = [
-  {
-    id: '1',
-    name: 'pratyush kumar',
-    starttime: '10:20 Pm',
-    endtime: '2:20 pm',
-    area: 'Bbsr',
-    location: 'india',
-    clientname: 'searchingyard',
-    date: '20 July,2023',
-    img: 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?size=626&ext=jpg&uid=R87654678&ga=GA1.1.2105023192.1667473463&semt=robertav1_2_sidr',
-    designation: 'App Developer',
-    meeting: 'Sales Representative',
-    day: 'Friday',
-    person: 'Jhone',
-    type: 'Upcoming',
-  },
-  {
-    id: '2',
-    name: 'pratyush kumar',
-    starttime: '10:20 Pm',
-    endtime: '2:20 pm',
-    area: 'Bbsr',
-    location: 'india',
-    clientname: 'searchingyard',
-    date: 'Friday, 20-02-2023',
-    img: 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?size=626&ext=jpg&uid=R87654678&ga=GA1.1.2105023192.1667473463&semt=robertav1_2_sidr',
-    designation: 'App Developer',
-    day: 'Friday',
-    meeting: 'For Development',
-    person: 'Jhone',
-    type: 'Ongoing',
-  },
-  {
-    id: '3',
-    name: 'pratyush kumar',
-    starttime: '10:20 Pm',
-    endtime: '2:20 pm',
-    area: 'Bbsr',
-    location: 'india',
-    clientname: 'searchingyard',
-    date: 'Friday, 20-02-2023',
-    img: 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?size=626&ext=jpg&uid=R87654678&ga=GA1.1.2105023192.1667473463&semt=robertav1_2_sidr',
-    designation: 'App Developer',
-    day: 'Friday',
-    meeting: 'Sales Representative',
-    person: 'Jhone',
-    type: 'Closed',
-  },
-  {
-    id: '4',
-    name: 'pratyush kumar',
-    starttime: '10:20 Pm',
-    endtime: '2:20 pm',
-    area: 'Bbsr',
-    location: 'india',
-    clientname: 'searchingyard',
-    date: 'Friday, 20-02-2023',
-    img: 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?size=626&ext=jpg&uid=R87654678&ga=GA1.1.2105023192.1667473463&semt=robertav1_2_sidr',
-    designation: 'App Developer',
-    day: 'Friday',
-    meeting: 'About Salary',
-    person: 'Jhone',
-    type: 'Upcoming',
-  },
-  {
-    id: '5',
-    name: 'pratyush kumar',
-    starttime: '10:20 Pm',
-    endtime: '2:20 pm',
-    area: 'Bbsr',
-    location: 'india',
-    clientname: 'searchingyard',
-    date: 'Friday, 20-02-2023',
-    img: 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?size=626&ext=jpg&uid=R87654678&ga=GA1.1.2105023192.1667473463&semt=robertav1_2_sidr',
-    designation: 'App Developer',
-    day: 'Friday',
-    meeting: 'Client Visit',
-    person: 'Jhone',
-    type: 'Ongoing',
-  },
-  {
-    id: '6',
-    name: 'pratyush kumar',
-    starttime: '10:20 Pm',
-    endtime: '2:20 pm',
-    area: 'Bbsr',
-    location: 'india',
-    clientname: 'searchingyard',
-    date: 'Friday, 20-02-2023',
-    designation: 'App Developer',
-    img: 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?size=626&ext=jpg&uid=R87654678&ga=GA1.1.2105023192.1667473463&semt=robertav1_2_sidr',
-    day: 'Friday',
-    meeting: 'Sales Representative',
-    person: 'Jhone',
-    type: 'Closed',
-  },
-];
+import RazorpayCheckout from 'react-native-razorpay';
 
 const Meetings = () => {
-  const {navigate} = useNavigation<PrivateScreenProps>();
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [showSearch, setShowSearch] = React.useState(false);
-  const [order, setOrder] = useState('');
   const {userData} = useAppContext();
-  const {data, isValidating} = useSwrApi(
+  const {data, isValidating, mutate} = useSwrApi(
     `meetings?require_all=true&user_id=${userData?._id}`,
   );
+  const {mutation, isLoading} = useMutation();
+  const makePayment = async (id: any) => {
+    const orderResponse = await mutation(`payments/orders/create`, {
+      method: 'POST',
+      body: {
+        meeting_id: id,
+      },
+    });
+    if (orderResponse?.results?.success === true) {
+      checkOutOrder(orderResponse?.results?.data?._id);
+    }
+  };
 
-  // console.log(data?.data?.data);
+  const checkOutOrder = async (orderId: any) => {
+    try {
+      const res = await mutation(`payments/orders/checkout`, {
+        method: 'POST',
+        body: {
+          order_id: orderId,
+          payment_type: 'send',
+        },
+      });
+      if (res?.results?.success === true) {
+        paymentMethod(res?.results?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
+  const paymentMethod = (paymentData: any) => {
+    const options = {
+      description: 'Feveal',
+      currency: 'INR',
+      key: 'rzp_test_hs7GKWV7szSVEA',
+      amount: paymentData?.total_fare * 100,
+      name: userData?.name,
+      order_id: paymentData?.metadata?.razorpay_order_id,
+      prefill: {
+        email: userData?.email || 'demo@gmail.com',
+        contact: userData?.phoneNumber,
+        name: userData?.name,
+      },
+    };
+    RazorpayCheckout.open(options)
+      .then(async (data: any) => {
+        console.log({data});
+        const verifyOrder = await mutation(`payments/orders/verify`, {
+          method: 'PUT',
+          body: {
+            payment_order_id: paymentData?.order_id,
+            razorpay_order_id: paymentData?.metadata?.razorpay_order_id,
+            razorpay_payment_id: data.razorpay_payment_id,
+            razorpay_signature: data.razorpay_signature,
+          },
+        });
+        if (verifyOrder?.results?.success === true) {
+          mutate();
+          Alert.alert('Success', 'Payment Successful');
+        }
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
+  };
+
+  if (isLoading) {
+    <Spinner size={'large'} />;
+  }
   return (
     <PrivateContainer title={'Meetings'} bg={'purple.50'} hasBackIcon={true}>
       <HStack
@@ -217,7 +182,7 @@ const Meetings = () => {
                     fontFamily="Montserrat-Bold"
                     px={'$2'}
                     color={COLORS.secondary}>
-                    {item?.sender_id?.name || item?.sender_id?.phone}
+                    {item?.sender_id?.nick_name}
                   </Text>
                 </HStack>
               </HStack>
@@ -243,15 +208,22 @@ const Meetings = () => {
                 </Text>
               </HStack>
             </HStack>
-            {/* <Box position={'absolute'} bottom={0} right={0}>
-              <Box
-                bg={'blue.300'}
-                p={2}
-                borderTopLeftRadius={20}
-                borderBottomRightRadius={5}>
-                <AppIcon AntDesignName="arrowright" size={18} color={'black'} />
+            {!item?.is_accepted && (
+              <Box position={'absolute'} bottom={0} right={0}>
+                <Pressable
+                  onPress={() => makePayment(item?._id)}
+                  bg={'blue.300'}
+                  p={'$2'}
+                  borderTopLeftRadius={20}
+                  borderBottomRightRadius={5}>
+                  <AppIcon
+                    AntDesignName="arrowright"
+                    size={18}
+                    color={'black'}
+                  />
+                </Pressable>
               </Box>
-            </Box> */}
+            )}
           </Pressable>
         ))}
       </ScrollView>

@@ -153,7 +153,7 @@ const PostCompo = ({item, mutate}: any) => {
                   fontFamily: 'Montserrat-Medium',
                   color: 'black',
                 }}>
-                {`${item?.user_id?.gender}, ${'13'}`}
+                {`${item?.user_id?.gender}`}
               </Text>
             </View>
           </View>
