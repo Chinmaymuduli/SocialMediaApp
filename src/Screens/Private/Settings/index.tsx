@@ -1,17 +1,17 @@
-import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import React from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {PrivateContainer} from '~/Components/container';
-import {COLORS} from '~/Styles';
-import {Box} from '@gluestack-ui/themed';
-import {colorsArray} from '~/Constants';
-import {useNavigation} from '@react-navigation/native';
-import {PrivateScreenProps} from '~/Routes/Private/types';
+import { PrivateContainer } from '~/Components/container';
+import { COLORS } from '~/Styles';
+import { Box } from '@gluestack-ui/themed';
+import { colorsArray } from '~/Constants';
+import { useNavigation } from '@react-navigation/native';
+import { PrivateScreenProps } from '~/Routes/Private/types';
 import useBasicFunction from '~/Hooks/useBasicFunctions';
 
 const SettingScreen = () => {
-  const {navigate} = useNavigation<PrivateScreenProps>();
-  const {handleLogout, handleClearAccessToken} = useBasicFunction();
+  const { navigate } = useNavigation<PrivateScreenProps>();
+  const { handleLogout, handleClearAccessToken } = useBasicFunction();
   const bgColor = (i: number) => colorsArray[i % colorsArray.length];
   const navigateToEditProfile = () => {
     // navigation.navigate("EditProfile");
@@ -77,6 +77,10 @@ const SettingScreen = () => {
   const addAccount = () => {
     console.log('Aadd account ');
   };
+  const Social_Interactions = () => {
+    console.log('SocialInteractions');
+    navigate('SocialInteractions');
+  };
 
   const logout = () => {
     handleLogout();
@@ -104,8 +108,8 @@ const SettingScreen = () => {
   ];
 
   const supportItems = [
-    {icon: 'report-problem', text: 'Help & Support', action: navigateToSupport},
-    {icon: 'help-outline', text: 'Contact Us', action: navigateToContact},
+    { icon: 'report-problem', text: 'Help & Support', action: navigateToSupport },
+    { icon: 'help-outline', text: 'Contact Us', action: navigateToContact },
 
     {
       icon: 'credit-card',
@@ -130,7 +134,7 @@ const SettingScreen = () => {
       text: 'My Connections',
       action: navigateToMyConnections,
     },
-    {icon: 'event-note', text: 'My Meetings', action: navigateToMeetings},
+    { icon: 'event-note', text: 'My Meetings', action: navigateToMeetings },
     {
       icon: 'rate-review',
       text: 'Reviews & Ratings',
@@ -144,10 +148,17 @@ const SettingScreen = () => {
       text: 'Delete Account',
       action: navigateToReportProblem,
     },
-    {icon: 'logout', text: 'Log out', action: logout},
+    { icon: 'logout', text: 'Log out', action: logout },
+  ];
+  const postItems = [
+    {
+      icon: 'social-distance',
+      text: 'Social Interactions',
+      action: Social_Interactions,
+    },
   ];
 
-  const renderSettingsItem = ({icon, text, action}: any, index: any) => (
+  const renderSettingsItem = ({ icon, text, action }: any, index: any) => (
     <TouchableOpacity
       onPress={action}
       style={{
@@ -169,7 +180,7 @@ const SettingScreen = () => {
           <MaterialIcons name={icon} size={15} color={'white'} />
         </Box>
       </Box>
-      <Text style={{fontSize: 13, fontFamily: 'Montserrat-SemiBold'}}>
+      <Text style={{ fontSize: 13, fontFamily: 'Montserrat-SemiBold' }}>
         {text}
       </Text>
     </TouchableOpacity>
@@ -185,7 +196,7 @@ const SettingScreen = () => {
           <Box
             softShadow="1"
             bgColor="white"
-            style={{marginBottom: 12}}
+            style={{ marginBottom: 12 }}
             borderRadius={10}>
             <Text
               style={{
@@ -212,7 +223,7 @@ const SettingScreen = () => {
           <Box
             softShadow="1"
             bgColor="white"
-            style={{marginBottom: 12}}
+            style={{ marginBottom: 12 }}
             borderRadius={10}>
             <Text
               style={{
@@ -238,7 +249,7 @@ const SettingScreen = () => {
           {/* Support and About settings */}
 
           <Box
-            style={{marginBottom: 12}}
+            style={{ marginBottom: 12 }}
             softShadow="1"
             bgColor="white"
             borderRadius={10}>
@@ -266,7 +277,7 @@ const SettingScreen = () => {
           {/* Actions Settings */}
 
           <Box
-            style={{marginBottom: 12}}
+            style={{ marginBottom: 12 }}
             softShadow="1"
             bgColor="white"
             borderRadius={10}>
@@ -284,6 +295,33 @@ const SettingScreen = () => {
                 //   backgroundColor: 'rgba(36, 39, 96, 0.05)',
               }}>
               {actionsItems.map((item, index) => (
+                <React.Fragment key={index}>
+                  {renderSettingsItem(item, index)}
+                </React.Fragment>
+              ))}
+            </View>
+          </Box>
+          {/*Post & Others  */}
+
+          <Box
+            style={{ marginBottom: 12 }}
+            softShadow="1"
+            bgColor="white"
+            borderRadius={10}>
+            <Text
+              style={{
+                marginVertical: 10,
+                fontFamily: 'Montserrat-SemiBold',
+                marginLeft: 12,
+              }}>
+              Post & Others
+            </Text>
+            <View
+              style={{
+                borderRadius: 12,
+                // backgroundColor: 'rgba(36, 39, 96, 0.05)',
+              }}>
+              {postItems.map((item, index) => (
                 <React.Fragment key={index}>
                   {renderSettingsItem(item, index)}
                 </React.Fragment>
