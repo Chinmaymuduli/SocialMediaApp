@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Avatar,
   Box,
@@ -22,7 +22,7 @@ import {useNavigation} from '@react-navigation/native';
 import {PrivateRoutesTypes, PrivateScreenProps} from '~/routes/private/types';
 import AppIcon from '~/Components/core/AppIcon';
 import {PrivateContainer} from '~/Components/container';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, useWindowDimensions} from 'react-native';
 import {useMutation, useSwrApi} from '~/Hooks';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {Modal} from '@gluestack-ui/themed';
@@ -32,10 +32,12 @@ import RazorpayCheckout from 'react-native-razorpay';
 import moment from 'moment';
 import {useAppContext} from '~/Contexts';
 import LinearGradient from 'react-native-linear-gradient';
+import RenderHTML from 'react-native-render-html';
 
 type Props = NativeStackScreenProps<PrivateRoutesTypes, 'ChatDetails'>;
 const ChatDetails = ({route: {params}}: Props) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
+  const {socketRef} = useAppContext();
   const [showModal, setShowModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const {userData} = useAppContext();
@@ -48,13 +50,27 @@ const ChatDetails = ({route: {params}}: Props) => {
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
+  const [upiId, setUpiId] = useState('');
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
   const {mutation, isLoading} = useMutation();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const {width} = useWindowDimensions();
+  useEffect(() => {
+    socketRef?.current?.on('join-to-connection', params?.connection_id);
+    socketRef?.current?.emit('new-user-joined', {
+      message: 'New user joined.',
+    });
+  }, [socketRef]);
   const handelChat = async () => {
     try {
+      socketRef?.current.emit('send-message', {
+        message: message,
+        userId: userData?._id,
+        connection_id: params?.connection_id,
+      });
+
       const res = await mutation(`chats/send-message`, {
         method: 'POST',
         body: {
@@ -63,7 +79,6 @@ const ChatDetails = ({route: {params}}: Props) => {
           text: message,
         },
       });
-      console.log({res});
       if (res?.status === 201) {
         mutate();
         setMessage('');
@@ -84,6 +99,7 @@ const ChatDetails = ({route: {params}}: Props) => {
         method: 'POST',
         body: {
           connection_id: params?.connection_id,
+          upi_id: upiId,
           amount: amount,
           date: selectedDate,
           location_details: {
@@ -175,14 +191,39 @@ const ChatDetails = ({route: {params}}: Props) => {
                 </Box>
                 {item?.messages?.map((msg: any, key: any) => (
                   <Box key={key} my={'$1'}>
-                    {msg?.is_received ? (
+                    {/* {console.log({msg})} */}
+                    {msg?.is_received && msg?.message_type === 'text' ? (
                       <Text ml={'$2'} fontFamily="Montserrat-Medium">
                         {msg?.text}
                       </Text>
                     ) : (
-                      <Box alignSelf="flex-end" pr={'$4'}>
-                        <Text fontFamily="Montserrat-Medium">{msg?.text}</Text>
-                      </Box>
+                      msg?.message_type === 'text' && (
+                        <Box alignSelf="flex-end" pr={'$4'}>
+                          <Text fontFamily="Montserrat-Medium">
+                            {msg?.text}
+                          </Text>
+                        </Box>
+                      )
+                    )}
+                    {msg?.message_type === 'markup' && (
+                      <RenderHTML
+                        contentWidth={width}
+                        source={{
+                          html: msg?.text,
+                        }}
+                        tagsStyles={{
+                          body: {
+                            whiteSpace: 'normal',
+                            color: 'black',
+                            fontWeight: '400',
+                            fontFamily: 'Montserrat-Medium',
+                          },
+                          p: {
+                            color: 'black',
+                            fontFamily: 'Montserrat-Medium',
+                          },
+                        }}
+                      />
                     )}
                   </Box>
                 ))}
@@ -251,6 +292,19 @@ const ChatDetails = ({route: {params}}: Props) => {
                     value={amount}
                     onChangeText={txt => setAmount(txt)}
                     keyboardType="number-pad"
+                  />
+                </Input>
+              </VStack>
+
+              <VStack gap={'$0.5'}>
+                <Text fontFamily="Montserrat-Medium">Upi ID</Text>
+                <Input borderRadius={'$lg'}>
+                  <InputField
+                    type="text"
+                    placeholder="Enter UPI ID"
+                    value={upiId}
+                    onChangeText={txt => setUpiId(txt)}
+                    // keyboardType="number-pad"
                   />
                 </Input>
               </VStack>

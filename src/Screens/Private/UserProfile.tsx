@@ -138,24 +138,33 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
           <Text fontFamily="Montserrat-Medium" fontSize={13}>
             {userData?.data?.data?.nick_name || userData?.data?.data?.name}
           </Text>
-          {userData?.data?.data?.interests?.map((item: any) => (
-            <Text fontFamily="Montserrat-Medium" fontSize={13} key={item?._id}>
-              {item?.label},
+          {data?.data?.data?.connection?._id &&
+            userData?.data?.data?.interests?.map((item: any) => (
+              <Text
+                fontFamily="Montserrat-Medium"
+                fontSize={13}
+                key={item?._id}>
+                {item?.label},
+              </Text>
+            ))}
+          {data?.data?.data?.connection?._id && (
+            <Text fontFamily="Montserrat-Medium" fontSize={13}>
+              {userData?.data?.data?.location_details?.city +
+                ' | ' +
+                userData?.data?.data?.location_details?.state}
             </Text>
-          ))}
-          <Text fontFamily="Montserrat-Medium" fontSize={13}>
-            {userData?.data?.data?.location_details?.city +
-              ' | ' +
-              userData?.data?.data?.location_details?.state}
-          </Text>
-          <Text fontFamily="Montserrat-Medium" fontSize={13}>
-            {userData?.data?.data?.email}
-          </Text>
+          )}
+          {data?.data?.data?.connection?._id && (
+            <Text fontFamily="Montserrat-Medium" fontSize={13}>
+              {userData?.data?.data?.email}
+            </Text>
+          )}
         </VStack>
         {userDetails?.is_profile_completed ? (
-          <HStack px={'$4'} gap={'$10'} mt={'$4'}>
+          <HStack justifyContent="space-around" px={'$2'} mt={'$4'}>
             {!data?.data?.data?.connection?._id ? (
               <Button
+                btnWidth={'35%'}
                 borderRadius={5}
                 py={'$2'}
                 onPress={() => {
@@ -172,6 +181,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
               <Button
                 borderRadius={5}
                 py={'$2'}
+                btnWidth={'35%'}
                 onPress={() => {
                   setShowModal(true);
                 }}>
@@ -193,9 +203,30 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
               </Button>
             )}
 
-            <Button borderRadius={5} py={'$2'} onPress={() => {}}>
+            <Button
+              borderRadius={5}
+              py={'$2'}
+              btnWidth={'35%'}
+              onPress={() =>
+                navigation.navigate('ChatDetails', {
+                  connection_id: data?.data?.data?._id,
+                  userNickName: data?.data?.data?.nick_name,
+                  isReceived: true,
+                  name: data?.data?.data?.name,
+                })
+              }>
               <Text color="$white" fontFamily="Montserrat-Medium" fontSize={13}>
                 Message
+              </Text>
+            </Button>
+
+            <Button
+              borderRadius={5}
+              py={'$2'}
+              onPress={() => navigation.navigate('Reviews')}
+              btnWidth={'35%'}>
+              <Text color="$white" fontFamily="Montserrat-Medium" fontSize={13}>
+                Reviews
               </Text>
             </Button>
           </HStack>

@@ -92,7 +92,9 @@ const Meetings = () => {
       });
   };
 
-  if (isLoading) {
+  // console.log(data?.data?.data);
+
+  if (isValidating) {
     <Spinner size={'large'} />;
   }
   return (
@@ -190,7 +192,7 @@ const Meetings = () => {
             <Box borderBottomWidth={1} borderStyle={'dashed'} py={'$2'}></Box>
             <HStack px={'$3'} py={'$3'}>
               <HStack mr={'$1'} w={'$80'}>
-                <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                {/* <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
                   Location :
                 </Text>
                 <Text
@@ -205,22 +207,31 @@ const Meetings = () => {
                     item?.location_details?.state +
                     ' , ' +
                     item?.location_details?.pincode}
-                </Text>
+                </Text> */}
+                <Pressable
+                  borderRadius={10}
+                  onPress={() => makePayment(item?._id)}
+                  bg={'$pink100'}>
+                  <Text
+                    px={'$3'}
+                    py={'$1'}
+                    fontFamily="Montserrat-Bold"
+                    fontSize={12}
+                    color={COLORS.secondary}>
+                    Pay Now
+                  </Text>
+                </Pressable>
               </HStack>
             </HStack>
             {!item?.is_accepted && (
               <Box position={'absolute'} bottom={0} right={0}>
                 <Pressable
-                  onPress={() => makePayment(item?._id)}
-                  bg={'blue.300'}
-                  p={'$2'}
+                  // onPress={() => makePayment(item?._id)}
+                  bg={COLORS.secondary}
+                  p={'$3'}
                   borderTopLeftRadius={20}
                   borderBottomRightRadius={5}>
-                  <AppIcon
-                    AntDesignName="arrowright"
-                    size={18}
-                    color={'black'}
-                  />
+                  <AppIcon AntDesignName="info" size={18} color={'white'} />
                 </Pressable>
               </Box>
             )}

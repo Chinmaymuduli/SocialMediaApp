@@ -83,6 +83,7 @@ const AuthRoute = ({route: {params}, navigation}: Props) => {
         <Box position={'absolute'} bottom={'$5'} w={'$full'} px={'$3'}>
           <VStack gap={'$3'}>
             <Button
+              onPress={() => navigation.navigate('GoogleAuth')}
               bgColor={COLORS.secondary}
               borderRadius={20}
               gap={'$1'}

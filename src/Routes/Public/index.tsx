@@ -18,6 +18,7 @@ export default function PublicRoutes({
       screenOptions={{headerShown: false}}>
       <Stack.Screen name="AuthScreen" component={Auth.AuthScreen} />
       <Stack.Screen name="AuthRoute" component={Auth.AuthRoute} />
+      <Stack.Screen name="GoogleAuth" component={Auth.GoogleAuth} />
       <Stack.Screen name="Login" component={Auth.Login} />
       <Stack.Screen name="SignUp" component={Auth.SignUp} />
       <Stack.Screen name="OtpScreen" component={Auth.OtpScreen} />

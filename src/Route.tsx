@@ -41,8 +41,6 @@ const Route = () => {
     getTokenData();
   }, []);
 
-  console.log('=======>', userData);
-
   if (userData === null) return <SplashScreen />;
   return userData?._id ? (
     <PrivateRoutes
