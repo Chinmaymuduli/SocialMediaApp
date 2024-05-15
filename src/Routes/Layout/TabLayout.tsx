@@ -51,7 +51,7 @@ export default function TabLayout() {
               route: 'Feeds',
               label: 'Feeds',
               icon: {
-                AntDesignName: 'instagram',
+                MaterialIconsName: 'dashboard',
               },
               component: Private.Feeds,
             },

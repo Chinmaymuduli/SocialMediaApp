@@ -54,14 +54,14 @@ const PostFeed = () => {
 
   return (
     <View>
-      <Box px={'$3'} mb={'$3'} mt={'$6'}>
+      {/* <Box px={'$3'} mb={'$3'} mt={'$6'}>
         <Input borderRadius={'$lg'}>
           <InputSlot pl="$3">
             <InputIcon as={SearchIcon} />
           </InputSlot>
           <InputField type="text" placeholder="Search for results" />
         </Input>
-      </Box>
+      </Box> */}
       {data?.data?.data?.map((item: any, index: any) => (
         <PostCompo item={item} key={index} mutate={mutate} />
       ))}

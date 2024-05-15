@@ -11,4 +11,5 @@ export default {
   AADHAAR: require('./aadhar.png'),
   COMMISSION: require('./setCommision.png'),
   CONNECT: require('./connect.png'),
+  SEARCH: require('./search.png'),
 };

@@ -203,22 +203,27 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
               </Button>
             )}
 
-            <Button
-              borderRadius={5}
-              py={'$2'}
-              btnWidth={'35%'}
-              onPress={() =>
-                navigation.navigate('ChatDetails', {
-                  connection_id: data?.data?.data?._id,
-                  userNickName: data?.data?.data?.nick_name,
-                  isReceived: true,
-                  name: data?.data?.data?.name,
-                })
-              }>
-              <Text color="$white" fontFamily="Montserrat-Medium" fontSize={13}>
-                Message
-              </Text>
-            </Button>
+            {data?.data?.data?.connection?.is_accepted && (
+              <Button
+                borderRadius={5}
+                py={'$2'}
+                btnWidth={'35%'}
+                onPress={() =>
+                  navigation.navigate('ChatDetails', {
+                    connection_id: data?.data?.data?._id,
+                    userNickName: data?.data?.data?.nick_name,
+                    isReceived: true,
+                    name: data?.data?.data?.name,
+                  })
+                }>
+                <Text
+                  color="$white"
+                  fontFamily="Montserrat-Medium"
+                  fontSize={13}>
+                  Message
+                </Text>
+              </Button>
+            )}
 
             <Button
               borderRadius={5}

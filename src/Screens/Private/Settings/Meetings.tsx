@@ -2,6 +2,8 @@ import {Alert, StyleSheet} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {
+  ActionsheetDragIndicator,
+  ActionsheetDragIndicatorWrapper,
   Box,
   HStack,
   Input,
@@ -20,8 +22,13 @@ import {useMutation, useSwrApi} from '~/Hooks';
 import {useAppContext} from '~/Contexts';
 import moment from 'moment';
 import RazorpayCheckout from 'react-native-razorpay';
+import {Actionsheet} from '@gluestack-ui/themed';
+import {ActionsheetBackdrop} from '@gluestack-ui/themed';
+import {ActionsheetContent} from '@gluestack-ui/themed';
 
 const Meetings = () => {
+  const [showActionsheet, setShowActionsheet] = React.useState(false);
+  const [meetingData, setMeetingData] = React.useState<any>();
   const {userData} = useAppContext();
   const {data, isValidating, mutate} = useSwrApi(
     `meetings?require_all=true&user_id=${userData?._id}`,
@@ -93,7 +100,6 @@ const Meetings = () => {
   };
 
   // console.log(data?.data?.data);
-
   if (isValidating) {
     <Spinner size={'large'} />;
   }
@@ -149,8 +155,8 @@ const Meetings = () => {
                 <Text
                   fontFamily="Montserrat-SemiBold"
                   fontSize={13}
-                  color={item?.is_accepted ? '$green500' : COLORS.secondary}>
-                  {item?.is_accepted ? 'Accepted' : 'Pending'}
+                  color={item?.is_sender_paid ? '$green500' : COLORS.secondary}>
+                  {item?.is_sender_paid ? 'Accepted' : 'Pending'}
                 </Text>
               </Box>
             </HStack>
@@ -189,9 +195,12 @@ const Meetings = () => {
                 </HStack>
               </HStack>
             </Box>
-            <Box borderBottomWidth={1} borderStyle={'dashed'} py={'$2'}></Box>
-            <HStack px={'$3'} py={'$3'}>
-              <HStack mr={'$1'} w={'$80'}>
+            {!item?.is_sender_paid && (
+              <Box borderBottomWidth={1} borderStyle={'dashed'} py={'$2'}></Box>
+            )}
+            {!item?.is_sender_paid && !item?.is_received && (
+              <Box px={'$3'} py={'$3'}>
+                {/* <Box mr={'$1'} w={'$80'}> */}
                 {/* <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
                   Location :
                 </Text>
@@ -208,7 +217,9 @@ const Meetings = () => {
                     ' , ' +
                     item?.location_details?.pincode}
                 </Text> */}
+
                 <Pressable
+                  w={'$24'}
                   borderRadius={10}
                   onPress={() => makePayment(item?._id)}
                   bg={'$pink100'}>
@@ -221,12 +232,33 @@ const Meetings = () => {
                     Pay Now
                   </Text>
                 </Pressable>
-              </HStack>
-            </HStack>
-            {!item?.is_accepted && (
+                {/* </Box> */}
+              </Box>
+            )}
+            {item?.is_sender_paid || item?.is_received ? (
+              <Pressable
+                onPress={() => {
+                  setMeetingData(item), setShowActionsheet(true);
+                }}
+                bg={COLORS.secondary}
+                mt={'$3'}
+                alignItems={'center'}
+                borderBottomLeftRadius={5}
+                borderBottomRightRadius={5}>
+                <Text
+                  py={'$1.5'}
+                  fontFamily="Montserrat-SemiBold"
+                  fontSize={14}
+                  color={'$white'}>
+                  See Details
+                </Text>
+              </Pressable>
+            ) : (
               <Box position={'absolute'} bottom={0} right={0}>
                 <Pressable
-                  // onPress={() => makePayment(item?._id)}
+                  onPress={() => {
+                    setMeetingData(item), setShowActionsheet(true);
+                  }}
                   bg={COLORS.secondary}
                   p={'$3'}
                   borderTopLeftRadius={20}
@@ -239,57 +271,121 @@ const Meetings = () => {
         ))}
       </ScrollView>
 
-      {/* <BottomSheet
-        visible={isOpen}
-        onDismiss={() => {
-          onClose();
-        }}>
-        <VStack space={2} mt={3}>
-          <Text bold fontSize={16} px={2}>
-            Status :{' '}
-          </Text>
-          <VStack space={3}>
-            {Sort_Array?.map((item, _) => (
-              <Pressable
-                key={item?.id}
-                m={1}
-                onPress={() => {
-                  setOrder(item?.title), onClose();
-                }}
-                borderWidth={1}
-                borderRadius={20}
-                borderColor={COLORS.primary}
-                bgColor={order === item?.title ? COLORS.primary : 'white'}>
-                <HStack alignItems={'center'} mx={'4'} py={2}>
-                  <AppIcon
-                    AntDesignName="codepen-circle"
-                    size={20}
-                    color={order === item?.title ? 'white' : 'blue'}
-                    style={{
-                      width: '8%',
-                    }}
-                  />
+      {/* Action Sheet */}
+      <Actionsheet
+        isOpen={showActionsheet}
+        onClose={() => setShowActionsheet(false)}>
+        <ActionsheetBackdrop />
+        <ActionsheetContent>
+          <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper>
+          <Box w={'$full'}>
+            <Pressable mx={'$1'} mt={'$4'}>
+              <Box
+                justifyContent="space-between"
+                bg={'$pink50'}
+                alignItems={'center'}>
+                <Box
+                  alignItems={'center'}
+                  justifyContent="center"
+                  px={'$2'}
+                  py={'$1'}>
                   <Text
-                    bold
-                    fontSize={'sm'}
-                    color={order === item?.title ? 'white' : COLORS.primary}
-                    mx={4}
-                    width={'70%'}>
-                    {item?.title}
+                    fontSize={14}
+                    fontFamily="Montserrat-Bold"
+                    color={COLORS.secondary}>
+                    {' - : Meeting Details : -'}
                   </Text>
-                </HStack>
-              </Pressable>
-            ))}
-          </VStack>
-        </VStack>
-      </BottomSheet>
+                </Box>
+              </Box>
 
-      <DateTimePicker
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={() => setDatePickerVisibility(false)}
-        onCancel={() => setDatePickerVisibility(false)}
-      /> */}
+              <Box px={'$3'} mt={'$2'}>
+                <HStack justifyContent={'space-between'}>
+                  <VStack gap={'$1'}>
+                    <Text fontFamily="Montserrat-Bold" fontSize={13}>
+                      Meeting Date
+                    </Text>
+                    <Text fontFamily="Montserrat-Medium" fontSize={13}>
+                      {moment(meetingData?.date).format('ll')}
+                    </Text>
+                  </VStack>
+                  <VStack gap={'$1'}>
+                    <Text bold fontSize={13}>
+                      Meeting Time
+                    </Text>
+                    <Text fontFamily="Montserrat-Medium" fontSize={13}>
+                      {moment(meetingData?.date).format('LT')}
+                    </Text>
+                  </VStack>
+                </HStack>
+                <HStack pt={'$3'}>
+                  <VStack>
+                    <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                      Meeting With :
+                    </Text>
+                    <Text
+                      fontSize={13}
+                      fontFamily="Montserrat-Bold"
+                      mt={'$1'}
+                      color={COLORS.secondary}>
+                      {meetingData?.sender_id?.nick_name}
+                    </Text>
+                  </VStack>
+                </HStack>
+              </Box>
+              <Box px={'$3'} py={'$3'}>
+                <Box mr={'$1'} w={'$80'}>
+                  <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                    Location :
+                  </Text>
+                  <Text fontSize={12} fontFamily="Montserrat-Medium" mt={'$1'}>
+                    {meetingData?.location_details?.address +
+                      ' , ' +
+                      meetingData?.location_details?.city +
+                      ' , ' +
+                      meetingData?.location_details?.state +
+                      ' , ' +
+                      meetingData?.location_details?.pincode}
+                  </Text>
+                </Box>
+              </Box>
+              <Box px={'$3'} py={'$1'}>
+                <Box mr={'$1'} w={'$80'}>
+                  <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                    Meeting Amount :
+                  </Text>
+                  <Text
+                    fontSize={12}
+                    fontFamily="Montserrat-Bold"
+                    mt={'$1'}
+                    color={COLORS.secondary}>
+                    {meetingData?.amount}
+                  </Text>
+                </Box>
+              </Box>
+              <Box px={'$3'} py={'$1'}>
+                <Box mr={'$1'} w={'$80'}>
+                  <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                    Payment Status :
+                  </Text>
+                  <Text
+                    fontSize={12}
+                    fontFamily="Montserrat-Bold"
+                    mt={'$1'}
+                    color={
+                      meetingData?.is_sender_paid
+                        ? '$green500'
+                        : COLORS.secondary
+                    }>
+                    {meetingData?.is_sender_paid ? 'Accepted' : 'Pending'}
+                  </Text>
+                </Box>
+              </Box>
+            </Pressable>
+          </Box>
+        </ActionsheetContent>
+      </Actionsheet>
     </PrivateContainer>
   );
 };

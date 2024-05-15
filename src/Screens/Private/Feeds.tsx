@@ -20,6 +20,11 @@ const Feeds = () => {
           side: 'RIGHT',
         },
         {
+          icon: {AntDesignName: 'search1'},
+          onPress: () => navigate('SearchScreen'),
+          side: 'RIGHT',
+        },
+        {
           icon: {EntypoName: 'dots-three-vertical'},
           onPress: () => navigate('Settings'),
           side: 'RIGHT',

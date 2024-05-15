@@ -33,6 +33,7 @@ export default function PrivateRoutes({initialRouteName}: PrivateRouteProps) {
       <Stack.Screen name="AdminDashboard" component={Private.AdminDashboard} />
       <Stack.Screen name="AllComments" component={Private.AllComments} />
       <Stack.Screen name="AgoraVoiceCall" component={Private.AgoraVoiceCall} />
+      <Stack.Screen name="SearchScreen" component={Private.SearchScreen} />
       <Stack.Screen
         name="CompleteProfile"
         component={Private.CompleteProfile}

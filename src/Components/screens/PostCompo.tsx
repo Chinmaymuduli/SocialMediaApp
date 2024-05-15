@@ -274,9 +274,10 @@ const PostCompo = ({item, mutate}: any) => {
               <Pressable
                 onPress={() => navigate('AllComments', {post_id: item?._id})}
                 borderRadius={'$full'}
+                w={'$80'}
                 borderWidth={1}>
                 <Text
-                  px={'$16'}
+                  px={'$24'}
                   fontSize={13}
                   py={'$0.5'}
                   fontFamily="Montserrat-Medium">
@@ -284,7 +285,7 @@ const PostCompo = ({item, mutate}: any) => {
                 </Text>
               </Pressable>
             </View>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            {/* <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Entypo
                 name="emoji-happy"
                 style={{fontSize: 15, color: 'lightgreen', marginRight: 10}}
@@ -294,7 +295,7 @@ const PostCompo = ({item, mutate}: any) => {
                 style={{fontSize: 15, color: 'pink', marginRight: 10}}
               />
               <Entypo name="emoji-sad" style={{fontSize: 15, color: 'red'}} />
-            </View>
+            </View> */}
           </View>
         </View>
       </View>

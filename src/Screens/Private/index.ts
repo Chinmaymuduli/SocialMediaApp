@@ -21,5 +21,6 @@ export {default as AllSupports} from './Admin/AllSupports';
 export {default as AllPayments} from './Admin/AllPayments';
 export {default as AllMeetings} from './Admin/AllMeetings';
 export {default as CompleteProfile} from './CompleteProfile';
+export {default as SearchScreen} from './SearchScreen';
 // voice call
 export {default as AgoraVoiceCall} from './Agora';
