@@ -1,18 +1,21 @@
 import { StyleSheet } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Box,
+    FormControl,
     HStack,
     Image,
+    Input,
+    InputField,
+    InputIcon,
     Pressable,
     ScrollView,
     Text,
-    VStack,
+    SearchIcon,
 } from '@gluestack-ui/themed';
 import { COLORS } from '~/Styles';
 import { PrivateContainer } from '~/Components/container';
 import AppIcon from '~/Components/core/AppIcon';
-import moment from 'moment';
 
 const data = [
     {
@@ -36,6 +39,7 @@ const data = [
 ]
 
 const SocialInteractions = () => {
+    const [searchPosts, setSearchPosts] = useState<boolean>(false)
     return (
         <PrivateContainer title={'Meetings'} bg={'purple.50'} hasBackIcon={true}>
             {/* Header with filter and Search  */}
@@ -63,6 +67,7 @@ const SocialInteractions = () => {
                         h={'$10'}
                         alignItems='center'
                         justifyContent='center'
+                        onPress={() => setSearchPosts(!searchPosts)}
                     >
                         <AppIcon
                             FeatherName="search"
@@ -90,6 +95,24 @@ const SocialInteractions = () => {
 
                 </HStack>
             </HStack>
+
+            {
+                searchPosts &&
+                <Box
+                    mx={'$3'}
+                >
+                    <FormControl isRequired mt={1}>
+                        <Input alignItems="center">
+                            <InputIcon as={SearchIcon} color="$coolGray500" pl="$8" size="lg" />
+
+                            <InputField
+                                type="text"
+
+                            />
+                        </Input>
+                    </FormControl>
+                </Box>
+            }
 
             <ScrollView
                 showsVerticalScrollIndicator={false}

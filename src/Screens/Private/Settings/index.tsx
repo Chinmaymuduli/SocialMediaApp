@@ -81,6 +81,9 @@ const SettingScreen = () => {
     console.log('SocialInteractions');
     navigate('SocialInteractions');
   };
+  const Relations = () => {
+    navigate('RetentionAndChurnMetrics');
+  };
 
   const logout = () => {
     handleLogout();
@@ -155,6 +158,11 @@ const SettingScreen = () => {
       icon: 'social-distance',
       text: 'Social Interactions',
       action: Social_Interactions,
+    },
+    {
+      icon: 'diversity-3',
+      text: 'Retention & Churn Metrics',
+      action: Relations,
     },
   ];
 

@@ -42,6 +42,10 @@ export default function PrivateRoutes({ initialRouteName }: PrivateRouteProps) {
         name="SocialInteractions"
         component={Private.SocialInteractions}
       />
+      <Stack.Screen
+        name="RetentionAndChurnMetrics"
+        component={Private.RetentionAndChurnMetrics}
+      />
     </Stack.Navigator>
   );
 }
