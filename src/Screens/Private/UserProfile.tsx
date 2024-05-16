@@ -56,7 +56,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
   const {mutation, isLoading} = useMutation();
   const {userData: userDetails} = useAppContext();
   const {data} = useSwrApi(`connections/check-is-connected/${params?.user_id}`);
-  const {data: userData} = useSwrApi(`users/read/${params?.user_id}`);
+  const {data: userData, mutate} = useSwrApi(`users/read/${params?.user_id}`);
   const handelConnectRequest = async () => {
     try {
       const res = await mutation(`connections/send-request`, {
@@ -75,6 +75,38 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
       console.log(error);
     }
   };
+
+  const handelRemoveUser = (id: any) => {
+    Alert.alert('Remove User', 'Are you sure you want to remove this user?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'OK',
+        onPress: async () => {
+          try {
+            const res = await mutation(`connections/accept-or-reject/${id}`, {
+              method: 'PUT',
+              body: {
+                is_accepted: false,
+              },
+            });
+            console.log(res);
+            if (res?.results?.success === true) {
+              mutate();
+            } else {
+              Alert.alert('Error', res?.results?.error?.message);
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        },
+      },
+    ]);
+  };
+
+  // console.log(userData?.data?.data?.posts);
 
   return (
     <PrivateContainer
@@ -178,20 +210,19 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                 </Text>
               </Button>
             ) : (
-              <Button
-                borderRadius={5}
-                py={'$2'}
-                btnWidth={'35%'}
-                onPress={() => {
-                  setShowModal(true);
-                }}>
+              <Button borderRadius={5} py={'$2'} btnWidth={'35%'}>
                 {data?.data?.data?.connection?.is_accepted ? (
-                  <Text
-                    color="$white"
-                    fontFamily="Montserrat-Medium"
-                    fontSize={13}>
-                    Remove
-                  </Text>
+                  <Pressable
+                    onPress={() =>
+                      handelRemoveUser(data?.data?.data?.connection?._id)
+                    }>
+                    <Text
+                      color="$white"
+                      fontFamily="Montserrat-Medium"
+                      fontSize={13}>
+                      Remove
+                    </Text>
+                  </Pressable>
                 ) : (
                   <Text
                     color="$white"
@@ -292,7 +323,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
           </Box>
         </Box>
 
-        {data?.data?.data?.connection?.is_accepted && (
+        {/* {data?.data?.data?.connection?.is_accepted && (
           <Box mt={'$8'} flex={1}>
             <FlatList
               data={HEADER_BTN}
@@ -348,6 +379,47 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
           <Box>
             {selectSwitch === 'Posts' && <UserPost />}
             {selectSwitch === 'Captions' && <UserCaption />}
+          </Box>
+        ) : (
+          <Box mt={'$16'} alignItems="center">
+            <Image
+              source={IMAGES.CONNECT}
+              style={{
+                height: 120,
+                width: 120,
+              }}
+              alt="img"
+            />
+            <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$4'}>
+              After connected with user you can see their posts
+            </Text>
+          </Box>
+        )} */}
+
+        {data?.data?.data?.connection?.is_accepted && (
+          <>
+            <Pressable mb={'$4'} mt={'$7'} px={'$2'}>
+              <HStack alignItems={'center'} px={'$3'} gap={'$3'}>
+                <AppIcon AntDesignName="table" size={20} />
+                <Text
+                  color={'black'}
+                  fontFamily="Montserrat-Medium"
+                  fontSize={13}
+                  fontWeight={'bold'}
+                  py={1}>
+                  {'All Posts'}
+                </Text>
+              </HStack>
+            </Pressable>
+            <Box w={'100%'} h={'$0.5'} bgColor={'$pink300'}></Box>
+          </>
+        )}
+        {data?.data?.data?.connection?.is_accepted ? (
+          <Box>
+            {selectSwitch === 'Posts' && (
+              <UserPost postData={userData?.data?.data?.posts} />
+            )}
+            {/* {selectSwitch === 'Captions' && <UserCaption />} */}
           </Box>
         ) : (
           <Box mt={'$16'} alignItems="center">

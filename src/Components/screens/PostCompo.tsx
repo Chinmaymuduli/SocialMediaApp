@@ -274,7 +274,7 @@ const PostCompo = ({item, mutate}: any) => {
               <Pressable
                 onPress={() => navigate('AllComments', {post_id: item?._id})}
                 borderRadius={'$full'}
-                w={'$80'}
+                // w={'$80'}
                 borderWidth={1}>
                 <Text
                   px={'$24'}

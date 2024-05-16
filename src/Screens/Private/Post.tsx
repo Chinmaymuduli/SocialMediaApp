@@ -13,6 +13,8 @@ import {
   ModalBody,
   ModalContent,
   Pressable,
+  RadioGroup,
+  RadioLabel,
   ScrollView,
   Spinner,
   Text,
@@ -33,6 +35,11 @@ import {COLORS} from '~/Styles';
 import {ButtonText} from '@gluestack-ui/themed';
 import {InputField} from '@gluestack-ui/themed';
 import {useAppContext} from '~/Contexts';
+import {Radio} from '@gluestack-ui/themed';
+import {RadioIndicator} from '@gluestack-ui/themed';
+import {RadioIcon} from '@gluestack-ui/themed';
+import {CircleIcon} from '@gluestack-ui/themed';
+import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 
 const Post = () => {
   const {navigate, goBack} = useNavigation<PrivateScreenProps>();
@@ -44,6 +51,8 @@ const Post = () => {
   const [images, setImages] = useState<any>([]);
   const [cation, setCaption] = useState<any>('');
   const [createTag, setCreateTag] = useState<any>('');
+  const [file, setFile] = useState('Photo');
+  const [videoUrl, setVideoUrl] = useState<any>([]);
   const [tags, setTags] = useState<any>([]);
   const {mutation, isLoading} = useMutation();
   const handelTags = (i: any) => {
@@ -63,24 +72,34 @@ const Post = () => {
     try {
       let formData = new FormData();
       formData.append('caption', cation);
-      formData.append('media_type', 'image');
+      formData.append('media_type', file === 'Photo' ? 'image' : 'video');
       tags?.forEach((tg: any) => formData.append('tags', tg?._id));
-      images?.forEach((img: any) => {
-        formData.append('media', {
-          uri: img?.path,
-          name: `file.jpg`,
-          type: 'image/jpeg',
+      file === 'Photo' &&
+        images?.forEach((img: any) => {
+          formData.append('media', {
+            uri: img?.path,
+            name: `file.jpg`,
+            type: 'image/jpeg',
+          });
         });
-      });
+      file === 'Video' &&
+        videoUrl?.forEach((video: any) => {
+          formData.append('media', {
+            uri: video?.path,
+            name: video?.path,
+            type: video?.mime,
+          });
+        });
       if (userData?.is_profile_completed) {
         const res = await mutation(`posts/create`, {
           method: 'POST',
           body: formData,
           isFormData: true,
         });
-
+        console.log({res});
         if (res?.status === 201) {
-          setImages('');
+          setImages([]);
+          setVideoUrl([]);
           setCaption('');
           setTags([]);
           Alert.alert('Success', 'Post Successfully Done');
@@ -110,6 +129,16 @@ const Post = () => {
       console.log(error);
     }
   };
+
+  const handleChooseVideo = async () => {
+    ImagePicker.openPicker({
+      mediaType: 'video',
+    }).then(video => {
+      setVideoUrl((prev: any) => [...prev, video]);
+    });
+  };
+
+  // console.log({videoUrl});
 
   return (
     <PrivateContainer
@@ -153,11 +182,40 @@ const Post = () => {
               Choose File
             </Text>
           </HStack>
-          <HStack mb={'$2'} justifyContent={'space-between'}>
+          <Box mt={'$2'}>
+            <RadioGroup value={file} onChange={setFile}>
+              <HStack gap={'$10'}>
+                <Radio
+                  value="Photo"
+                  size="md"
+                  isInvalid={false}
+                  isDisabled={false}>
+                  <RadioIndicator mr="$2">
+                    <RadioIcon as={CircleIcon} />
+                  </RadioIndicator>
+                  <RadioLabel>Photo</RadioLabel>
+                </Radio>
+                <Radio
+                  value="Video"
+                  size="md"
+                  isInvalid={false}
+                  isDisabled={false}>
+                  <RadioIndicator mr="$2">
+                    <RadioIcon as={CircleIcon} />
+                  </RadioIndicator>
+                  <RadioLabel>Video</RadioLabel>
+                </Radio>
+              </HStack>
+            </RadioGroup>
+          </Box>
+          <HStack mb={'$2'} mt={'$6'} justifyContent={'space-between'}>
             <Pressable
               bgColor={'white'}
-              onPress={() => setImagesPicker(true)}
-              // w={'$40'}
+              onPress={
+                file === 'Photo'
+                  ? () => setImagesPicker(true)
+                  : () => handleChooseVideo()
+              }
               w={'$full'}
               alignItems={'center'}
               justifyContent={'center'}
@@ -165,16 +223,38 @@ const Post = () => {
               borderRadius={7}
               borderColor={'$coolGray300'}>
               <VStack>
-                <Image
-                  source={{
-                    uri:
-                      images?.length > 0
-                        ? images?.[0]?.path
-                        : 'https://cdn-icons-png.flaticon.com/256/892/892311.png',
-                  }}
-                  alt="Default Image"
-                  size={'md'}
-                />
+                {file === 'Photo' ? (
+                  <Image
+                    source={{
+                      uri:
+                        images?.length > 0
+                          ? images?.[0]?.path
+                          : 'https://cdn-icons-png.flaticon.com/256/892/892311.png',
+                    }}
+                    alt="Default Image"
+                    size={'md'}
+                  />
+                ) : (
+                  <Box>
+                    {videoUrl?.length > 0 ? (
+                      <Box py={'$7'}>
+                        <Text
+                          fontFamily="Montserrat-SemiBold"
+                          color={COLORS.secondary}>
+                          {`${videoUrl?.length} Video Uploaded`}
+                        </Text>
+                      </Box>
+                    ) : (
+                      <Image
+                        source={{
+                          uri: 'https://cdn-icons-png.flaticon.com/256/892/892311.png',
+                        }}
+                        alt="Default Image"
+                        size={'md'}
+                      />
+                    )}
+                  </Box>
+                )}
               </VStack>
               {/* <Box p={'$4'}>
                 <Text fontFamily="Montserrat-SemiBold">Photo</Text>

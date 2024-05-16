@@ -12,6 +12,7 @@ import {PrivateScreenProps} from '~/Routes/Private/types';
 
 const MyConnectionCompo = ({data}: any) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
+  // console.log(data);
 
   return (
     <Box>
@@ -23,8 +24,12 @@ const MyConnectionCompo = ({data}: any) => {
               <HStack gap={'$1'} alignItems="center">
                 <Image
                   source={
-                    item?.sender_id?.image
-                      ? {uri: item?.sender_id?.image}
+                    item?.sender_id?.avatar
+                      ? {
+                          uri: item?.is_received
+                            ? item?.sender_id?.avatar
+                            : item?.receiver_id?.avatar,
+                        }
                       : IMAGES.USER
                   }
                   alt="img"
@@ -35,9 +40,9 @@ const MyConnectionCompo = ({data}: any) => {
                   borderRadius={20}
                 />
                 <Text fontFamily="Montserrat-SemiBold" fontSize={12}>
-                  {item?.sender_id?.nick_name ||
-                    item?.sender_id?.name ||
-                    item?.sender_id?.phone}
+                  {item?.is_received
+                    ? item?.sender_id?.nick_name
+                    : item?.receiver_id?.nick_name}
                 </Text>
               </HStack>
               <HStack gap={'$10'} mt={'$1'} px={'$10'} alignItems="center">

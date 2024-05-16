@@ -16,7 +16,7 @@ import {Button} from '@gluestack-ui/themed';
 import {Text} from '@gluestack-ui/themed';
 import {useSwrApi} from '~/Hooks';
 import FetchLoader from '~/Components/core/FetchLoader';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
 import {LinearComponent} from '~/Components/core';
 import {COLORS} from '~/Styles';
@@ -47,6 +47,15 @@ const MyConnections = () => {
     },
   ];
   if (isValidating) <FetchLoader />;
+
+  console.log(data?.data?.data);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      mutate();
+      requestMutate();
+    }, []),
+  );
 
   return (
     <PrivateContainer title={'My Connections'} hasBackIcon={true}>
