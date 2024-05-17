@@ -20,10 +20,32 @@ import {LinearComponent} from '~/Components/core';
 import {useNavigation} from '@react-navigation/native';
 import {AppRoutesTypes} from '~/Routes/Public/types';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 
 type Props = NativeStackScreenProps<AppRoutesTypes, 'AuthRoute'>;
 const AuthRoute = ({route: {params}, navigation}: Props) => {
   const isRegister = params?.isRegister;
+  const SignIn = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      // setState({userInfo});
+      console.log({userInfo});
+    } catch (error: any) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        // operation (e.g. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        // play services not available or outdated
+      } else {
+        // some other error happened
+      }
+    }
+  };
   return (
     <SafeAreaView style={{flex: 1}}>
       <LinearComponent>
@@ -83,7 +105,8 @@ const AuthRoute = ({route: {params}, navigation}: Props) => {
         <Box position={'absolute'} bottom={'$5'} w={'$full'} px={'$3'}>
           <VStack gap={'$3'}>
             <Button
-              onPress={() => navigation.navigate('GoogleAuth')}
+              onPress={() => SignIn()}
+              // onPress={() => navigation.navigate('GoogleAuth')}
               bgColor={COLORS.secondary}
               borderRadius={20}
               gap={'$1'}

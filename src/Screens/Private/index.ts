@@ -13,6 +13,7 @@ export {default as RequestConnections} from './Settings/RequestConnections';
 export {default as MyConnections} from './Settings/MyConnections';
 export {default as Meetings} from './Settings/Meetings';
 export {default as Reviews} from './Settings/Reviews';
+export {default as MyProfile} from './Settings/MyProfile';
 export {default as Support} from './Settings/Support';
 export {default as ContactUs} from './Settings/ContactUs';
 export {default as AdminDashboard} from './Admin/AdminDashboard';

@@ -1,8 +1,8 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
-import { PrivateRoutesTypes } from './types';
-import { TabLayout } from '../Layout';
-import { Private } from '~/Screens';
+import {PrivateRoutesTypes} from './types';
+import {TabLayout} from '../Layout';
+import {Private} from '~/Screens';
 
 const Stack = createNativeStackNavigator<PrivateRoutesTypes>();
 
@@ -10,11 +10,11 @@ type PrivateRouteProps = {
   initialRouteName?: keyof PrivateRoutesTypes;
 };
 
-export default function PrivateRoutes({ initialRouteName }: PrivateRouteProps) {
+export default function PrivateRoutes({initialRouteName}: PrivateRouteProps) {
   return (
     <Stack.Navigator
       initialRouteName={initialRouteName}
-      screenOptions={{ headerShown: false }}>
+      screenOptions={{headerShown: false}}>
       <Stack.Screen name="TabLayout" component={TabLayout} />
       <Stack.Screen name="UserProfile" component={Private.UserProfile} />
       <Stack.Screen name="Settings" component={Private.Settings} />
@@ -34,6 +34,7 @@ export default function PrivateRoutes({ initialRouteName }: PrivateRouteProps) {
       <Stack.Screen name="AllComments" component={Private.AllComments} />
       <Stack.Screen name="AgoraVoiceCall" component={Private.AgoraVoiceCall} />
       <Stack.Screen name="SearchScreen" component={Private.SearchScreen} />
+      <Stack.Screen name="MyProfile" component={Private.MyProfile} />
       <Stack.Screen
         name="CompleteProfile"
         component={Private.CompleteProfile}
