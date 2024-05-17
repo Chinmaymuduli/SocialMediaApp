@@ -41,7 +41,7 @@ const data = [
 const SocialInteractions = () => {
     const [searchPosts, setSearchPosts] = useState<boolean>(false)
     return (
-        <PrivateContainer title={'Meetings'} bg={'purple.50'} hasBackIcon={true}>
+        <PrivateContainer title={'Posts'} bg={'purple.50'} hasBackIcon={true}>
             {/* Header with filter and Search  */}
             <HStack
                 px={'$3'}
