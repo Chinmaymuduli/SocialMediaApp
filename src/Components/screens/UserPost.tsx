@@ -12,64 +12,46 @@ import {IMAGES} from '~/Assets';
 import {Text} from '@gluestack-ui/themed';
 import AppIcon from '../core/AppIcon';
 import {COLORS} from '~/Styles';
+import {useMutation} from '~/Hooks';
+import {Alert} from 'react-native';
 
-const UserPost = ({postData}: any) => {
-  const postInfo = [
-    {
-      postTitle: 'mr shermon',
-      postPersonImage: IMAGES.USER,
-      postImage: IMAGES.POST1,
-      likes: 765,
-      isLiked: false,
-    },
-    {
-      postTitle: 'chillhouse',
-      postPersonImage: IMAGES.USER,
-      postImage: IMAGES.POST2,
-      likes: 345,
-      isLiked: false,
-    },
-    {
-      postTitle: 'Tom',
-      postPersonImage: IMAGES.USER,
-      postImage: IMAGES.POST3,
-      likes: 734,
-      isLiked: false,
-    },
-    {
-      postTitle: 'The_Groot',
-      postPersonImage: IMAGES.USER,
-      postImage: IMAGES.POST4,
-      likes: 875,
-      isLiked: false,
-    },
-    {
-      postTitle: 'The_Groot',
-      postPersonImage: IMAGES.USER,
-      postImage: IMAGES.POST4,
-      likes: 875,
-      isLiked: false,
-    },
-    {
-      postTitle: 'The_Groot',
-      postPersonImage: IMAGES.USER,
-      postImage: IMAGES.POST4,
-      likes: 875,
-      isLiked: false,
-    },
-    {
-      postTitle: 'The_Groot',
-      postPersonImage: IMAGES.USER,
-      postImage: IMAGES.POST4,
-      likes: 875,
-      isLiked: false,
-    },
-  ];
+type Props = {
+  postData: any;
+  isFormUser?: boolean;
+  mutate?: any;
+};
+
+const UserPost = ({postData, isFormUser, mutate}: Props) => {
+  const {mutation, isLoading} = useMutation();
+  const DeletePost = async (id: string) => {
+    try {
+      const response = await mutation(`posts/remove/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response?.status === 202) {
+        Alert.alert('Success', 'Post Successfully Deleted', [
+          {
+            text: 'OK',
+            onPress: () => {
+              mutate();
+            },
+          },
+        ]);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <Box style={{marginTop: 10}}>
       {/* <View style={{flexDirection: 'row', flexWrap: 'wrap', marginTop: 10}}> */}
       {postData?.map((item: any, index: any) => (
-        <Pressable key={index} style={{margin: 5}} onPress={() => {}}>
+        <Pressable
+          key={index}
+          style={{margin: 5}}
+          onPress={() => {}}
+          overflow="hidden">
           <Image
             source={{uri: item?.media?.[0]}}
             alt="image"
@@ -116,7 +98,20 @@ const UserPost = ({postData}: any) => {
               </HStack>
             </HStack>
           </VStack>
-          <Divider my={'$2'} />
+          <Divider my={'$2'} py={'$1'} />
+
+          {isFormUser && (
+            <Box position="absolute" top={0} right={0}>
+              <Pressable
+                onPress={() => DeletePost(item?._id)}
+                bgColor={COLORS.secondary}
+                p={'$2.5'}
+                borderBottomLeftRadius={5}
+                borderTopRightRadius={5}>
+                <AppIcon AntDesignName="delete" size={20} color={'white'} />
+              </Pressable>
+            </Box>
+          )}
         </Pressable>
       ))}
     </Box>

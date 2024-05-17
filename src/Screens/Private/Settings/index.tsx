@@ -1,20 +1,22 @@
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
 import React from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { PrivateContainer } from '~/Components/container';
-import { COLORS } from '~/Styles';
-import { Box } from '@gluestack-ui/themed';
-import { colorsArray } from '~/Constants';
-import { useNavigation } from '@react-navigation/native';
-import { PrivateScreenProps } from '~/Routes/Private/types';
+import {PrivateContainer} from '~/Components/container';
+import {COLORS} from '~/Styles';
+import {Box} from '@gluestack-ui/themed';
+import {colorsArray} from '~/Constants';
+import {useNavigation} from '@react-navigation/native';
+import {PrivateScreenProps} from '~/Routes/Private/types';
 import useBasicFunction from '~/Hooks/useBasicFunctions';
+import {useAppContext} from '~/Contexts';
 
 const SettingScreen = () => {
-  const { navigate } = useNavigation<PrivateScreenProps>();
-  const { handleLogout, handleClearAccessToken } = useBasicFunction();
+  const {navigate} = useNavigation<PrivateScreenProps>();
+  const {handleLogout, handleClearAccessToken} = useBasicFunction();
   const bgColor = (i: number) => colorsArray[i % colorsArray.length];
+  const {userData} = useAppContext();
   const navigateToEditProfile = () => {
-    // navigation.navigate("EditProfile");
+    navigate('CompleteProfile');
   };
 
   const navigateToSecurity = () => {
@@ -112,18 +114,23 @@ const SettingScreen = () => {
   };
 
   const accountItems = [
-    // {
-    //   icon: 'person-outline',
-    //   text: 'Edit Profile',
-    //   action: navigateToEditProfile,
-    // }
-    // {icon: 'lock-outline', text: 'Verify Aadhar', action: navigateToAadhar},
-
     {
-      icon: 'security',
-      text: 'Two Step Verification',
-      action: navigateToSecurity,
+      icon: 'person-outline',
+      text: 'Edit Profile',
+      action: navigateToEditProfile,
     },
+    // {icon: 'lock-outline', text: 'Verify Aadhar', action: navigateToAadhar},
+    {
+      icon: 'people',
+      text: 'My Profile',
+      action: () => navigate('MyProfile'),
+    },
+
+    // {
+    //   icon: 'security',
+    //   text: 'Two Step Verification',
+    //   action: navigateToSecurity,
+    // },
     {
       icon: 'notifications-none',
       text: 'Notifications',
@@ -132,8 +139,8 @@ const SettingScreen = () => {
   ];
 
   const supportItems = [
-    { icon: 'report-problem', text: 'Help & Support', action: navigateToSupport },
-    { icon: 'help-outline', text: 'Contact Us', action: navigateToContact },
+    {icon: 'report-problem', text: 'Help & Support', action: navigateToSupport},
+    {icon: 'help-outline', text: 'Contact Us', action: navigateToContact},
 
     {
       icon: 'credit-card',
@@ -158,7 +165,7 @@ const SettingScreen = () => {
       text: 'My Connections',
       action: navigateToMyConnections,
     },
-    { icon: 'event-note', text: 'My Meetings', action: navigateToMeetings },
+    {icon: 'event-note', text: 'My Meetings', action: navigateToMeetings},
     {
       icon: 'rate-review',
       text: 'Reviews & Ratings',
@@ -172,7 +179,7 @@ const SettingScreen = () => {
       text: 'Delete Account',
       action: navigateToReportProblem,
     },
-    { icon: 'logout', text: 'Log out', action: logout },
+    {icon: 'logout', text: 'Log out', action: logout},
   ];
   const postItems = [
     {
@@ -222,7 +229,7 @@ const SettingScreen = () => {
     },
   ];
 
-  const renderSettingsItem = ({ icon, text, action }: any, index: any) => (
+  const renderSettingsItem = ({icon, text, action}: any, index: any) => (
     <TouchableOpacity
       onPress={action}
       style={{
@@ -244,7 +251,7 @@ const SettingScreen = () => {
           <MaterialIcons name={icon} size={15} color={'white'} />
         </Box>
       </Box>
-      <Text style={{ fontSize: 13, fontFamily: 'Montserrat-SemiBold' }}>
+      <Text style={{fontSize: 13, fontFamily: 'Montserrat-SemiBold'}}>
         {text}
       </Text>
     </TouchableOpacity>
@@ -260,7 +267,7 @@ const SettingScreen = () => {
           <Box
             softShadow="1"
             bgColor="white"
-            style={{ marginBottom: 12 }}
+            style={{marginBottom: 12}}
             borderRadius={10}>
             <Text
               style={{
@@ -287,7 +294,7 @@ const SettingScreen = () => {
           <Box
             softShadow="1"
             bgColor="white"
-            style={{ marginBottom: 12 }}
+            style={{marginBottom: 12}}
             borderRadius={10}>
             <Text
               style={{
@@ -313,7 +320,7 @@ const SettingScreen = () => {
           {/* Support and About settings */}
 
           <Box
-            style={{ marginBottom: 12 }}
+            style={{marginBottom: 12}}
             softShadow="1"
             bgColor="white"
             borderRadius={10}>
@@ -341,7 +348,7 @@ const SettingScreen = () => {
           {/* Actions Settings */}
 
           <Box
-            style={{ marginBottom: 12 }}
+            style={{marginBottom: 12}}
             softShadow="1"
             bgColor="white"
             borderRadius={10}>
@@ -368,7 +375,7 @@ const SettingScreen = () => {
           {/*Post & Others  */}
 
           <Box
-            style={{ marginBottom: 12 }}
+            style={{marginBottom: 12}}
             softShadow="1"
             bgColor="white"
             borderRadius={10}>

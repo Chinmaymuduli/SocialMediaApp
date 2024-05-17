@@ -27,7 +27,7 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import {Button, PhotoPicker, StatePicker} from '~/Components/core';
 import AppIcon from '~/Components/core/AppIcon';
 import {useAppContext} from '~/Contexts';
-import {useMutation, useSwrApi} from '~/Hooks';
+import {useBasicFunctions, useMutation, useSwrApi} from '~/Hooks';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import {Radio} from '@gluestack-ui/themed';
@@ -61,8 +61,11 @@ const CompleteProfile = () => {
     `interests?type=professional&search=${expertise}`,
   );
 
+  const {getUser} = useBasicFunctions();
+
   useEffect(() => {
     setEmail(userData?.email);
+    setProfileImage({path: userData?.avatar});
     setPhone(userData?.phone);
     setName(userData?.name);
     setNickName(userData?.nick_name);
@@ -74,7 +77,7 @@ const CompleteProfile = () => {
       title: userData?.location_details?.state,
       state: userData?.location_details?.state,
     });
-    setProfileImage(userData?.profileImage);
+
     setExpertise(
       userData?.interests?.find((item: any) => item?.type === 'personal'),
     );
@@ -82,6 +85,8 @@ const CompleteProfile = () => {
       userData?.interests?.find((item: any) => item?.type === 'professional'),
     );
   }, [userData]);
+
+  console.log('date', moment(selectedDate).toISOString());
 
   const handelUpdateProfile = async () => {
     try {
@@ -122,6 +127,7 @@ const CompleteProfile = () => {
       console.log(updateData);
       if (updateData?.status === 200) {
         Alert.alert('Success', 'Profile Updated Successfully');
+        getUser();
         navigate('TabLayout');
       } else {
         Alert.alert('Error', 'Please fill all the fields');
@@ -173,7 +179,7 @@ const CompleteProfile = () => {
             rounded={'$lg'}
             alignSelf={'center'}
             alignItems={'center'}>
-            {profileImage ? (
+            {profileImage?.path ? (
               <Image
                 source={profileImage?.path}
                 style={{
@@ -531,7 +537,7 @@ const CompleteProfile = () => {
 
             <VStack gap={'$2'} mt={'$2'}>
               <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
-                Interested In *
+                Interested / Skills *
               </Text>
               {/* <Input
                 flex={1}
@@ -667,6 +673,7 @@ const CompleteProfile = () => {
         mode="date"
         onConfirm={date => handleConfirm(date)}
         onCancel={() => setDatePickerVisibility(false)}
+        maximumDate={new Date()}
       />
       {/* ActionSheet */}
       <Actionsheet

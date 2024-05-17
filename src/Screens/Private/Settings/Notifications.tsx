@@ -10,10 +10,15 @@ import {
 import {COLORS} from '~/Styles';
 import AppIcon from '~/Components/core/AppIcon';
 import {PrivateContainer} from '~/Components/container';
+import {useSwrApi} from '~/Hooks';
+import {useAppContext} from '~/Contexts';
 
 const Notifications = () => {
   const [notificationTitle, setNotificationTitle] = useState('');
   const [notificationDesc, setNotificationDesc] = useState('');
+  const {userData} = useAppContext();
+  const {data, isValidating} = useSwrApi(`notifications`);
+  // console.log(data?.data?.data);
 
   const NOTIFICATION_DATA: {
     id: string;

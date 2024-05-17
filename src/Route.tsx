@@ -41,14 +41,12 @@ const Route = () => {
     getTokenData();
   }, []);
 
-  //642062
-
-  // if (userData === null) return <SplashScreen />;
+  if (userData === null) return <SplashScreen />;
   return userData?._id ? (
     <PrivateRoutes
-    // initialRouteName={
-    //   userData?.is_profile_completed ? 'TabLayout' : 'CompleteProfile'
-    // }
+      initialRouteName={
+        userData?.is_profile_completed ? 'TabLayout' : 'CompleteProfile'
+      }
     />
   ) : (
     <PublicRoutes />
