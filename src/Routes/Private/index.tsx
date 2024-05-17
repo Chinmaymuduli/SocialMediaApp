@@ -46,6 +46,10 @@ export default function PrivateRoutes({ initialRouteName }: PrivateRouteProps) {
         name="RetentionAndChurnMetrics"
         component={Private.RetentionAndChurnMetrics}
       />
+      <Stack.Screen
+        name="PopularReels"
+        component={Private.PopularReels}
+      />
     </Stack.Navigator>
   );
 }

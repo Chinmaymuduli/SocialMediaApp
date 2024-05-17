@@ -24,5 +24,6 @@ export {default as CompleteProfile} from './CompleteProfile';
 export {default as SearchScreen} from './SearchScreen';
 export {default as SocialInteractions} from './Admin/SocialInteractions';
 export {default as RetentionAndChurnMetrics} from './Admin/RetentionAndChurnMetrics';
+export {default as PopularReels} from './Admin/PopularReels';
 // voice call
 export {default as AgoraVoiceCall} from './Agora';

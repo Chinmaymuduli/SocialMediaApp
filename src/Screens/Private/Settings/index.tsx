@@ -84,6 +84,9 @@ const SettingScreen = () => {
   const Relations = () => {
     navigate('RetentionAndChurnMetrics');
   };
+  const Popular_Reel = () => {
+    navigate('PopularReels');
+  };
 
   const logout = () => {
     handleLogout();
@@ -163,6 +166,11 @@ const SettingScreen = () => {
       icon: 'diversity-3',
       text: 'Retention & Churn Metrics',
       action: Relations,
+    },
+    {
+      icon: 'video-library',
+      text: 'Popular Reels',
+      action: Popular_Reel,
     },
   ];
 
