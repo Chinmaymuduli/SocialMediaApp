@@ -25,5 +25,11 @@ export {default as SearchScreen} from './SearchScreen';
 export {default as SocialInteractions} from './Admin/SocialInteractions';
 export {default as RetentionAndChurnMetrics} from './Admin/RetentionAndChurnMetrics';
 export {default as PopularReels} from './Admin/PopularReels';
+export {default as UserEngagement} from './Admin/UserEngagement';
+export {default as UserFeedback} from './Admin/UserFeedback ';
+export {default as RevenueMetrics} from './Admin/RevenueMetrics';
+export {default as TechnicalMetrics} from './Admin/TechnicalMetrics';
+export {default as DemographicMetrics} from './Admin/DemographicMetrics';
+export {default as AcquisitionMetrics} from './Admin/AcquisitionMetrics';
 // voice call
 export {default as AgoraVoiceCall} from './Agora';

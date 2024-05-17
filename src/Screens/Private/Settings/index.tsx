@@ -87,6 +87,24 @@ const SettingScreen = () => {
   const Popular_Reel = () => {
     navigate('PopularReels');
   };
+  const User_Feedback = () => {
+    navigate('UserFeedback');
+  };
+  const User_Engagement = () => {
+    navigate('UserEngagement');
+  };
+  const Revenue_Metrics = () => {
+    navigate('RevenueMetrics');
+  };
+  const Technical_Metrics = () => {
+    navigate('TechnicalMetrics');
+  };
+  const Demographic_Metrics = () => {
+    navigate('DemographicMetrics');
+  };
+  const Acquisition_Metrics = () => {
+    navigate('AcquisitionMetrics');
+  };
 
   const logout = () => {
     handleLogout();
@@ -171,6 +189,36 @@ const SettingScreen = () => {
       icon: 'video-library',
       text: 'Popular Reels',
       action: Popular_Reel,
+    },
+    {
+      icon: 'supervised-user-circle',
+      text: 'User Engagement',
+      action: User_Engagement,
+    },
+    {
+      icon: 'connect-without-contact',
+      text: 'All Reviews',
+      action: User_Feedback,
+    },
+    {
+      icon: 'monetization-on',
+      text: 'Revenue Metrics',
+      action: Revenue_Metrics,
+    },
+    {
+      icon: 'military-tech',
+      text: 'Technical Metrics',
+      action: Technical_Metrics,
+    },
+    {
+      icon: 'add-moderator',
+      text: 'Demographic Metrics',
+      action: Demographic_Metrics,
+    },
+    {
+      icon: 'family-restroom',
+      text: 'Acquisition Metrics',
+      action: Acquisition_Metrics,
     },
   ];
 
