@@ -51,6 +51,30 @@ export default function PrivateRoutes({initialRouteName}: PrivateRouteProps) {
         name="PopularReels"
         component={Private.PopularReels}
       />
+      <Stack.Screen
+        name="UserEngagement"
+        component={Private.UserEngagement}
+      />
+      <Stack.Screen
+        name="UserFeedback"
+        component={Private.UserFeedback}
+      />
+      <Stack.Screen
+        name="RevenueMetrics"
+        component={Private.RevenueMetrics}
+      />
+      <Stack.Screen
+        name="TechnicalMetrics"
+        component={Private.TechnicalMetrics}
+      />
+      <Stack.Screen
+        name="DemographicMetrics"
+        component={Private.DemographicMetrics}
+      />
+      <Stack.Screen
+        name="AcquisitionMetrics"
+        component={Private.AcquisitionMetrics}
+      />
     </Stack.Navigator>
   );
 }
