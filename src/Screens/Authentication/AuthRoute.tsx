@@ -1,4 +1,4 @@
-import {SafeAreaView, StyleSheet} from 'react-native';
+import {SafeAreaView, StyleSheet, Alert} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
   Box,
@@ -46,6 +46,9 @@ const AuthRoute = ({route: {params}, navigation}: Props) => {
       console.log({res});
       const userInfo = await GoogleSignin.signIn();
       setGoogleUser(userInfo);
+      if (userInfo) {
+        loginRegisterGoogle();
+      }
     } catch (error: any) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
@@ -82,15 +85,17 @@ const AuthRoute = ({route: {params}, navigation}: Props) => {
         handleSetAccessToken(res?.results?.data?.access_token);
         handleLogin();
         getUser();
+      } else {
+        Alert.alert('Error', 'res?.results?.error?.message');
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  useEffect(() => {
-    loginRegisterGoogle();
-  }, [googleUser]);
+  // useEffect(() => {
+  //   loginRegisterGoogle();
+  // }, [googleUser]);
 
   if (isLoading)
     return (
