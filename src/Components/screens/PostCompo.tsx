@@ -40,6 +40,7 @@ import {Modal} from '@gluestack-ui/themed';
 import {ModalBody} from '@gluestack-ui/themed';
 import {VStack} from '@gluestack-ui/themed';
 import {Divider} from '@gluestack-ui/themed';
+import VideoCompo from './VideoCompo';
 
 const PostCompo = ({item, mutate}: any) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
@@ -175,19 +176,22 @@ const PostCompo = ({item, mutate}: any) => {
             </Pressable>
           )}
         </View>
-        {item?.media?.length > 0 && (
-          <View
-            style={{
-              position: 'relative',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Image
-              source={{uri: item?.media[0]}}
-              style={{width: '100%', height: 400}}
-            />
-          </View>
-        )}
+        {item?.media?.length > 0 &&
+          (item?.media_type === 'image' ? (
+            <View
+              style={{
+                position: 'relative',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Image
+                source={{uri: item?.media[0]}}
+                style={{width: '100%', height: 400}}
+              />
+            </View>
+          ) : (
+            <VideoCompo url={item?.media?.[0]} />
+          ))}
 
         <HStack
           style={{

@@ -5,13 +5,22 @@ import {
   ActionsheetDragIndicator,
   ActionsheetDragIndicatorWrapper,
   Box,
+  ButtonText,
   HStack,
+  Icon,
   Input,
   InputField,
+  Modal,
+  ModalBackdrop,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
   Pressable,
   ScrollView,
   Spinner,
   Text,
+  TextareaInput,
   VStack,
 } from '@gluestack-ui/themed';
 import {COLORS} from '~/Styles';
@@ -25,13 +34,27 @@ import RazorpayCheckout from 'react-native-razorpay';
 import {Actionsheet} from '@gluestack-ui/themed';
 import {ActionsheetBackdrop} from '@gluestack-ui/themed';
 import {ActionsheetContent} from '@gluestack-ui/themed';
+import {Heading} from '@gluestack-ui/themed';
+import {CloseIcon} from '@gluestack-ui/themed';
+import {ModalFooter} from '@gluestack-ui/themed';
+import {Button} from '@gluestack-ui/themed';
+import {Textarea} from '@gluestack-ui/themed';
+import {Rating} from 'react-native-ratings';
 
 const Meetings = () => {
   const [showActionsheet, setShowActionsheet] = React.useState(false);
   const [meetingData, setMeetingData] = React.useState<any>();
+  const [showModal, setShowModal] = React.useState(false);
+  const [ratings, setRatings] = React.useState(0);
+  const [reviews, setReviews] = React.useState('');
+  const [meetingId, setMeetingId] = useState('');
+  const ref = React.useRef(null);
   const {userData} = useAppContext();
   const {data, isValidating, mutate} = useSwrApi(
     `meetings?require_all=true&user_id=${userData?._id}`,
+  );
+  const {data: reviewData, mutate: reviewMutate} = useSwrApi(
+    `meetings/reviews?meeting_id=${meetingData?._id}`,
   );
   const {mutation, isLoading} = useMutation();
   const makePayment = async (id: any) => {
@@ -99,7 +122,47 @@ const Meetings = () => {
       });
   };
 
-  // console.log(data?.data?.data);
+  const handelMeetingFinished = async (item: any, status: boolean) => {
+    try {
+      const updateData: any = {};
+      if (item?.is_accepted) updateData.is_meeting_finished = true;
+      if (!item?.is_accepted) updateData.is_accepted = status;
+      const res = await mutation(`meetings/${item?._id}`, {
+        method: 'PUT',
+        body: updateData,
+      });
+      console.log(res);
+      if (res?.results?.success === true) {
+        mutate();
+      } else {
+        Alert.alert('Error', res?.results?.error?.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const addReviews = async () => {
+    try {
+      const res = await mutation(`meetings/reviews`, {
+        method: 'POST',
+        body: {
+          rating: ratings,
+          comment: reviews,
+          meeting_id: meetingId,
+        },
+      });
+      if (res?.results?.success === true) {
+        Alert.alert('Success', 'Review Added');
+        mutate();
+        setShowModal(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // console.log(reviewData?.data?.data);
   if (isValidating) {
     <Spinner size={'large'} />;
   }
@@ -194,6 +257,69 @@ const Meetings = () => {
                   </Text>
                 </HStack>
               </HStack>
+
+              {!item?.is_meeting_finished && (
+                <Box pt={'$3'}>
+                  <HStack mr={'$1'} alignItems={'center'} gap={'$4'}>
+                    {item?.is_accepted ? (
+                      <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                        Is Meeting Finished ?
+                      </Text>
+                    ) : (
+                      <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                        Is Meeting Accepted ?
+                      </Text>
+                    )}
+                    <HStack alignItems="center" gap={'$5'}>
+                      <Pressable
+                        bg={'$green400'}
+                        borderRadius={5}
+                        onPress={() => handelMeetingFinished(item, true)}>
+                        <Text
+                          fontFamily="Montserrat-SemiBold"
+                          px={'$4'}
+                          py={'$1'}
+                          color={'$white'}
+                          fontSize={13}>
+                          Yes
+                        </Text>
+                      </Pressable>
+                      {!item?.is_accepted && (
+                        <Pressable
+                          bg={COLORS.secondary}
+                          borderRadius={5}
+                          onPress={() => handelMeetingFinished(item, false)}>
+                          <Text
+                            fontFamily="Montserrat-SemiBold"
+                            px={'$4'}
+                            py={'$1'}
+                            color={'$white'}
+                            fontSize={13}>
+                            No
+                          </Text>
+                        </Pressable>
+                      )}
+                    </HStack>
+                  </HStack>
+                </Box>
+              )}
+
+              {item?.is_meeting_finished && (
+                <Box pt={'$3'}>
+                  <Pressable
+                    onPress={() => {
+                      setMeetingId(item?._id), setShowModal(true);
+                    }}>
+                    <Text
+                      fontFamily="Montserrat-SemiBold"
+                      fontSize={13}
+                      textDecorationLine="underline"
+                      color={COLORS.secondary}>
+                      Give Review
+                    </Text>
+                  </Pressable>
+                </Box>
+              )}
             </Box>
             {!item?.is_sender_paid && (
               <Box borderBottomWidth={1} borderStyle={'dashed'} py={'$2'}></Box>
@@ -281,111 +407,241 @@ const Meetings = () => {
             <ActionsheetDragIndicator />
           </ActionsheetDragIndicatorWrapper>
           <Box w={'$full'}>
-            <Pressable mx={'$1'} mt={'$4'}>
-              <Box
-                justifyContent="space-between"
-                bg={'$pink50'}
-                alignItems={'center'}>
+            <ScrollView>
+              <Pressable mx={'$1'} mt={'$4'}>
                 <Box
-                  alignItems={'center'}
-                  justifyContent="center"
-                  px={'$2'}
-                  py={'$1'}>
-                  <Text
-                    fontSize={14}
-                    fontFamily="Montserrat-Bold"
-                    color={COLORS.secondary}>
-                    {' - : Meeting Details : -'}
-                  </Text>
+                  justifyContent="space-between"
+                  bg={'$pink50'}
+                  alignItems={'center'}>
+                  <Box
+                    alignItems={'center'}
+                    justifyContent="center"
+                    px={'$2'}
+                    py={'$1'}>
+                    <Text
+                      fontSize={14}
+                      fontFamily="Montserrat-Bold"
+                      color={COLORS.secondary}>
+                      {' - : Meeting Details : -'}
+                    </Text>
+                  </Box>
                 </Box>
-              </Box>
 
-              <Box px={'$3'} mt={'$2'}>
-                <HStack justifyContent={'space-between'}>
-                  <VStack gap={'$1'}>
-                    <Text fontFamily="Montserrat-Bold" fontSize={13}>
-                      Meeting Date
-                    </Text>
-                    <Text fontFamily="Montserrat-Medium" fontSize={13}>
-                      {moment(meetingData?.date).format('ll')}
-                    </Text>
-                  </VStack>
-                  <VStack gap={'$1'}>
-                    <Text bold fontSize={13}>
-                      Meeting Time
-                    </Text>
-                    <Text fontFamily="Montserrat-Medium" fontSize={13}>
-                      {moment(meetingData?.date).format('LT')}
-                    </Text>
-                  </VStack>
-                </HStack>
-                <HStack pt={'$3'}>
-                  <VStack>
+                <Box px={'$3'} mt={'$2'}>
+                  <HStack justifyContent={'space-between'}>
+                    <VStack gap={'$1'}>
+                      <Text fontFamily="Montserrat-Bold" fontSize={13}>
+                        Meeting Date
+                      </Text>
+                      <Text fontFamily="Montserrat-Medium" fontSize={13}>
+                        {moment(meetingData?.date).format('ll')}
+                      </Text>
+                    </VStack>
+                    <VStack gap={'$1'}>
+                      <Text bold fontSize={13}>
+                        Meeting Time
+                      </Text>
+                      <Text fontFamily="Montserrat-Medium" fontSize={13}>
+                        {moment(meetingData?.date).format('LT')}
+                      </Text>
+                    </VStack>
+                  </HStack>
+                  <HStack pt={'$3'}>
+                    <VStack>
+                      <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                        Meeting With :
+                      </Text>
+                      <Text
+                        fontSize={13}
+                        fontFamily="Montserrat-Bold"
+                        mt={'$1'}
+                        color={COLORS.secondary}>
+                        {meetingData?.sender_id?.nick_name}
+                      </Text>
+                    </VStack>
+                  </HStack>
+                </Box>
+                <Box px={'$3'} py={'$3'}>
+                  <Box mr={'$1'} w={'$80'}>
                     <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
-                      Meeting With :
+                      Location :
                     </Text>
                     <Text
-                      fontSize={13}
+                      fontSize={12}
+                      fontFamily="Montserrat-Medium"
+                      mt={'$1'}>
+                      {meetingData?.location_details?.address +
+                        ' , ' +
+                        meetingData?.location_details?.city +
+                        ' , ' +
+                        meetingData?.location_details?.state +
+                        ' , ' +
+                        meetingData?.location_details?.pincode}
+                    </Text>
+                  </Box>
+                </Box>
+                <Box px={'$3'} py={'$1'}>
+                  <Box mr={'$1'} w={'$80'}>
+                    <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                      Meeting Amount :
+                    </Text>
+                    <Text
+                      fontSize={12}
                       fontFamily="Montserrat-Bold"
                       mt={'$1'}
                       color={COLORS.secondary}>
-                      {meetingData?.sender_id?.nick_name}
+                      {meetingData?.amount}
                     </Text>
-                  </VStack>
-                </HStack>
-              </Box>
-              <Box px={'$3'} py={'$3'}>
-                <Box mr={'$1'} w={'$80'}>
-                  <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
-                    Location :
-                  </Text>
-                  <Text fontSize={12} fontFamily="Montserrat-Medium" mt={'$1'}>
-                    {meetingData?.location_details?.address +
-                      ' , ' +
-                      meetingData?.location_details?.city +
-                      ' , ' +
-                      meetingData?.location_details?.state +
-                      ' , ' +
-                      meetingData?.location_details?.pincode}
-                  </Text>
+                  </Box>
                 </Box>
-              </Box>
-              <Box px={'$3'} py={'$1'}>
-                <Box mr={'$1'} w={'$80'}>
-                  <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
-                    Meeting Amount :
-                  </Text>
-                  <Text
-                    fontSize={12}
-                    fontFamily="Montserrat-Bold"
-                    mt={'$1'}
-                    color={COLORS.secondary}>
-                    {meetingData?.amount}
-                  </Text>
+                <Box px={'$3'} py={'$1'}>
+                  <Box mr={'$1'} w={'$80'}>
+                    <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                      Payment Status :
+                    </Text>
+                    <Text
+                      fontSize={12}
+                      fontFamily="Montserrat-Bold"
+                      mt={'$1'}
+                      color={
+                        meetingData?.is_sender_paid
+                          ? '$green500'
+                          : COLORS.secondary
+                      }>
+                      {meetingData?.is_sender_paid ? 'Accepted' : 'Pending'}
+                    </Text>
+                  </Box>
                 </Box>
-              </Box>
-              <Box px={'$3'} py={'$1'}>
-                <Box mr={'$1'} w={'$80'}>
-                  <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
-                    Payment Status :
-                  </Text>
-                  <Text
-                    fontSize={12}
-                    fontFamily="Montserrat-Bold"
-                    mt={'$1'}
-                    color={
-                      meetingData?.is_sender_paid
-                        ? '$green500'
-                        : COLORS.secondary
-                    }>
-                    {meetingData?.is_sender_paid ? 'Accepted' : 'Pending'}
-                  </Text>
+                <Box px={'$3'} py={'$1'}>
+                  <Box mr={'$1'} w={'$80'}>
+                    <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                      Is Meeting Finished ?
+                    </Text>
+                    <Text
+                      fontSize={12}
+                      fontFamily="Montserrat-Bold"
+                      mt={'$1'}
+                      color={
+                        meetingData?.is_sender_paid
+                          ? '$green500'
+                          : COLORS.secondary
+                      }>
+                      {meetingData?.is_meeting_finished ? 'Yes' : 'No'}
+                    </Text>
+                  </Box>
                 </Box>
-              </Box>
-            </Pressable>
+
+                <Box px={'$3'} py={'$1'} mt={'$2'}>
+                  <Pressable mr={'$1'} w={'$80'}>
+                    <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                      All Reviews
+                    </Text>
+                    <Box mt={'$3'}>
+                      {reviewData?.data?.data?.map((rev: any) => (
+                        <VStack
+                          px={'$1'}
+                          py={'$1'}
+                          mb={'$2'}
+                          key={rev?._id}
+                          borderWidth={1}
+                          borderColor="$coolGray200">
+                          <HStack>
+                            <Text fontFamily="Montserrat-Medium" fontSize={12}>
+                              Ratings :{' '}
+                            </Text>
+                            <Text fontFamily="Montserrat-Medium" fontSize={12}>
+                              {rev?.rating}
+                            </Text>
+                          </HStack>
+                          <Text
+                            fontSize={12}
+                            fontFamily="Montserrat-Medium"
+                            mt={'$1'}>
+                            {rev?.comment}
+                          </Text>
+                        </VStack>
+                      ))}
+                    </Box>
+                  </Pressable>
+                </Box>
+              </Pressable>
+            </ScrollView>
           </Box>
         </ActionsheetContent>
       </Actionsheet>
+
+      {/* Modal for review */}
+      <Modal
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+        }}
+        finalFocusRef={ref}>
+        <ModalBackdrop />
+        <ModalContent>
+          <ModalHeader>
+            <Heading size="lg">Rate & Review</Heading>
+            <ModalCloseButton>
+              <Icon as={CloseIcon} />
+            </ModalCloseButton>
+          </ModalHeader>
+          <ModalBody>
+            <VStack>
+              <Text fontFamily="Montserrat-Medium">Rate</Text>
+              <Box px={'$0'}>
+                <Rating
+                  type="custom"
+                  startingValue={ratings}
+                  ratingColor={COLORS.secondary}
+                  tintColor={'#fff'}
+                  ratingBackgroundColor={'gray'}
+                  ratingCount={5}
+                  imageSize={30}
+                  onFinishRating={(rating: React.SetStateAction<number>) => {
+                    setRatings(rating);
+                  }}
+                />
+              </Box>
+            </VStack>
+            <VStack gap={'$1'}>
+              <Text fontFamily="Montserrat-Medium">Review</Text>
+              <Textarea
+                size="md"
+                isReadOnly={false}
+                isInvalid={false}
+                isDisabled={false}
+                w="$64">
+                <TextareaInput
+                  placeholder="Your text goes here..."
+                  value={reviews}
+                  onChangeText={txt => {
+                    setReviews(txt);
+                  }}
+                />
+              </Textarea>
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="outline"
+              size="sm"
+              action="secondary"
+              mr="$3"
+              onPress={() => {
+                setShowModal(false);
+              }}>
+              <ButtonText>Cancel</ButtonText>
+            </Button>
+            <Button
+              size="sm"
+              action="positive"
+              borderWidth="$0"
+              onPress={() => addReviews()}>
+              <ButtonText>Send</ButtonText>
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </PrivateContainer>
   );
 };

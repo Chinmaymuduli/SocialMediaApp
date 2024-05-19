@@ -52,6 +52,8 @@ const PostFeed = () => {
     }, []),
   );
 
+  // console.log(data?.data?.data?.[0]);
+
   return (
     <View>
       {/* <Box px={'$3'} mb={'$3'} mt={'$6'}>

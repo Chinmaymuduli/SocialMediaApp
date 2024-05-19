@@ -13,6 +13,7 @@ type MutationOptions = {
 const useMutation = () => {
   const [isLoading, setIsLoading] = useState(false);
   const mutation = async (path: string, options?: MutationOptions) => {
+    console.log(options?.body);
     try {
       const token = await AsyncStorage.getItem('accessToken');
       const url = options?.BASE_URL || BASE_URL;

@@ -1,5 +1,5 @@
 import {SafeAreaView, StyleSheet} from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Box,
   Center,
@@ -12,6 +12,7 @@ import {
   PhoneIcon,
   ButtonIcon,
   GlobeIcon,
+  Spinner,
 } from '@gluestack-ui/themed';
 import {IMAGES} from '~/Assets';
 import LinearGradient from 'react-native-linear-gradient';
@@ -24,28 +25,80 @@ import {
   GoogleSignin,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
+import {useBasicFunctions, useMutation} from '~/Hooks';
 
 type Props = NativeStackScreenProps<AppRoutesTypes, 'AuthRoute'>;
 const AuthRoute = ({route: {params}, navigation}: Props) => {
   const isRegister = params?.isRegister;
+  const [googleUser, setGoogleUser] = useState<any>();
+  const {mutation, isLoading} = useMutation();
+  const {handleLogin, getUser, handleSetAccessToken} = useBasicFunctions();
+  // com.fevelapp
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId:
+        '1061452931939-vfokpioaef88sn5bcpiev4v1squj2ui1.apps.googleusercontent.com',
+    });
+  }, []);
   const SignIn = async () => {
     try {
-      await GoogleSignin.hasPlayServices();
+      const res = await GoogleSignin.hasPlayServices();
+      console.log({res});
       const userInfo = await GoogleSignin.signIn();
-      // setState({userInfo});
-      console.log({userInfo});
+      setGoogleUser(userInfo);
     } catch (error: any) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
+        console.log('object1');
       } else if (error.code === statusCodes.IN_PROGRESS) {
         // operation (e.g. sign in) is in progress already
+        console.log('object2');
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         // play services not available or outdated
+        console.log('object3');
       } else {
+        console.log(error);
         // some other error happened
       }
     }
   };
+
+  const loginRegisterGoogle = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('email', googleUser?.user?.email);
+      formData.append('avatar', {
+        uri: googleUser?.user?.photo,
+        name: 'image.png',
+        fileName: 'image',
+        type: 'image/png',
+      });
+      const res = await mutation(`auth/login-or-register-with-firebase`, {
+        method: 'POST',
+        isFormData: true,
+        body: formData,
+      });
+      if (res?.results?.success === true) {
+        handleSetAccessToken(res?.results?.data?.access_token);
+        handleLogin();
+        getUser();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    loginRegisterGoogle();
+  }, [googleUser]);
+
+  if (isLoading)
+    return (
+      <Box flex={1} justifyContent="center" alignItems="center">
+        <Spinner size={'large'} />
+      </Box>
+    );
+
   return (
     <SafeAreaView style={{flex: 1}}>
       <LinearComponent>

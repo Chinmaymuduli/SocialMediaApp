@@ -1,4 +1,4 @@
-package com.fevealapp
+package com.feveal
 
 import android.app.Application
 import com.facebook.react.PackageList

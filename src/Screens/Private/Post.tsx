@@ -83,12 +83,14 @@ const Post = () => {
           });
         });
       file === 'Video' &&
-        videoUrl?.forEach((video: any) => {
-          formData.append('media', {
-            uri: video?.path,
-            name: video?.path,
-            type: video?.mime,
-          });
+        videoUrl.forEach((video: any) => {
+          if (video?.path && video?.mime) {
+            formData.append('media', {
+              uri: video.path,
+              name: video.path.split('/').pop(),
+              type: video.mime,
+            });
+          }
         });
       if (userData?.is_profile_completed) {
         const res = await mutation(`posts/create`, {
@@ -103,6 +105,8 @@ const Post = () => {
           setCaption('');
           setTags([]);
           Alert.alert('Success', 'Post Successfully Done');
+        } else {
+          Alert.alert('Error', 'Something went wrong');
         }
       } else {
         Alert.alert('Error', 'Please Complete Your Profile First Before Post');
@@ -365,7 +369,7 @@ const Post = () => {
                   borderWidth={1}
                   borderColor="$coolGray400"
                   bgColor={
-                    tags?.find(i => i?._id === item?._id)
+                    tags?.find((i: any) => i?._id === item?._id)
                       ? COLORS.secondary
                       : '$white'
                   }

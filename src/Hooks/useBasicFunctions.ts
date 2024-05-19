@@ -55,8 +55,13 @@ const useBasicFunction = () => {
       const data = await res.json();
       const status = res?.status;
 
+      console.log({status});
+
       if (status === 401) {
         await AsyncStorage.removeItem('accessToken');
+        setUserData({});
+      }
+      if (status === 500) {
         setUserData({});
       }
       if (status === 200) {
