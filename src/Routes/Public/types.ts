@@ -5,7 +5,7 @@ export type PublicRoutesTypes = {
   [key in keyof typeof Public]: undefined;
 } & {[key in keyof typeof Auth]: undefined};
 
-type OmittedScreens = 'OtpScreen' | 'AuthRoute';
+type OmittedScreens = 'OtpScreen' | 'AuthRoute' | 'Login';
 export type AppRoutesTypes = Omit<PublicRoutesTypes, OmittedScreens> & {
   OtpScreen: {
     token?: string;
@@ -14,6 +14,9 @@ export type AppRoutesTypes = Omit<PublicRoutesTypes, OmittedScreens> & {
   };
   AuthRoute: {
     isRegister: boolean;
+  };
+  Login: {
+    isRegister?: boolean;
   };
 };
 

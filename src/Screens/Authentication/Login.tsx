@@ -22,12 +22,14 @@ import {ButtonIcon} from '@gluestack-ui/themed';
 import PhoneLogin from './PhoneLogin';
 import EmailLogin from './EmailLogin';
 import {useNavigation} from '@react-navigation/native';
-import {PublicNavigationProps} from '~/Routes/Public/types';
+import {AppRoutesTypes, PublicNavigationProps} from '~/Routes/Public/types';
 import {GlobeIcon} from '@gluestack-ui/themed';
 import {useMutation} from '~/Hooks';
 import useBasicFunction from '~/Hooks/useBasicFunctions';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
-const Login = () => {
+type Props = NativeStackScreenProps<AppRoutesTypes, 'Login'>;
+const Login = ({route: {params}}: Props) => {
   const {navigate} = useNavigation<PublicNavigationProps>();
   const [showPassword, setShowPassword] = useState(false);
   const [isPhoneLogin, setIsPhoneLogin] = useState(false);
@@ -87,14 +89,27 @@ const Login = () => {
       Alert.alert('Error', 'Please Provide Phone Number');
     }
     try {
-      const phoneSignUp = await mutation(`auth/generate-otp`, {
-        method: 'POST',
-        body: {
-          phone: phoneNumber,
-        },
-      });
+      let phoneSignUp;
 
-      console.log(phoneSignUp?.results);
+      if (params?.isRegister) {
+        phoneSignUp = await mutation(`auth/register-with-phone`, {
+          method: 'POST',
+          body: {
+            phone: phoneNumber,
+            country_details: {
+              name: selectedCountry.name,
+              code: selectedCountry.phone,
+            },
+          },
+        });
+      } else {
+        phoneSignUp = await mutation(`auth/generate-otp`, {
+          method: 'POST',
+          body: {
+            phone: phoneNumber,
+          },
+        });
+      }
       if (phoneSignUp?.results?.success !== true) {
         Alert.alert('Error', phoneSignUp?.results?.error?.message);
       } else {

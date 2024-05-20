@@ -30,7 +30,6 @@ import {useBasicFunctions, useMutation} from '~/Hooks';
 type Props = NativeStackScreenProps<AppRoutesTypes, 'AuthRoute'>;
 const AuthRoute = ({route: {params}, navigation}: Props) => {
   const isRegister = params?.isRegister;
-  const [googleUser, setGoogleUser] = useState<any>();
   const {mutation, isLoading} = useMutation();
   const {handleLogin, getUser, handleSetAccessToken} = useBasicFunctions();
   // com.fevelapp
@@ -45,9 +44,8 @@ const AuthRoute = ({route: {params}, navigation}: Props) => {
       const res = await GoogleSignin.hasPlayServices();
       console.log({res});
       const userInfo = await GoogleSignin.signIn();
-      setGoogleUser(userInfo);
       if (userInfo) {
-        loginRegisterGoogle();
+        loginRegisterGoogle(userInfo);
       }
     } catch (error: any) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
@@ -66,27 +64,30 @@ const AuthRoute = ({route: {params}, navigation}: Props) => {
     }
   };
 
-  const loginRegisterGoogle = async () => {
+  const loginRegisterGoogle = async (userInfo: any) => {
+    console.log(userInfo?.user?.email, 'Email');
     try {
       const formData = new FormData();
-      formData.append('email', googleUser?.user?.email);
-      formData.append('avatar', {
-        uri: googleUser?.user?.photo,
-        name: 'image.png',
-        fileName: 'image',
-        type: 'image/png',
-      });
+      formData.append('email', userInfo?.user?.email);
+      userInfo?.user?.photo &&
+        formData.append('avatar', {
+          uri: userInfo?.user?.photo,
+          name: 'image.png',
+          fileName: 'image',
+          type: 'image/png',
+        });
       const res = await mutation(`auth/login-or-register-with-firebase`, {
         method: 'POST',
         isFormData: true,
         body: formData,
       });
+      console.log(res);
       if (res?.results?.success === true) {
         handleSetAccessToken(res?.results?.data?.access_token);
         handleLogin();
         getUser();
       } else {
-        Alert.alert('Error', 'res?.results?.error?.message');
+        Alert.alert('Error', res?.results?.error?.message);
       }
     } catch (error) {
       console.log(error);
@@ -178,7 +179,11 @@ const AuthRoute = ({route: {params}, navigation}: Props) => {
               borderRadius={20}
               gap={'$1'}
               w={'100%'}
-              onPress={() => navigation.navigate('Login')}>
+              onPress={() =>
+                navigation.navigate('Login', {
+                  isRegister: isRegister,
+                })
+              }>
               <ButtonIcon as={PhoneIcon} mr="$2" />
               <ButtonText color="$white" fontFamily={'Montserrat-Bold'}>
                 Continue with phone number

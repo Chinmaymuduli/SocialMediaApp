@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1061452931939-7tut45j07rvd49e41dphnmjs2o23qlrj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.feveal",
+            "certificate_hash": "1b3614155967115ffb544a926603d1b90478cdbe"
+          }
+        },
+        {
           "client_id": "1061452931939-rur04k3np9d6d3avu905s0r7b826rjs3.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

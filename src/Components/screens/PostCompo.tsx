@@ -202,7 +202,7 @@ const PostCompo = ({item, mutate}: any) => {
           gap={'$2'}>
           <TouchableOpacity onPress={() => giveLikeDislike(item?._id)}>
             <AntDesign
-              name={item?.is_liked ? 'heart' : 'hearto'}
+              name={item?.is_liked ? 'like1' : 'like2'}
               style={{
                 paddingRight: 10,
                 fontSize: 20,
