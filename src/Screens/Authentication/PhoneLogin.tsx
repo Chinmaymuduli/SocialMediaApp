@@ -59,6 +59,7 @@ const PhoneLogin = ({
               type="text"
               value={phoneNumber}
               onChangeText={txt => setPhoneNumber(txt)}
+              keyboardType="number-pad"
             />
           </Input>
         </FormControl>
