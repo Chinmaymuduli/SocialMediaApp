@@ -66,7 +66,7 @@ const MyConnectionCompo = ({data}: any) => {
                     navigate('ChatDetails', {
                       connection_id: item?._id,
                       userNickName: item?.receiver_id?.nick_name,
-                      isReceived: true,
+                      isReceived: item?.is_received,
                       name: item?.receiver_id?.name || 'Demo',
                     })
                   }
