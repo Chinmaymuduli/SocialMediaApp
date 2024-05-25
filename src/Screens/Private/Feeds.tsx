@@ -6,12 +6,12 @@ import {PrivateScreenProps} from '~/Routes/Private/types';
 import {PrivateContainer} from '~/Components/container';
 import {PostFeed} from '~/Components/screens';
 import {ScrollView} from '@gluestack-ui/themed';
-import {useSwrApi} from '~/Hooks';
+import {useFCMToken, useSwrApi} from '~/Hooks';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 
 const Feeds = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
-
+  useFCMToken();
   const handleDynamicLink = (link: any) => {
     if (!!link?.url) {
       let getId = link.url?.split('=').pop();

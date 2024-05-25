@@ -2552,6 +2552,11 @@
   resolved "https://registry.yarnpkg.com/@react-native-firebase/dynamic-links/-/dynamic-links-20.0.0.tgz#6b94697ff9642862419f02af3f78d840595dfe2d"
   integrity sha512-eJvUKFZp/4ySLafNdxLonb7GRuQDjQ5CNkP48e3s0a6bpdek4e3BQy163/pAeYYiIS358710OXgPH8Pd6llL3A==
 
+"@react-native-firebase/messaging@^20.0.0":
+  version "20.0.0"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/messaging/-/messaging-20.0.0.tgz#92d25294361ef7e7341b916a903f8fc0abb53abc"
+  integrity sha512-sBc3SRmUW9+T75YKa374kV4TfAz5EemBc9rXHYlgTI2DQeBhWNQbazAbKEJyyZOJDbs2RgR9f330VWCP7jLTBA==
+
 "@react-native-google-signin/google-signin@^11.0.1":
   version "11.0.1"
   resolved "https://registry.yarnpkg.com/@react-native-google-signin/google-signin/-/google-signin-11.0.1.tgz#1bff0c8f65d3b32eac1622f68293e94137b96360"
