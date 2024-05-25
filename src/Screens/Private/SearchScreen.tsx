@@ -3,6 +3,7 @@ import {
   ButtonText,
   Divider,
   FlatList,
+  Pressable,
   SearchIcon,
   Text,
 } from '@gluestack-ui/themed';
@@ -17,8 +18,11 @@ import MyConnectionCompo from './Settings/MyConnectionCompo';
 import {VStack} from '@gluestack-ui/themed';
 import {HStack} from '@gluestack-ui/themed';
 import FetchLoader from '~/Components/core/FetchLoader';
+import {useNavigation} from '@react-navigation/native';
+import {PrivateScreenProps} from '~/Routes/Private/types';
 
 const SearchScreen = () => {
+  const {navigate} = useNavigation<PrivateScreenProps>();
   const inputRef = useRef<any>(null);
   const [search, setSearch] = useState('');
 
@@ -64,7 +68,9 @@ const SearchScreen = () => {
         <FlatList
           data={data?.data?.data}
           renderItem={({item}: any) => (
-            <Box py={'$1'}>
+            <Pressable
+              onPress={() => navigate('UserProfile', {user_id: item?._id})}
+              py={'$1'}>
               <VStack px={'$4'}>
                 <HStack gap={'$2'} alignItems="center">
                   <Image
@@ -82,7 +88,7 @@ const SearchScreen = () => {
                 </HStack>
               </VStack>
               <Divider mt={'$4'} />
-            </Box>
+            </Pressable>
           )}
         />
       )}
