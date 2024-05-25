@@ -65,7 +65,7 @@ const SettingScreen = () => {
   };
   const navigateToRequest = () => {
     console.log('Date saver');
-    navigate('RequestConnections');
+    navigate('SentConnections');
   };
   const navigateToAadhar = () => {
     console.log('Date saver');
@@ -157,14 +157,14 @@ const SettingScreen = () => {
   const cacheAndCellularItems = [
     {
       icon: 'bookmark-add',
-      text: 'Request Connections',
+      text: 'Sent Connections',
       action: navigateToRequest,
     },
-    {
-      icon: 'diversity-1',
-      text: 'My Connections',
-      action: navigateToMyConnections,
-    },
+    // {
+    //   icon: 'diversity-1',
+    //   text: 'My Connections',
+    //   action: navigateToMyConnections,
+    // },
     {icon: 'event-note', text: 'My Meetings', action: navigateToMeetings},
     {
       icon: 'rate-review',

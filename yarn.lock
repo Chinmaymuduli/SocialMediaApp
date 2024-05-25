@@ -2547,6 +2547,11 @@
   dependencies:
     plist "^3.1.0"
 
+"@react-native-firebase/dynamic-links@^20.0.0":
+  version "20.0.0"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/dynamic-links/-/dynamic-links-20.0.0.tgz#6b94697ff9642862419f02af3f78d840595dfe2d"
+  integrity sha512-eJvUKFZp/4ySLafNdxLonb7GRuQDjQ5CNkP48e3s0a6bpdek4e3BQy163/pAeYYiIS358710OXgPH8Pd6llL3A==
+
 "@react-native-google-signin/google-signin@^11.0.1":
   version "11.0.1"
   resolved "https://registry.yarnpkg.com/@react-native-google-signin/google-signin/-/google-signin-11.0.1.tgz#1bff0c8f65d3b32eac1622f68293e94137b96360"

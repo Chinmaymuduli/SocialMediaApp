@@ -36,6 +36,10 @@ const MyConnections = () => {
     `connections/read-all?type=receive&is_accepted=false&require_all=true`,
   );
 
+  const {data: recommendationData} = useSwrApi(
+    `connections/read-all-recommendation?require_all=true`,
+  );
+
   const btnArray = [
     {
       id: '1',
@@ -157,6 +161,7 @@ const MyConnections = () => {
               data={requestData?.data?.data}
               requestMutate={requestMutate}
               mutate={mutate}
+              recommendationData={recommendationData?.data?.data}
             />
           )}
         </Box>

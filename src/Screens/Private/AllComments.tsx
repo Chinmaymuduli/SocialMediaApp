@@ -60,6 +60,18 @@ const AllComments = ({route: {params}}: Props) => {
           renderItem={({item}: any) => (
             <CommonCompo item={item} mutate={mutate} />
           )}
+          ListEmptyComponent={
+            <Box alignItems="center" mt={'$10'}>
+              <VStack alignItems="center" gap={10}>
+                <Image
+                  source={IMAGES.CONNECT_BG_REMOVE}
+                  alt="img"
+                  style={{width: 200, height: 200}}
+                />
+                <Text fontFamily="Montserrat-SemiBold">No Message found</Text>
+              </VStack>
+            </Box>
+          }
         />
       </Box>
       <HStack px={'$3'} gap={'$2'} py={'$2'}>

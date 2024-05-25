@@ -16,6 +16,7 @@ export {default as Reviews} from './Settings/Reviews';
 export {default as MyProfile} from './Settings/MyProfile';
 export {default as Support} from './Settings/Support';
 export {default as ContactUs} from './Settings/ContactUs';
+export {default as SentConnections} from './Settings/SentConnections';
 export {default as AdminDashboard} from './Admin/AdminDashboard';
 export {default as AllUsers} from './Admin/AllUsers';
 export {default as AllSupports} from './Admin/AllSupports';
@@ -34,3 +35,4 @@ export {default as DemographicMetrics} from './Admin/DemographicMetrics';
 export {default as AcquisitionMetrics} from './Admin/AcquisitionMetrics';
 // voice call
 export {default as AgoraVoiceCall} from './Agora';
+export {default as ShareScreenDetails} from './ShareScreenDetails';

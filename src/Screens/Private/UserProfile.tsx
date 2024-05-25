@@ -55,7 +55,9 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
   ];
   const {mutation, isLoading} = useMutation();
   const {userData: userDetails} = useAppContext();
-  const {data} = useSwrApi(`connections/check-is-connected/${params?.user_id}`);
+  const {data, mutate: connectMutate} = useSwrApi(
+    `connections/check-is-connected/${params?.user_id}`,
+  );
   const {data: userData, mutate} = useSwrApi(`users/read/${params?.user_id}`);
   const handelConnectRequest = async () => {
     try {
@@ -68,7 +70,9 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
       });
       console.log({res: res?.results?.error});
       if (res?.status === 201) {
+        connectMutate();
         setShowModal(false);
+        setMessage('');
         Alert.alert('success', 'Connection request sent successfully');
       }
     } catch (error) {

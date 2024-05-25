@@ -32,18 +32,17 @@ import {
 } from '@gluestack-ui/themed';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
-import AppIcon from '../core/AppIcon';
-import {SearchIcon} from '@gluestack-ui/themed';
+
 import {useMutation, useSwrApi} from '~/Hooks';
 import {useAppContext} from '~/Contexts';
 import {Modal} from '@gluestack-ui/themed';
 import {ModalBody} from '@gluestack-ui/themed';
 import {VStack} from '@gluestack-ui/themed';
 import {Divider} from '@gluestack-ui/themed';
-import VideoCompo from './VideoCompo';
-import dynamicLinks from '@react-native-firebase/dynamic-links';
+import VideoCompo from '~/Components/screens/VideoCompo';
+import {PrivateContainer} from '~/Components/container';
 
-const PostCompo = ({item, mutate}: any) => {
+const ShareScreenDetails = ({item, mutate}: any) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
   const [showModal, setShowModal] = useState(false);
   const [postId, setPostId] = useState<string>('');
@@ -95,24 +94,12 @@ const PostCompo = ({item, mutate}: any) => {
     }
   };
 
-  const buildLink = async (id: any) => {
-    const link = await dynamicLinks().buildLink({
-      link: `https://invertase.io?id=${id}`,
-      // domainUriPrefix is created in your Firebase console
-      domainUriPrefix: 'https://fevealapp.page.link',
-    });
-
-    return link;
-  };
-
-  const onShare = async (id: any) => {
+  const onShare = async () => {
     try {
-      const getLink = await buildLink(id);
-      console.log({getLink});
       const result = await Share.share({
-        message: getLink,
-        url: getLink,
-        // title: 'React Native',
+        message: 'Share the post',
+        url: 'https://reactnative.dev/',
+        title: 'React Native',
       });
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
@@ -129,7 +116,7 @@ const PostCompo = ({item, mutate}: any) => {
   };
 
   return (
-    <View>
+    <PrivateContainer image={IMAGES.LOGO} hasBackIcon={true}>
       <View
         style={{
           paddingBottom: 10,
@@ -203,7 +190,11 @@ const PostCompo = ({item, mutate}: any) => {
               />
             </View>
           ) : (
-            <VideoCompo url={item?.media?.[0]} />
+            <VideoCompo
+              url={
+                'https://d1kn7fxh6uqnk4.cloudfront.net/Posts/1716228287513.mp4'
+              }
+            />
           ))}
 
         <HStack
@@ -231,7 +222,7 @@ const PostCompo = ({item, mutate}: any) => {
               color={'black'}
             />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => onShare(item?._id)}>
+          <TouchableOpacity onPress={() => onShare()}>
             <Feather name="repeat" style={{fontSize: 20}} />
           </TouchableOpacity>
         </HStack>
@@ -366,8 +357,8 @@ const PostCompo = ({item, mutate}: any) => {
           </ModalBody>
         </ModalContent>
       </Modal>
-    </View>
+    </PrivateContainer>
   );
 };
 
-export default PostCompo;
+export default ShareScreenDetails;

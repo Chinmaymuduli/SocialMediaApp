@@ -50,6 +50,7 @@ const Meetings = () => {
   const [meetingId, setMeetingId] = useState('');
   const ref = React.useRef(null);
   const {userData} = useAppContext();
+
   const {data, isValidating, mutate} = useSwrApi(
     `meetings?require_all=true&user_id=${userData?._id}`,
   );
@@ -258,18 +259,13 @@ const Meetings = () => {
                 </HStack>
               </HStack>
 
-              {!item?.is_meeting_finished && (
+              {!item?.is_accepted && (
                 <Box pt={'$3'}>
                   <HStack mr={'$1'} alignItems={'center'} gap={'$4'}>
-                    {item?.is_accepted ? (
-                      <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
-                        Is Meeting Finished ?
-                      </Text>
-                    ) : (
-                      <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
-                        Is Meeting Accepted ?
-                      </Text>
-                    )}
+                    <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                      Is Meeting Accepted ?
+                    </Text>
+
                     <HStack alignItems="center" gap={'$5'}>
                       <Pressable
                         bg={'$green400'}

@@ -1,10 +1,17 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   AddIcon,
   Box,
   Button,
   ButtonIcon,
   HStack,
+  Icon,
+  InfoIcon,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+  Pressable,
   VStack,
 } from '@gluestack-ui/themed';
 import {FlatList} from '@gluestack-ui/themed';
@@ -16,8 +23,22 @@ import {ANIMATIONS, IMAGES} from '~/Assets';
 import Empty from '~/Components/core/Empty';
 import {CloseIcon} from '@gluestack-ui/themed';
 import {useMutation} from '~/Hooks';
+import {ModalBackdrop} from '@gluestack-ui/themed';
+import {Heading} from '@gluestack-ui/themed';
+import {ModalCloseButton} from '@gluestack-ui/themed';
+import {COLORS} from '~/Styles';
+import {useNavigation} from '@react-navigation/native';
+import {PrivateScreenProps} from '~/Routes/Private/types';
 
-const RequestCompo = ({data, requestMutate, mutate}: any) => {
+const RequestCompo = ({
+  data,
+  requestMutate,
+  mutate,
+  recommendationData,
+}: any) => {
+  const {navigate} = useNavigation<PrivateScreenProps>();
+  const [showModal, setShowModal] = useState(false);
+  const [connectMessage, setConnectMessage] = useState('');
   const {mutation, isLoading} = useMutation();
   const handelConfirmReject = async (id: any, isAccepted: boolean) => {
     try {
@@ -35,6 +56,8 @@ const RequestCompo = ({data, requestMutate, mutate}: any) => {
       console.log(error);
     }
   };
+
+  // console.log({recommendationData});
   return (
     <Box>
       <FlatList
@@ -91,19 +114,117 @@ const RequestCompo = ({data, requestMutate, mutate}: any) => {
                   </ButtonText>
                   <ButtonIcon as={CloseIcon} color={'$pink600'} />
                 </Button>
+                <Button
+                  onPress={() => {
+                    setConnectMessage(item?.message), setShowModal(true);
+                  }}
+                  size="md"
+                  h={20}
+                  w={'$24'}
+                  variant="outline"
+                  action="primary"
+                  borderColor={'$pink400'}
+                  isDisabled={false}
+                  isFocusVisible={false}>
+                  <ButtonText fontSize={12} color={'$pink600'}>
+                    Info
+                  </ButtonText>
+                  <ButtonIcon as={InfoIcon} color={'$pink600'} />
+                </Button>
               </HStack>
             </VStack>
             <Divider mt={'$4'} />
           </Box>
         )}
         ListEmptyComponent={
-          <Empty
-            title="No Request Found"
-            subtitle=""
-            animation={ANIMATIONS.NOT_FOUND}
-          />
+          <Box alignItems="center" mt={'$10'}>
+            <VStack alignItems="center" gap={10}>
+              <Image
+                source={IMAGES.CONNECT_BG_REMOVE}
+                alt="img"
+                style={{width: 200, height: 200}}
+              />
+              <Text fontFamily="Montserrat-SemiBold">No request found</Text>
+            </VStack>
+          </Box>
+        }
+        ListFooterComponent={
+          <Box mt={'$8'} ml={'$3'}>
+            <Box my={'$4'}>
+              <Text fontFamily="Montserrat-SemiBold">
+                Suggested Connections
+              </Text>
+            </Box>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              // contentContainerStyle={{backgroundColor: 'white'}}
+              data={recommendationData}
+              renderItem={({item}: any) => (
+                <Box w={'$32'} mr={'$2'} mb={'$1'} p={'$0.5'}>
+                  <Box
+                    borderRadius={7}
+                    softShadow="1"
+                    bg={'$white'}
+                    alignItems="center"
+                    py={'$3'}>
+                    <Image
+                      source={item?.avatar ? {uri: item?.avatar} : IMAGES.USER}
+                      alt="image"
+                      style={{height: 60, width: 60}}
+                      rounded={'$full'}
+                    />
+                    <Text
+                      mt={'$1'}
+                      fontFamily="Montserrat-SemiBold"
+                      fontSize={13}
+                      numberOfLines={1}>
+                      {item?.nick_name}
+                    </Text>
+                    <Pressable
+                      onPress={() =>
+                        navigate('UserProfile', {user_id: item?._id})
+                      }
+                      bg={COLORS.secondary}
+                      py={'$1'}
+                      px={'$3'}
+                      mt={'$2'}
+                      borderRadius={6}>
+                      <Text
+                        fontFamily="Montserrat-SemiBold"
+                        color={'$white'}
+                        fontSize={13}>
+                        Profile
+                      </Text>
+                    </Pressable>
+                  </Box>
+                </Box>
+              )}
+            />
+          </Box>
         }
       />
+
+      <Modal
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+        }}>
+        <ModalBackdrop />
+        <ModalContent>
+          <ModalHeader>
+            <Heading size="lg">Request Message</Heading>
+            <ModalCloseButton>
+              <Icon as={CloseIcon} />
+            </ModalCloseButton>
+          </ModalHeader>
+          <ModalBody>
+            <Text fontSize={13} fontFamily="Montserrat-Medium">
+              {connectMessage}
+            </Text>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };

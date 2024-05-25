@@ -1,7 +1,7 @@
 import React from 'react';
 import {GluestackUIProvider, Text} from '@gluestack-ui/themed';
 import {config} from '@gluestack-ui/config';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import Route from './src/Route';
 import {AppContextProvider} from '~/Contexts';
 

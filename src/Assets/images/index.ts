@@ -12,4 +12,5 @@ export default {
   COMMISSION: require('./setCommision.png'),
   CONNECT: require('./connect.png'),
   SEARCH: require('./search.png'),
+  CONNECT_BG_REMOVE: require('./connectBgRemove.png'),
 };

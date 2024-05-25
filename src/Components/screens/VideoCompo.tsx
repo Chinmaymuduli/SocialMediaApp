@@ -22,7 +22,6 @@ const VideoCompo = ({url}: any) => {
           }}
           style={{flex: 1, backgroundColor: '#fff', aspectRatio: 16 / 9}}
           rate={1}
-          muted
           resizeMode="cover"
           repeat
           paused={paused}

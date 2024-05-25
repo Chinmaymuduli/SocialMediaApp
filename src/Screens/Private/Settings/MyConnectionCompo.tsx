@@ -12,7 +12,7 @@ import {PrivateScreenProps} from '~/Routes/Private/types';
 
 const MyConnectionCompo = ({data}: any) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
-  // console.log(data);
+  // console.log(data?.[0]);
 
   return (
     <Box>
@@ -65,9 +65,9 @@ const MyConnectionCompo = ({data}: any) => {
                   onPress={() =>
                     navigate('ChatDetails', {
                       connection_id: item?._id,
-                      userNickName: item?.sender_id?.nick_name,
+                      userNickName: item?.receiver_id?.nick_name,
                       isReceived: true,
-                      name: item?.sender_id?.name || 'Demo',
+                      name: item?.receiver_id?.name || 'Demo',
                     })
                   }
                   size="md"
@@ -87,6 +87,18 @@ const MyConnectionCompo = ({data}: any) => {
             <Divider mt={'$4'} />
           </Box>
         )}
+        ListEmptyComponent={
+          <Box alignItems="center" mt={'$10'}>
+            <VStack alignItems="center" gap={10}>
+              <Image
+                source={IMAGES.CONNECT_BG_REMOVE}
+                alt="img"
+                style={{width: 200, height: 200}}
+              />
+              <Text fontFamily="Montserrat-SemiBold">No connection found</Text>
+            </VStack>
+          </Box>
+        }
       />
     </Box>
   );

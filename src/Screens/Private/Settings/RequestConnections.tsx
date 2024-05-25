@@ -25,7 +25,7 @@ const RequestConnections = () => {
   const {data, isValidating, mutate} = useSwrApi(
     `connections/read-all?type=receive&is_accepted=false&require_all=true`,
   );
-  // console.log(data?.data?.data);
+
   const handelConfirmReject = async (id: any, isAccepted: boolean) => {
     try {
       const res = await mutation(`connections/accept-or-reject/${id}`, {

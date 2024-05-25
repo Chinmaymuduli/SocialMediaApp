@@ -10,6 +10,7 @@ import {
   ActionsheetItem,
   Box,
   CircleIcon,
+  FlatList,
   HStack,
   Image,
   InputField,
@@ -55,6 +56,14 @@ const CompleteProfile = () => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
   const [profileImage, setProfileImage] = useState<any>();
+  const [otp, setOtp] = useState<string>('');
+  const [isPhoneVerify, setIsPhoneVerify] = useState<boolean>(false);
+  const [isEmailVerify, setIsEmailVerify] = useState<boolean>(false);
+
+  const [imagesPicker, setImagesPicker] = useState(false);
+  const [isImagePick, setIsImagePick] = useState(false);
+  const [images, setImages] = useState<any>([]);
+
   const {mutation, isLoading} = useMutation();
   const {data} = useSwrApi(`interests?type=personal`);
   const {data: professionalData} = useSwrApi(
@@ -85,8 +94,6 @@ const CompleteProfile = () => {
       userData?.interests?.find((item: any) => item?.type === 'professional'),
     );
   }, [userData]);
-
-  console.log('date', moment(selectedDate).toISOString());
 
   const handelUpdateProfile = async () => {
     try {
@@ -157,6 +164,43 @@ const CompleteProfile = () => {
   const handleSelect2 = (data: any) => {
     setShowActionsheet2(false);
     setExpertiseFor(data);
+  };
+
+  const handelVerifyPhone = async () => {
+    try {
+      setIsPhoneVerify(!isPhoneVerify);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handelImages = (img: any) => {
+    console.log({img});
+    setImages((prev: any) => [...prev, img]);
+  };
+  const handelMultipleImage = async () => {
+    try {
+      const formData = new FormData();
+      images.forEach((img: any) => {
+        formData.append('avatar', {
+          uri: img?.path,
+          name: `file.jpg`,
+          type: 'image/jpeg',
+        });
+      });
+      const res = await mutation(`users/add-avatars`, {
+        method: 'POST',
+        isFormData: true,
+        body: formData,
+      });
+      if (res?.status === 201) {
+        // mutate();
+        setIsImagePick(false);
+        Alert.alert('Success', 'Images Added Successfully');
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -236,10 +280,91 @@ const CompleteProfile = () => {
                 fontFamily="Montserrat-Medium"
                 fontSize={12}
                 color={COLORS.secondary}>
-                Add Photos
+                Add Photo
               </Text>
             </HStack>
           </Pressable>
+        </Box>
+
+        <Box mt={'$2'}>
+          <Box py={'$2'} px={'$3'} bg={'$pink50'} mt={'$3'}>
+            <HStack justifyContent="space-between">
+              <Text
+                fontFamily="Montserrat-Bold"
+                fontSize={13}
+                color={COLORS.secondary}>
+                Add More Images
+              </Text>
+              <Pressable
+                onPress={
+                  images?.length >= 4
+                    ? () => {
+                        Alert.alert('Error', 'You can add maximum 4 images');
+                      }
+                    : () => {
+                        setIsImagePick(true), setImagesPicker(true);
+                      }
+                }>
+                <HStack alignItems="center" gap={'$2'}>
+                  <AppIcon
+                    AntDesignName="plussquare"
+                    size={20}
+                    color={COLORS.secondary}
+                  />
+                  <Text
+                    fontFamily="Montserrat-Bold"
+                    fontSize={13}
+                    color={COLORS.secondary}>
+                    Add Images
+                  </Text>
+                </HStack>
+              </Pressable>
+            </HStack>
+          </Box>
+          {images?.length > 0 ? (
+            <Box px={'$3'} mt={'$4'}>
+              <FlatList
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={images}
+                renderItem={({item}: any) => (
+                  <Box mr={'$3'}>
+                    <Image
+                      source={{uri: item?.path ? item?.path : item?.avatar}}
+                      alt="user"
+                      style={{height: 70, width: 70}}
+                      borderRadius={6}
+                    />
+                  </Box>
+                )}
+              />
+
+              {isImagePick && (
+                <Box mt={'$2'}>
+                  <Button
+                    borderRadius={5}
+                    isLoading={isLoading}
+                    btnWidth={'full'}
+                    mx={'$4'}
+                    py={'$2'}
+                    onPress={() => handelMultipleImage()}>
+                    <Text
+                      color="$white"
+                      fontFamily="Montserrat-Bold"
+                      fontSize={13}>
+                      Save Images
+                    </Text>
+                  </Button>
+                </Box>
+              )}
+            </Box>
+          ) : (
+            <Box alignItems={'center'} justifyContent="center" mt={'$2'}>
+              <Text fontFamily="Montserrat-Bold" fontSize={13}>
+                No Images Found
+              </Text>
+            </Box>
+          )}
         </Box>
         <Box mt={'$2'}>
           {/* Primary Details */}
@@ -254,7 +379,7 @@ const CompleteProfile = () => {
           <VStack gap={'$2'} px={'$3'} mt={'$2'}>
             <VStack gap={'$2'}>
               <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
-                Employee Name *
+                User Name *
               </Text>
               <Input
                 flex={1}
@@ -391,13 +516,57 @@ const CompleteProfile = () => {
                 isInvalid={false}
                 isReadOnly={false}>
                 <InputField
-                  placeholder="Enter Name"
+                  placeholder="Enter Phone Number"
                   fontSize={12}
                   value={phone}
                   onChangeText={txt => setPhone(txt)}
+                  keyboardType="phone-pad"
                 />
               </Input>
+              {!userData?.phone_verify?.is_verified && (
+                <Pressable
+                  onPress={() => handelVerifyPhone()}
+                  alignSelf="flex-end">
+                  <Text
+                    fontFamily="Montserrat-Bold"
+                    fontSize={13}
+                    color={'$green500'}>
+                    Verify Phone
+                  </Text>
+                </Pressable>
+              )}
             </VStack>
+
+            {!isPhoneVerify && (
+              <VStack>
+                <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
+                  Enter OTP
+                </Text>
+                <HStack alignItems="center" gap={15} pr={'$2'}>
+                  <Input
+                    alignItems="center"
+                    borderRadius={'$xl'}
+                    mt={'$1'}
+                    flex={1}>
+                    <InputField
+                      type="text"
+                      maxLength={6}
+                      placeholder="Enter OTP"
+                      value={otp}
+                      onChangeText={text => setOtp(text)}
+                    />
+                  </Input>
+                  <Pressable bg={COLORS.secondary} borderRadius={'$xl'}>
+                    <Text
+                      fontFamily="Montserrat-Bold"
+                      color={'$white'}
+                      p={'$2'}>
+                      Verify
+                    </Text>
+                  </Pressable>
+                </HStack>
+              </VStack>
+            )}
 
             <VStack gap={'$2'}>
               <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
@@ -419,7 +588,50 @@ const CompleteProfile = () => {
                   onChangeText={txt => setEmail(txt)}
                 />
               </Input>
+              {!userData?.email_verify?.is_verified && (
+                <Pressable
+                  onPress={() => setIsEmailVerify(true)}
+                  alignSelf="flex-end">
+                  <Text
+                    fontFamily="Montserrat-Bold"
+                    fontSize={13}
+                    color={'$green500'}>
+                    Verify Email
+                  </Text>
+                </Pressable>
+              )}
             </VStack>
+
+            {isEmailVerify && (
+              <VStack>
+                <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
+                  Enter OTP
+                </Text>
+                <HStack alignItems="center" gap={15} pr={'$2'}>
+                  <Input
+                    alignItems="center"
+                    borderRadius={'$xl'}
+                    mt={'$1'}
+                    flex={1}>
+                    <InputField
+                      type="text"
+                      maxLength={6}
+                      placeholder="Enter OTP"
+                      value={otp}
+                      onChangeText={text => setOtp(text)}
+                    />
+                  </Input>
+                  <Pressable bg={COLORS.secondary} borderRadius={'$xl'}>
+                    <Text
+                      fontFamily="Montserrat-Bold"
+                      color={'$white'}
+                      p={'$2'}>
+                      Verify
+                    </Text>
+                  </Pressable>
+                </HStack>
+              </VStack>
+            )}
             {/* State */}
             <VStack gap={'$2'}>
               <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
@@ -657,6 +869,14 @@ const CompleteProfile = () => {
           setImageUrl={setProfileImage}
           cropperCircleOverlay={true}
           postImages={true}
+        />
+
+        <PhotoPicker
+          visible={imagesPicker}
+          onDismiss={() => setImagesPicker(false)}
+          setImageUrl={(img: any) => handelImages(img)}
+          cropperCircleOverlay={true}
+          postImages={false}
         />
       </ScrollView>
       {/* state modal */}

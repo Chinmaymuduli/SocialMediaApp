@@ -47,22 +47,10 @@ export default function PrivateRoutes({initialRouteName}: PrivateRouteProps) {
         name="RetentionAndChurnMetrics"
         component={Private.RetentionAndChurnMetrics}
       />
-      <Stack.Screen
-        name="PopularReels"
-        component={Private.PopularReels}
-      />
-      <Stack.Screen
-        name="UserEngagement"
-        component={Private.UserEngagement}
-      />
-      <Stack.Screen
-        name="UserFeedback"
-        component={Private.UserFeedback}
-      />
-      <Stack.Screen
-        name="RevenueMetrics"
-        component={Private.RevenueMetrics}
-      />
+      <Stack.Screen name="PopularReels" component={Private.PopularReels} />
+      <Stack.Screen name="UserEngagement" component={Private.UserEngagement} />
+      <Stack.Screen name="UserFeedback" component={Private.UserFeedback} />
+      <Stack.Screen name="RevenueMetrics" component={Private.RevenueMetrics} />
       <Stack.Screen
         name="TechnicalMetrics"
         component={Private.TechnicalMetrics}
@@ -74,6 +62,14 @@ export default function PrivateRoutes({initialRouteName}: PrivateRouteProps) {
       <Stack.Screen
         name="AcquisitionMetrics"
         component={Private.AcquisitionMetrics}
+      />
+      <Stack.Screen
+        name="SentConnections"
+        component={Private.SentConnections}
+      />
+      <Stack.Screen
+        name="ShareScreenDetails"
+        component={Private.ShareScreenDetails}
       />
     </Stack.Navigator>
   );
