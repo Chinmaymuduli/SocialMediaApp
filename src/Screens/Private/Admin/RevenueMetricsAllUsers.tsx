@@ -1,34 +1,9 @@
 import { StyleSheet } from 'react-native';
-import React, { useState } from 'react';
+import React from 'react';
 import { PrivateContainer } from '~/Components/container';
-import { Box, Divider, FlatList, HStack, Image, Pressable, VStack } from '@gluestack-ui/themed';
+import { Box, FlatList, HStack, Image, VStack } from '@gluestack-ui/themed';
 import { Text } from '@gluestack-ui/themed';
-import { WIDTH } from '~/Utils';
-import AppIcon from '~/Components/core/AppIcon';
-import { COLORS } from '~/Styles';
-
-const UserEngagement = () => {
-    const [open, setOpen] = useState(true);
-    const data = [
-        {
-            id: '0',
-            title: 'Number of active users -',
-            value: '40',
-            nb: 'N:B- How many users are actively using the platform',
-        },
-        {
-            id: '1',
-            title: 'Time spent per session -',
-            value: '40',
-            nb: 'N:B- Average duration users spend on the platform in one session ',
-        },
-        {
-            id: '2',
-            title: 'Frequency of visits -',
-            value: '40',
-            nb: 'N:B- How often users return to the platform ',
-        },
-    ];
+const RevenueMetricsAllUsers = () => {
     const Data = [
         {
             id: '0',
@@ -89,70 +64,9 @@ const UserEngagement = () => {
     ];
     return (
         <PrivateContainer
-            title={'All User Engagement'}
+            title={'Revenue Metrics'}
             bg={'purple.50'}
             hasBackIcon={true}>
-            <HStack
-                px={'$5'}
-                py={'$2'}
-                borderBottomColor="$coolGray200"
-                justifyContent={'space-between'}
-                borderBottomWidth={'$1'}
-                alignItems={'center'}>
-                <Text bold fontSize={16}>
-                    User Metrics
-                </Text>
-                <Pressable
-                    onPress={() => setOpen(!open)}
-                >
-                    <HStack gap={'$2'} alignItems={'center'}>
-                        {
-                            open ?
-                                <AppIcon AntDesignName="caretup" size={25} color={COLORS.secondary} />
-                                :
-                                <AppIcon AntDesignName="caretdown" size={25} color={COLORS.secondary} />
-                        }
-                    </HStack>
-                </Pressable>
-            </HStack>
-            {
-                open &&
-                <Box mx={'$2'} bgColor={'$coolGray100'}>
-                    {data?.map(i => (
-                        <Box
-                            mx={'$3'}
-                            my={'$4'}
-                            borderRadius={5}
-                            overflow="hidden"
-                            softShadow={'1'}
-                            bgColor={'white'}
-                            p={'$2'}>
-                            <HStack>
-                                <Text
-                                    fontFamily="Montserrat-SemiBold"
-                                    fontSize={16}
-                                    color={'$black'}>
-                                    {i?.title}
-                                </Text>
-                                <HStack alignItems="center">
-                                    <Text
-                                        fontFamily="Montserrat-SemiBold"
-                                        fontSize={16}
-                                        ml={'$2'}
-                                        color={COLORS.secondary}>
-                                        {i?.value}
-                                    </Text>
-                                    <AppIcon MaterialIconsName="percent" size={20} color="black" />
-                                </HStack>
-                            </HStack>
-                            <Divider mt={'$2'} />
-                            <Text fontSize={'$sm'} color={'$blueGray600'} mt={'$2'}>
-                                {i?.nb}
-                            </Text>
-                        </Box>
-                    ))}
-                </Box>
-            }
             <HStack
                 px={'$5'}
                 py={'$3'}
@@ -163,12 +77,6 @@ const UserEngagement = () => {
                 <Text bold fontSize={16}>
                     User Details
                 </Text>
-                <Pressable>
-                    <HStack gap={'$2'} alignItems={'center'}>
-                        <AppIcon IoniconsName="filter" size={25} color={COLORS.secondary} />
-                        <Text fontWeight={'semibold'}>Filter</Text>
-                    </HStack>
-                </Pressable>
             </HStack>
             <FlatList
                 data={Data}
@@ -261,6 +169,6 @@ const UserEngagement = () => {
     );
 };
 
-export default UserEngagement;
+export default RevenueMetricsAllUsers;
 
 const styles = StyleSheet.create({});
