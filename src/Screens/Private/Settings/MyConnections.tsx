@@ -52,8 +52,6 @@ const MyConnections = () => {
   ];
   if (isValidating) <FetchLoader />;
 
-  console.log(data?.data?.data);
-
   useFocusEffect(
     React.useCallback(() => {
       mutate();

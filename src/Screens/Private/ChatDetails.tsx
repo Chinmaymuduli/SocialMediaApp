@@ -156,6 +156,7 @@ const ChatDetails = ({route: {params}}: Props) => {
             navigate('AgoraVoiceCall', {
               avatar: params?.avatar,
               nickName: params?.userNickName,
+              isHost: true,
             });
           },
           side: 'RIGHT',

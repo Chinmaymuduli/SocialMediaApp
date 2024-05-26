@@ -110,7 +110,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
     ]);
   };
 
-  // console.log(userData?.data?.data?.posts);
+  // console.log(data?.data?.data);
 
   return (
     <PrivateContainer
@@ -245,9 +245,9 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                 btnWidth={'35%'}
                 onPress={() =>
                   navigation.navigate('ChatDetails', {
-                    connection_id: data?.data?.data?._id,
+                    connection_id: data?.data?.data?.connection?._id,
                     userNickName: data?.data?.data?.nick_name,
-                    isReceived: true,
+                    isReceived: false,
                     name: data?.data?.data?.name,
                   })
                 }>

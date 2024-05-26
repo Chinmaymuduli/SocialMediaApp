@@ -34,10 +34,13 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
   const agoraEngineRef = useRef<IRtcEngine>(); // Agora engine instance
   const [isJoined, setIsJoined] = useState(false); // Indicates if the local user has joined the channel
   const [remoteUid, setRemoteUid] = useState(0); // Uid of the remote user
+  const [isHost, setIsHost] = useState(params?.isHost);
+  const [isJoinLoading, setJoinLoading] = React.useState(false);
+  const [isLeaveLoading, setLeaveLoading] = React.useState(false);
   const [message, setMessage] = useState('');
-  const appId = AGORA_SECRETE_KEY;
+  const appId = 'eae9231f9e4a45748e2ac4208f87421f';
   const channelName = '123456';
-  const token = tokenData;
+  const token = '92d00f7b953b4e6d8efb3e67baf1af33';
   const uid = 0;
   // Get Token
   React.useEffect(() => {
@@ -60,8 +63,6 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
   function showMessage(msg: string) {
     setMessage(msg);
   }
-
-  console.log({message});
 
   const setupVoiceSDKEngine = async () => {
     try {
@@ -86,13 +87,16 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
           setRemoteUid(0);
         },
       });
-      const t = agoraEngine.initialize({
+      agoraEngine.initialize({
         appId: appId,
       });
+      console.log('Agora engine initialized successfully');
     } catch (e) {
       console.log(e);
     }
   };
+
+  console.log({isJoined});
 
   // Call End
   const leave = () => {
@@ -101,14 +105,41 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
       setRemoteUid(0);
       setIsJoined(false);
       showMessage('You left the channel');
+      console.log('leave channel successfully');
+      navigation.goBack();
     } catch (e) {
       console.log(e);
     }
   };
 
   // Join Call
-  const join = async () => {
+  useEffect(() => {
     if (isJoined) {
+      setJoinLoading(false);
+      return;
+    }
+    try {
+      agoraEngineRef.current?.setChannelProfile(
+        ChannelProfileType.ChannelProfileCommunication,
+      );
+      if (isHost) {
+        // agoraEngineRef.current?.startPreview();
+        agoraEngineRef.current?.joinChannel(token, channelName, uid, {
+          clientRoleType: ClientRoleType.ClientRoleBroadcaster,
+        });
+        console.log('user host use calling');
+      }
+      setJoinLoading(false);
+    } catch (e) {
+      console.log(e);
+    }
+  }, [isJoined, isHost]);
+
+  const join = async () => {
+    setJoinLoading(true);
+    console.log('joining channel');
+    if (isJoined) {
+      setJoinLoading(false);
       return;
     }
     try {
@@ -116,12 +147,42 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
         ChannelProfileType.ChannelProfileCommunication,
       );
       agoraEngineRef.current?.joinChannel(token, channelName, uid, {
-        clientRoleType: ClientRoleType.ClientRoleBroadcaster,
+        clientRoleType: ClientRoleType.ClientRoleAudience,
       });
+      console.log('User 2 join');
+      setJoinLoading(false);
     } catch (e) {
       console.log(e);
     }
   };
+  // const join = async () => {
+  //   setJoinLoading(true);
+  //   console.log('joining channel');
+  //   if (isJoined) {
+  //     setJoinLoading(false);
+  //     return;
+  //   }
+  //   try {
+  //     agoraEngineRef.current?.setChannelProfile(
+  //       ChannelProfileType.ChannelProfileCommunication,
+  //     );
+  //     if (isHost) {
+  //       agoraEngineRef.current?.startPreview();
+  //       agoraEngineRef.current?.joinChannel(token, channelName, uid, {
+  //         clientRoleType: ClientRoleType.ClientRoleBroadcaster,
+  //       });
+  //       console.log('user host calling');
+  //     } else {
+  //       agoraEngineRef.current?.joinChannel(token, channelName, uid, {
+  //         clientRoleType: ClientRoleType.ClientRoleAudience,
+  //       });
+  //       console.log('User 2 join');
+  //     }
+  //     setJoinLoading(false);
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // };
 
   return (
     <Box flex={1}>
@@ -160,7 +221,9 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
         <Box position={'absolute'} bottom={'5%'} left={'28%'}>
           <HStack gap={'$16'}>
             <Pressable
-              onPress={() => setIsMicOff(!isMicOff)}
+              onPress={() => {
+                setIsMicOff(!isMicOff), join();
+              }}
               bg={'$pink600'}
               borderRadius={40}
               h={'$16'}

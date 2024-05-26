@@ -37,6 +37,7 @@ export type PrivateNavigationProp = Omit<PrivateScreens, OmittedScreens> & {
   AgoraVoiceCall: {
     avatar?: any;
     nickName?: string;
+    isHost?: boolean;
   };
 };
 
