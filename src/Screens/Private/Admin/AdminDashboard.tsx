@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
-import {PrivateContainer} from '~/Components/container';
-import {IMAGES} from '~/Assets';
+import React, { useState } from 'react';
+import { PrivateContainer } from '~/Components/container';
+import { IMAGES } from '~/Assets';
 import {
   Box,
   FormControl,
@@ -18,11 +18,12 @@ import {
   Button,
   ButtonText,
 } from '@gluestack-ui/themed';
-import {WIDTH} from '~/Utils';
+import { WIDTH } from '~/Utils';
 import AppIcon from '~/Components/core/AppIcon';
-import {COLORS} from '~/Styles';
-import {useNavigation} from '@react-navigation/native';
-import {PrivateScreenProps} from '~/Routes/Private/types';
+import { COLORS } from '~/Styles';
+import { useNavigation } from '@react-navigation/native';
+import { PrivateScreenProps } from '~/Routes/Private/types';
+import { useAppContext } from '~/Contexts';
 
 const AdminDashboard = () => {
   const boxData = [
@@ -75,8 +76,9 @@ const AdminDashboard = () => {
       source: IMAGES.USER,
     },
   ];
-  const {navigate} = useNavigation<PrivateScreenProps>();
+  const { navigate } = useNavigation<PrivateScreenProps>();
   const [commission, setCommission] = useState('');
+  const { userData } = useAppContext();
   const handleCommissionChange = (value: any) => {
     setCommission(value);
   };
@@ -84,13 +86,13 @@ const AdminDashboard = () => {
     <PrivateContainer
       icons={[
         {
-          icon: {IoniconsName: 'notifications'},
+          icon: { IoniconsName: 'notifications' },
           onPress: () => navigate('Notifications'),
           side: 'RIGHT',
         },
         {
-          icon: {EntypoName: 'dots-three-vertical'},
-          onPress: () => navigate('Settings'),
+          icon: { EntypoName: 'dots-three-vertical' },
+          onPress: userData?.role === 'admin' ? () => navigate('MoreOptions') : () => navigate('Settings'),
           side: 'RIGHT',
         },
       ]}

@@ -33,6 +33,8 @@ export {default as RevenueMetrics} from './Admin/RevenueMetrics';
 export {default as TechnicalMetrics} from './Admin/TechnicalMetrics';
 export {default as DemographicMetrics} from './Admin/DemographicMetrics';
 export {default as AcquisitionMetrics} from './Admin/AcquisitionMetrics';
+export {default as MoreOptions} from './Admin/MoreOptions';
+export {default as RevenueMetricsAllUsers} from './Admin/RevenueMetricsAllUsers';
 // voice call
 export {default as AgoraVoiceCall} from './Agora';
 export {default as ShareScreenDetails} from './ShareScreenDetails';
