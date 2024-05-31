@@ -31,7 +31,7 @@ import {
   Text,
 } from '@gluestack-ui/themed';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {PrivateScreenProps} from '~/Routes/Private/types';
+import {PrivateRoutesTypes, PrivateScreenProps} from '~/Routes/Private/types';
 
 import {useMutation, useSwrApi} from '~/Hooks';
 import {useAppContext} from '~/Contexts';
@@ -41,37 +41,19 @@ import {VStack} from '@gluestack-ui/themed';
 import {Divider} from '@gluestack-ui/themed';
 import VideoCompo from '~/Components/screens/VideoCompo';
 import {PrivateContainer} from '~/Components/container';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
-const ShareScreenDetails = ({item, mutate}: any) => {
+type Props = NativeStackScreenProps<PrivateRoutesTypes, 'ShareScreenDetails'>;
+const ShareScreenDetails = ({route: {params}}: Props) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
   const [showModal, setShowModal] = useState(false);
   const [postId, setPostId] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const {userData} = useAppContext();
-  const {
-    data: allLikeData,
-    isValidating: likeValidating,
-    mutate: likeMutate,
-  } = useSwrApi(
-    `posts/read-all-likes?per_page=100&page_no=0&require_all=true&post_id=${postId}`,
-  );
+
+  const {data} = useSwrApi(`posts/read/${params?.postId}`);
 
   const {mutation, isLoading} = useMutation();
-
-  const giveLikeDislike = async (id: string) => {
-    try {
-      const response = await mutation(`posts/like-or-dislike/${id}`, {
-        method: 'POST',
-      });
-      console.log(response?.status);
-      if (response?.status === 200) {
-        likeMutate();
-        mutate();
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
   const DeletePost = async (id: string) => {
     try {
       setLoading(true);
@@ -84,7 +66,8 @@ const ShareScreenDetails = ({item, mutate}: any) => {
           {
             text: 'OK',
             onPress: () => {
-              setLoading(false), mutate();
+              setLoading(false);
+              navigate('Feeds');
             },
           },
         ]);
@@ -94,26 +77,7 @@ const ShareScreenDetails = ({item, mutate}: any) => {
     }
   };
 
-  const onShare = async () => {
-    try {
-      const result = await Share.share({
-        message: 'Share the post',
-        url: 'https://reactnative.dev/',
-        title: 'React Native',
-      });
-      if (result.action === Share.sharedAction) {
-        if (result.activityType) {
-          // shared with activity type of result.activityType
-        } else {
-          // shared
-        }
-      } else if (result.action === Share.dismissedAction) {
-        // dismissed
-      }
-    } catch (error: any) {
-      Alert.alert(error.message);
-    }
-  };
+  console.log(data?.data?.data);
 
   return (
     <PrivateContainer image={IMAGES.LOGO} hasBackIcon={true}>
@@ -132,11 +96,7 @@ const ShareScreenDetails = ({item, mutate}: any) => {
           }}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Image
-              source={
-                item?.user_id?.avatar
-                  ? {uri: item?.user_id?.avatar}
-                  : IMAGES.USER
-              }
+              source={IMAGES.USER}
               style={{width: 40, height: 40, borderRadius: 100}}
             />
             <View style={{paddingLeft: 5}}>
@@ -146,21 +106,25 @@ const ShareScreenDetails = ({item, mutate}: any) => {
                   fontFamily: 'Montserrat-Bold',
                   color: 'black',
                 }}>
-                {item?.user_id?.nick_name}
+                {data?.data?.data?.user_id?.nick_name}
               </Text>
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontFamily: 'Montserrat-Medium',
-                  color: 'black',
-                }}>
-                {`${item?.user_id?.gender}`}
-              </Text>
+              {data?.data?.data?.user_id?.gender && (
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontFamily: 'Montserrat-Medium',
+                    color: 'black',
+                  }}>
+                  {data?.data?.data?.user_id?.gender}
+                </Text>
+              )}
             </View>
           </View>
-          {item?.user_id?._id === userData?._id ? (
+          {data?.data?.data?.user_id?._id === userData?._id ? (
             <Pressable
-              onPress={loading ? () => {} : () => DeletePost(item?._id)}>
+              onPress={
+                loading ? () => {} : () => DeletePost(data?.data?.data?._id)
+              }>
               <MaterialCommunityIcons
                 name="delete-empty"
                 style={{fontSize: 20}}
@@ -170,13 +134,26 @@ const ShareScreenDetails = ({item, mutate}: any) => {
           ) : (
             <Pressable
               onPress={() =>
-                navigate('UserProfile', {user_id: item?.user_id?._id})
+                navigate('UserProfile', {
+                  user_id: data?.data?.data?.user_id?._id,
+                })
               }>
               <Feather name="more-vertical" style={{fontSize: 20}} />
             </Pressable>
           )}
         </View>
-        {item?.media?.length > 0 &&
+        <View
+          style={{
+            position: 'relative',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Image
+            source={{uri: data?.data?.data?.media[1]}}
+            style={{width: '100%', height: 400}}
+          />
+        </View>
+        {/* {item?.media?.length > 0 &&
           (item?.media_type === 'image' ? (
             <View
               style={{
@@ -225,9 +202,9 @@ const ShareScreenDetails = ({item, mutate}: any) => {
           <TouchableOpacity onPress={() => onShare()}>
             <Feather name="repeat" style={{fontSize: 20}} />
           </TouchableOpacity>
-        </HStack>
+        </HStack> */}
 
-        <View style={{paddingHorizontal: 15}}>
+        {/* <View style={{paddingHorizontal: 15}}>
           <Pressable
             onPress={() => {
               setPostId(item?._id), setShowModal(true);
@@ -293,19 +270,9 @@ const ShareScreenDetails = ({item, mutate}: any) => {
                 </Text>
               </Pressable>
             </View>
-            {/* <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Entypo
-                name="emoji-happy"
-                style={{fontSize: 15, color: 'lightgreen', marginRight: 10}}
-              />
-              <Entypo
-                name="emoji-neutral"
-                style={{fontSize: 15, color: 'pink', marginRight: 10}}
-              />
-              <Entypo name="emoji-sad" style={{fontSize: 15, color: 'red'}} />
-            </View> */}
+         
           </View>
-        </View>
+        </View> */}
       </View>
 
       <Modal
@@ -321,7 +288,7 @@ const ShareScreenDetails = ({item, mutate}: any) => {
               <Icon as={CloseIcon} />
             </ModalCloseButton>
           </ModalHeader>
-          <ModalBody>
+          {/* <ModalBody>
             {allLikeData?.data?.data?.map((likeData: any) => (
               <Box py={'$1'} key={likeData?._id}>
                 <VStack px={'$4'}>
@@ -354,7 +321,7 @@ const ShareScreenDetails = ({item, mutate}: any) => {
                 <Divider mt={'$4'} />
               </Box>
             ))}
-          </ModalBody>
+          </ModalBody> */}
         </ModalContent>
       </Modal>
     </PrivateContainer>

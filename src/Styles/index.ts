@@ -6,6 +6,9 @@ export const COLORS = {
   textWhite: '#FFFFFF',
   textSecondary: '#756bb3',
   fadePrime: '#7166ba',
+  gradientLow: '#F3EBFE',
+  NewPrimary: '#290A5F',
+  NewSecondary: '#462775',
 };
 const CustomTheme = createConfig({
   ...defaultConfig,

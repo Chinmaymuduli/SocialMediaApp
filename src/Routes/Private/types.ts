@@ -15,7 +15,8 @@ type OmittedScreens =
   | 'AllComments'
   | 'UserProfile'
   | 'ChatDetails'
-  | 'AgoraVoiceCall';
+  | 'AgoraVoiceCall'
+  | 'ShareScreenDetails';
 
 export type PrivateNavigationProp = Omit<PrivateScreens, OmittedScreens> & {
   // OtpScreen: {
@@ -38,6 +39,9 @@ export type PrivateNavigationProp = Omit<PrivateScreens, OmittedScreens> & {
     avatar?: any;
     nickName?: string;
     isHost?: boolean;
+  };
+  ShareScreenDetails: {
+    postId: string;
   };
 };
 

@@ -5,9 +5,10 @@ import {useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
 import {PrivateContainer} from '~/Components/container';
 import {PostFeed} from '~/Components/screens';
-import {ScrollView} from '@gluestack-ui/themed';
+import {Box, ScrollView} from '@gluestack-ui/themed';
 import {useFCMToken, useSwrApi} from '~/Hooks';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
+import {COLORS} from '~/Styles';
 
 const Feeds = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
@@ -17,7 +18,7 @@ const Feeds = () => {
       let getId = link.url?.split('=').pop();
       console.log('post id', getId);
       setTimeout(() => {
-        navigate('ShareScreenDetails');
+        navigate('ShareScreenDetails', {postId: getId});
       }, 1000);
     }
   };
@@ -56,7 +57,9 @@ const Feeds = () => {
       ]}
       image={IMAGES.LOGO}>
       <ScrollView contentContainerStyle={{paddingBottom: 50}}>
-        <PostFeed />
+        <Box bg={COLORS.gradientLow}>
+          <PostFeed />
+        </Box>
       </ScrollView>
     </PrivateContainer>
   );

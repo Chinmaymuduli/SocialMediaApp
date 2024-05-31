@@ -62,9 +62,11 @@ const PostFeed = () => {
           <InputField type="text" placeholder="Search for results" />
         </Input>
       </Box> */}
-      {data?.data?.data?.map((item: any, index: any) => (
-        <PostCompo item={item} key={index} mutate={mutate} />
-      ))}
+      <Box mt={'$3'} mx={'$2'}>
+        {data?.data?.data?.map((item: any, index: any) => (
+          <PostCompo item={item} mutate={mutate} key={index} />
+        ))}
+      </Box>
 
       <Modal
         isOpen={showModal}

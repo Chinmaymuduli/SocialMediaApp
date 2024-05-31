@@ -1,26 +1,14 @@
 import React, {useState} from 'react';
-import {
-  View,
-  Image,
-  TouchableOpacity,
-  TextInput,
-  Alert,
-  Share,
-} from 'react-native';
+import {View, Image, TouchableOpacity, Alert, Share} from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import Ionic from 'react-native-vector-icons/Ionicons';
-import Entypo from 'react-native-vector-icons/Entypo';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {IMAGES} from '~/Assets';
 import {
   Box,
   HStack,
   Heading,
-  Input,
-  InputField,
-  InputIcon,
-  InputSlot,
   ModalBackdrop,
   ModalContent,
   ModalHeader,
@@ -30,10 +18,8 @@ import {
   CloseIcon,
   Text,
 } from '@gluestack-ui/themed';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
-import AppIcon from '../core/AppIcon';
-import {SearchIcon} from '@gluestack-ui/themed';
 import {useMutation, useSwrApi} from '~/Hooks';
 import {useAppContext} from '~/Contexts';
 import {Modal} from '@gluestack-ui/themed';
@@ -42,6 +28,7 @@ import {VStack} from '@gluestack-ui/themed';
 import {Divider} from '@gluestack-ui/themed';
 import VideoCompo from './VideoCompo';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
+import {COLORS} from '~/Styles';
 
 const PostCompo = ({item, mutate}: any) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
@@ -129,7 +116,7 @@ const PostCompo = ({item, mutate}: any) => {
   };
 
   return (
-    <View>
+    <Box softShadow="1" bg={'$white'} mb={'$4'} borderRadius={6}>
       <View
         style={{
           paddingBottom: 10,
@@ -199,7 +186,8 @@ const PostCompo = ({item, mutate}: any) => {
               }}>
               <Image
                 source={{uri: item?.media[0]}}
-                style={{width: '100%', height: 400}}
+                style={{width: '100%', height: 200}}
+                // resizeMode="contain"
               />
             </View>
           ) : (
@@ -212,8 +200,9 @@ const PostCompo = ({item, mutate}: any) => {
             paddingVertical: 15,
             paddingHorizontal: 12,
           }}
-          gap={'$2'}>
-          <TouchableOpacity onPress={() => giveLikeDislike(item?._id)}>
+          // gap={'$2'}
+          justifyContent="space-between">
+          {/* <TouchableOpacity onPress={() => giveLikeDislike(item?._id)}>
             <AntDesign
               name={item?.is_liked ? 'like1' : 'like2'}
               style={{
@@ -233,18 +222,78 @@ const PostCompo = ({item, mutate}: any) => {
           </TouchableOpacity>
           <TouchableOpacity onPress={() => onShare(item?._id)}>
             <Feather name="repeat" style={{fontSize: 20}} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          <HStack alignItems="center" gap={'$1'}>
+            <TouchableOpacity>
+              <FontAwesome6
+                name="face-grin-hearts"
+                size={25}
+                color={COLORS.NewSecondary}
+              />
+            </TouchableOpacity>
+            <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+              52
+            </Text>
+          </HStack>
+          <HStack alignItems="center" gap={'$1'}>
+            <TouchableOpacity>
+              <FontAwesome6
+                name="face-grin-tongue"
+                size={25}
+                color={COLORS.NewSecondary}
+              />
+            </TouchableOpacity>
+            <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+              48
+            </Text>
+          </HStack>
+          <HStack alignItems="center" gap={'$1'}>
+            <TouchableOpacity>
+              <FontAwesome6
+                name="face-frown-open"
+                size={25}
+                color={COLORS.NewSecondary}
+              />
+            </TouchableOpacity>
+            <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+              20
+            </Text>
+          </HStack>
+          <HStack alignItems="center" gap={'$1'}>
+            <TouchableOpacity>
+              <FontAwesome6
+                name="heart"
+                size={25}
+                color={COLORS.NewSecondary}
+              />
+            </TouchableOpacity>
+            <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+              36
+            </Text>
+          </HStack>
+          <HStack alignItems="center" gap={'$1'}>
+            <TouchableOpacity>
+              <FontAwesome6
+                name="thumbs-down"
+                size={25}
+                color={COLORS.NewSecondary}
+              />
+            </TouchableOpacity>
+            <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+              75
+            </Text>
+          </HStack>
         </HStack>
 
         <View style={{paddingHorizontal: 15}}>
-          <Pressable
+          {/* <Pressable
             onPress={() => {
               setPostId(item?._id), setShowModal(true);
             }}>
             <Text style={{fontFamily: 'Montserrat-Medium', fontSize: 13}}>
               Liked by {item?.total_likes} others
             </Text>
-          </Pressable>
+          </Pressable> */}
           <Text
             style={{
               fontSize: 13,
@@ -254,10 +303,12 @@ const PostCompo = ({item, mutate}: any) => {
             {item?.caption}
           </Text>
           {item?.tags?.length > 0 && (
-            <HStack>
+            <HStack flexWrap="wrap" gap={'$1'}>
               {item?.tags?.map((tag: any, index: any) => (
                 <Box key={index}>
-                  <Text>#{tag?.title}</Text>
+                  <Text fontSize={13} fontFamily="Montserrat-SemiBold">
+                    #{tag?.title}
+                  </Text>
                 </Box>
               ))}
             </HStack>
@@ -265,44 +316,47 @@ const PostCompo = ({item, mutate}: any) => {
           <Pressable
             onPress={() => navigate('AllComments', {post_id: item?._id})}>
             <Text style={{opacity: 0.4, paddingVertical: 2}}>
-              View all questions
+              View all Query
             </Text>
           </Pressable>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginTop: 10,
-            }}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Image
-                source={
-                  userData?.avatar ? {uri: userData?.avatar} : IMAGES.USER
-                }
-                style={{
-                  width: 25,
-                  height: 25,
-                  borderRadius: 100,
-                  backgroundColor: 'orange',
-                  marginRight: 10,
-                }}
-              />
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginTop: 10,
+            marginHorizontal: 5,
+          }}>
+          <View style={{flexDirection: 'row', alignItems: 'center', gap: 5}}>
+            <Image
+              source={userData?.avatar ? {uri: userData?.avatar} : IMAGES.USER}
+              style={{
+                width: 25,
+                height: 25,
+                borderRadius: 100,
+                backgroundColor: 'orange',
+                marginRight: 10,
+              }}
+            />
 
-              <Pressable
-                onPress={() => navigate('AllComments', {post_id: item?._id})}
-                borderRadius={'$full'}
-                // w={'$80'}
-                borderWidth={1}>
-                <Text
-                  px={'$24'}
-                  fontSize={13}
-                  py={'$0.5'}
-                  fontFamily="Montserrat-Medium">
-                  Ask a questions
-                </Text>
-              </Pressable>
-            </View>
-            {/* <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Pressable
+              onPress={() => navigate('AllComments', {post_id: item?._id})}
+              borderRadius={'$full'}
+              borderWidth={1}>
+              <Text
+                px={'$20'}
+                fontSize={13}
+                py={'$0.5'}
+                fontFamily="Montserrat-Medium">
+                Ask a Query
+              </Text>
+            </Pressable>
+
+            <Pressable onPress={() => onShare(item?._id)} px={'$4'}>
+              <FontAwesome name="share" size={20} />
+            </Pressable>
+          </View>
+          {/* <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Entypo
                 name="emoji-happy"
                 style={{fontSize: 15, color: 'lightgreen', marginRight: 10}}
@@ -313,8 +367,15 @@ const PostCompo = ({item, mutate}: any) => {
               />
               <Entypo name="emoji-sad" style={{fontSize: 15, color: 'red'}} />
             </View> */}
-          </View>
         </View>
+
+        <Box position="absolute" right={9} top={'20%'}>
+          <Box bg={COLORS.gradientLow} softShadow="1" borderRadius={8}>
+            <Text fontFamily="Montserrat-SemiBold" fontSize={13} px={'$1'}>
+              1 / 2
+            </Text>
+          </Box>
+        </Box>
       </View>
 
       <Modal
@@ -366,7 +427,7 @@ const PostCompo = ({item, mutate}: any) => {
           </ModalBody>
         </ModalContent>
       </Modal>
-    </View>
+    </Box>
   );
 };
 
