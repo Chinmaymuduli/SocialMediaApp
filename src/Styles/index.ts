@@ -2,13 +2,15 @@ import {createConfig} from '@gluestack-ui/themed';
 import {config as defaultConfig} from '@gluestack-ui/config';
 export const COLORS = {
   primary: '#FA1DBB',
-  secondary: '#F0315C',
+  secondary: '#753CEF',
+  // secondary: '#F0315C',
   textWhite: '#FFFFFF',
   textSecondary: '#756bb3',
   fadePrime: '#7166ba',
   gradientLow: '#F3EBFE',
   NewPrimary: '#290A5F',
   NewSecondary: '#462775',
+  NewColor: '#753CEF',
 };
 const CustomTheme = createConfig({
   ...defaultConfig,

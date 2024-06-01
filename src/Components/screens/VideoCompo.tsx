@@ -1,13 +1,14 @@
 import React, {useRef, useState} from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
 import Video from 'react-native-video';
+import {WIDTH} from '~/Utils';
 
 const VideoCompo = ({url}: any) => {
-  const [paused, setPaused] = useState(false);
+  const [paused, setPaused] = useState(true);
   const ref = useRef<any>();
   return (
     <Pressable
-      style={{width: '100%'}}
+      // style={{width: '100%'}}
       onPress={() => {
         setPaused(!paused);
       }}>
@@ -20,7 +21,8 @@ const VideoCompo = ({url}: any) => {
           source={{
             uri: url,
           }}
-          style={{flex: 1, backgroundColor: '#fff', aspectRatio: 16 / 9}}
+          // style={{flex: 1, backgroundColor: '#fff', aspectRatio: 16 / 9}}
+          style={styles.media}
           rate={1}
           resizeMode="cover"
           repeat
@@ -37,4 +39,11 @@ const VideoCompo = ({url}: any) => {
 
 export default VideoCompo;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  media: {
+    // width: 300,
+    width: WIDTH,
+    height: 200, // Adjust the height as needed
+    // marginRight: 10,
+  },
+});

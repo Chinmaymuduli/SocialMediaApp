@@ -16,6 +16,7 @@ const useMutation = () => {
     console.log(options?.body);
     try {
       const token = await AsyncStorage.getItem('accessToken');
+      console.log({token});
       const url = options?.BASE_URL || BASE_URL;
       setIsLoading(true);
       const method = options?.method || 'POST';

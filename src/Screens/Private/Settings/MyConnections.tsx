@@ -22,8 +22,12 @@ import {LinearComponent} from '~/Components/core';
 import {COLORS} from '~/Styles';
 import MyConnectionCompo from './MyConnectionCompo';
 import RequestCompo from './RequestCompo';
+import {WIDTH} from '~/Utils';
+import SentCompo from './SentCompo';
+import Suggestions from './Suggestions';
 
 const MyConnections = () => {
+  const {navigate} = useNavigation<PrivateScreenProps>();
   const [selectTab, setSelectTab] = useState('1');
   const {data, isValidating, mutate} = useSwrApi(
     `connections/read-all?type=all&is_accepted=true&require_all=true`,
@@ -40,14 +44,28 @@ const MyConnections = () => {
     `connections/read-all-recommendation?require_all=true`,
   );
 
+  // Sent connection
+  const {
+    data: sentData,
+    mutate: sentMutate,
+    isValidating: sentValidating,
+  } = useSwrApi(`connections/read-all?type=send&require_all=true`);
+
   const btnArray = [
     {
       id: '1',
-      title: 'My Connections',
+      // title: 'My Connections',
+      title: 'Sent',
     },
     {
       id: '2',
-      title: 'Request Connections',
+      // title: 'Request Connections',
+      title: 'Received',
+    },
+    {
+      id: '3',
+      // title: 'Request Connections',
+      title: 'Suggestions',
     },
   ];
   if (isValidating) <FetchLoader />;
@@ -59,32 +77,63 @@ const MyConnections = () => {
     }, []),
   );
 
+  // console.log(sentData?.data?.data);
+
   return (
-    <PrivateContainer title={'My Connections'} hasBackIcon={true}>
+    <PrivateContainer
+      icons={[
+        {
+          icon: {IoniconsName: 'notifications'},
+          onPress: () => navigate('Notifications'),
+          side: 'RIGHT',
+        },
+        {
+          icon: {AntDesignName: 'search1'},
+          onPress: () => navigate('SearchScreen'),
+          side: 'RIGHT',
+        },
+        {
+          icon: {EntypoName: 'dots-three-vertical'},
+          onPress: () => navigate('Settings'),
+          side: 'RIGHT',
+        },
+      ]}
+      image={IMAGES.LOGO}>
       <LinearComponent>
-        <Box px={'$3'} mt={'$4'}>
-          <Box bg="$white" softShadow="1" borderRadius={10}>
-            <HStack justifyContent="space-between">
+        <Box px={'$2'} mt={'$4'}>
+          <Box bg="$white" softShadow="1" borderRadius={1} w={'$full'}>
+            <HStack w={'$full'} overflow="hidden">
               {btnArray?.map(btn => (
-                <Pressable
-                  onPress={() => setSelectTab(btn?.id)}
-                  py={'$3'}
-                  bg={selectTab === btn.id ? COLORS.primary : '$white'}
-                  w={'50%'}
-                  alignItems="center"
-                  borderRadius={10}>
-                  <Text
-                    fontFamily="Montserrat-SemiBold"
-                    fontSize={13}
-                    color={selectTab === btn.id ? '$white' : COLORS.primary}>
-                    {btn?.title}
-                  </Text>
-                </Pressable>
+                <Box w={'$1/3'} overflow="hidden">
+                  <Pressable
+                    onPress={() => setSelectTab(btn?.id)}
+                    py={'$4'}
+                    // bg={selectTab === btn.id ? COLORS.primary : '$white'}
+                    alignItems="center"
+                    borderRadius={10}>
+                    <Text
+                      fontFamily="Montserrat-SemiBold"
+                      fontSize={13}
+                      color={selectTab === btn.id ? '#7A3DF0' : '$black'}
+                      // color={'$black'}
+                    >
+                      {btn?.title}
+                    </Text>
+                    <Box position="absolute" right={0} top={0}>
+                      {btn?.id !== '3' && (
+                        <Divider orientation="vertical" h={'$12'} />
+                      )}
+                    </Box>
+                  </Pressable>
+                  {selectTab === btn.id && (
+                    <Divider w={'$full'} bg={'#7A3DF0'} />
+                  )}
+                </Box>
               ))}
             </HStack>
           </Box>
         </Box>
-        <Box mt={'$4'}>
+        <Box mt={'$4'} flex={1}>
           {/* <FlatList
             data={data?.data?.data}
             renderItem={({item}: any) => (
@@ -153,13 +202,30 @@ const MyConnections = () => {
               </Box>
             )}
           /> */}
-          {selectTab === '1' && <MyConnectionCompo data={data?.data?.data} />}
+          {
+            selectTab === '1' && (
+              <SentCompo
+                data={sentData?.data?.data}
+                mutate={sentMutate}
+                isValidating={sentValidating}
+              />
+            )
+            // <MyConnectionCompo data={data?.data?.data} />
+          }
           {selectTab === '2' && (
             <RequestCompo
               data={requestData?.data?.data}
               requestMutate={requestMutate}
               mutate={mutate}
               recommendationData={recommendationData?.data?.data}
+            />
+          )}
+          {selectTab === '3' && (
+            <Suggestions
+              // data={requestData?.data?.data}
+              // requestMutate={requestMutate}
+              // mutate={mutate}
+              data={recommendationData?.data?.data}
             />
           )}
         </Box>

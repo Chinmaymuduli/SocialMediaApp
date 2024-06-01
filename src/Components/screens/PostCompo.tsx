@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useRef, useState} from 'react';
 import {View, Image, TouchableOpacity, Alert, Share} from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
@@ -17,6 +17,8 @@ import {
   Icon,
   CloseIcon,
   Text,
+  FlatList,
+  ScrollView,
 } from '@gluestack-ui/themed';
 import {useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
@@ -29,12 +31,16 @@ import {Divider} from '@gluestack-ui/themed';
 import VideoCompo from './VideoCompo';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {COLORS} from '~/Styles';
+import moment from 'moment';
+import {StyleSheet} from 'react-native';
+import {WIDTH} from '~/Utils';
 
 const PostCompo = ({item, mutate}: any) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
   const [showModal, setShowModal] = useState(false);
   const [postId, setPostId] = useState<string>('');
   const [loading, setLoading] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const {userData} = useAppContext();
   const {
     data: allLikeData,
@@ -66,8 +72,8 @@ const PostCompo = ({item, mutate}: any) => {
       const response = await mutation(`posts/remove/${id}`, {
         method: 'DELETE',
       });
-
-      if (response?.status === 200) {
+      console.log(response?.results?.error);
+      if (response?.status === 202) {
         Alert.alert('Success', 'Post Successfully Deleted', [
           {
             text: 'OK',
@@ -115,8 +121,60 @@ const PostCompo = ({item, mutate}: any) => {
     }
   };
 
+  const EMOJI_ARRAY = [
+    {
+      id: '1',
+      img: IMAGES.HEART_EMOJI,
+      value: 52,
+    },
+    {
+      id: '2',
+      img: IMAGES.MONEY_EMOJI,
+      value: 12,
+    },
+    {
+      id: '3',
+      img: IMAGES.SAD_EMOJI,
+      value: 32,
+    },
+    {
+      id: '4',
+      img: IMAGES.YELLOW_EMOJI,
+      value: 42,
+    },
+    {
+      id: '5',
+      img: IMAGES.THUMB_EMOJI,
+      value: 88,
+    },
+  ];
+
+  const onViewableItemsChanged = useRef(({viewableItems}: any) => {
+    if (viewableItems?.length > 0) {
+      setCurrentIndex(viewableItems[0]?.index);
+    }
+  }).current;
+
+  const viewabilityConfig = {
+    itemVisiblePercentThreshold: 50,
+  };
+
+  const renderItem = ({item}: any) => {
+    const isVideo = item?.substring(item.lastIndexOf('.') + 1) === 'mp4';
+    if (!isVideo) {
+      return (
+        <Box alignItems="center" justifyContent="center" position="relative">
+          <Image source={{uri: item}} style={styles.media} />
+        </Box>
+      );
+    } else if (isVideo) {
+      return <VideoCompo url={item} />;
+    }
+    return null;
+  };
+
   return (
-    <Box softShadow="1" bg={'$white'} mb={'$4'} borderRadius={6}>
+    <Box softShadow="1" bg={'$white'} mb={'$4'} borderRadius={6} flex={1}>
       <View
         style={{
           paddingBottom: 10,
@@ -176,23 +234,44 @@ const PostCompo = ({item, mutate}: any) => {
             </Pressable>
           )}
         </View>
-        {item?.media?.length > 0 &&
-          (item?.media_type === 'image' ? (
-            <View
-              style={{
-                position: 'relative',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Image
-                source={{uri: item?.media[0]}}
-                style={{width: '100%', height: 200}}
-                // resizeMode="contain"
-              />
-            </View>
-          ) : (
-            <VideoCompo url={item?.media?.[0]} />
-          ))}
+        <Box>
+          {/* {item?.media?.length > 0 &&
+            (item?.media_type === 'image' ? (
+              <View
+                style={{
+                  position: 'relative',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Image
+                  source={{uri: item?.media[0]}}
+                  style={{width: '100%', height: 200}}
+                  // resizeMode="contain"
+                />
+              </View>
+            ) : (
+              <VideoCompo url={item?.media?.[0]} />
+            ))} */}
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={item?.media}
+            // data={mediaData}
+            renderItem={renderItem}
+            onViewableItemsChanged={onViewableItemsChanged}
+            viewabilityConfig={viewabilityConfig}
+          />
+
+          {item?.media?.length > 1 && (
+            <Box position="absolute" right={9} top={'3%'}>
+              <Box bg={COLORS.gradientLow} softShadow="1" borderRadius={8}>
+                <Text fontFamily="Montserrat-SemiBold" fontSize={13} px={'$1'}>
+                  {`${currentIndex + 1} / ${item?.media?.length}`}
+                </Text>
+              </Box>
+            </Box>
+          )}
+        </Box>
 
         <HStack
           style={{
@@ -223,66 +302,20 @@ const PostCompo = ({item, mutate}: any) => {
           <TouchableOpacity onPress={() => onShare(item?._id)}>
             <Feather name="repeat" style={{fontSize: 20}} />
           </TouchableOpacity> */}
-          <HStack alignItems="center" gap={'$1'}>
-            <TouchableOpacity>
-              <FontAwesome6
-                name="face-grin-hearts"
-                size={25}
-                color={COLORS.NewSecondary}
-              />
-            </TouchableOpacity>
-            <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
-              52
-            </Text>
-          </HStack>
-          <HStack alignItems="center" gap={'$1'}>
-            <TouchableOpacity>
-              <FontAwesome6
-                name="face-grin-tongue"
-                size={25}
-                color={COLORS.NewSecondary}
-              />
-            </TouchableOpacity>
-            <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
-              48
-            </Text>
-          </HStack>
-          <HStack alignItems="center" gap={'$1'}>
-            <TouchableOpacity>
-              <FontAwesome6
-                name="face-frown-open"
-                size={25}
-                color={COLORS.NewSecondary}
-              />
-            </TouchableOpacity>
-            <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
-              20
-            </Text>
-          </HStack>
-          <HStack alignItems="center" gap={'$1'}>
-            <TouchableOpacity>
-              <FontAwesome6
-                name="heart"
-                size={25}
-                color={COLORS.NewSecondary}
-              />
-            </TouchableOpacity>
-            <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
-              36
-            </Text>
-          </HStack>
-          <HStack alignItems="center" gap={'$1'}>
-            <TouchableOpacity>
-              <FontAwesome6
-                name="thumbs-down"
-                size={25}
-                color={COLORS.NewSecondary}
-              />
-            </TouchableOpacity>
-            <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
-              75
-            </Text>
-          </HStack>
+          {EMOJI_ARRAY?.map(emoji => (
+            <HStack alignItems="center" gap={'$1'} key={emoji?.id}>
+              <TouchableOpacity>
+                <Image
+                  source={emoji.img}
+                  alt="img"
+                  style={{height: 25, width: 25}}
+                />
+              </TouchableOpacity>
+              <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                {emoji.value}
+              </Text>
+            </HStack>
+          ))}
         </HStack>
 
         <View style={{paddingHorizontal: 15}}>
@@ -313,12 +346,23 @@ const PostCompo = ({item, mutate}: any) => {
               ))}
             </HStack>
           )}
-          <Pressable
+          {/* <Pressable
             onPress={() => navigate('AllComments', {post_id: item?._id})}>
-            <Text style={{opacity: 0.4, paddingVertical: 2}}>
+            <Text
+              style={{opacity: 0.4, paddingVertical: 2}}
+              fontFamily="Montserrat-Medium"
+              fontSize={13}>
               View all Query
             </Text>
-          </Pressable>
+          </Pressable> */}
+          <Box mt={'$2'}>
+            <Text
+              fontFamily="Montserrat-SemiBold"
+              fontSize={12}
+              color="$coolGray400">
+              {moment(item?.created_at).fromNow()}
+            </Text>
+          </Box>
         </View>
         <View
           style={{
@@ -344,38 +388,19 @@ const PostCompo = ({item, mutate}: any) => {
               borderRadius={'$full'}
               borderWidth={1}>
               <Text
-                px={'$20'}
+                px={'$16'}
                 fontSize={13}
                 py={'$0.5'}
                 fontFamily="Montserrat-Medium">
-                Ask a Query
+                Query / Comments
               </Text>
             </Pressable>
 
-            <Pressable onPress={() => onShare(item?._id)} px={'$4'}>
+            <Pressable onPress={() => onShare(item?._id)} px={'$2'}>
               <FontAwesome name="share" size={20} />
             </Pressable>
           </View>
-          {/* <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Entypo
-                name="emoji-happy"
-                style={{fontSize: 15, color: 'lightgreen', marginRight: 10}}
-              />
-              <Entypo
-                name="emoji-neutral"
-                style={{fontSize: 15, color: 'pink', marginRight: 10}}
-              />
-              <Entypo name="emoji-sad" style={{fontSize: 15, color: 'red'}} />
-            </View> */}
         </View>
-
-        <Box position="absolute" right={9} top={'20%'}>
-          <Box bg={COLORS.gradientLow} softShadow="1" borderRadius={8}>
-            <Text fontFamily="Montserrat-SemiBold" fontSize={13} px={'$1'}>
-              1 / 2
-            </Text>
-          </Box>
-        </Box>
       </View>
 
       <Modal
@@ -432,3 +457,9 @@ const PostCompo = ({item, mutate}: any) => {
 };
 
 export default PostCompo;
+const styles = StyleSheet.create({
+  media: {
+    width: WIDTH,
+    height: 200, // Adjust the height as needed
+  },
+});

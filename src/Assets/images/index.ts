@@ -13,4 +13,10 @@ export default {
   CONNECT: require('./connect.png'),
   SEARCH: require('./search.png'),
   CONNECT_BG_REMOVE: require('./connectBgRemove.png'),
+  // emoji
+  SAD_EMOJI: require('./anguished.png'),
+  HEART_EMOJI: require('./heart_eyes.png'),
+  MONEY_EMOJI: require('./money_mouth_face.png'),
+  YELLOW_EMOJI: require('./yellow_heart.png'),
+  THUMB_EMOJI: require('./thumbDown.png'),
 };

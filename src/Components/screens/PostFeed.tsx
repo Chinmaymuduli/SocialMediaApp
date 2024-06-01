@@ -33,6 +33,7 @@ import {ModalBody} from '@gluestack-ui/themed';
 import {VStack} from '@gluestack-ui/themed';
 import {Divider} from '@gluestack-ui/themed';
 import PostCompo from './PostCompo';
+import {FlatList} from '@gluestack-ui/themed';
 
 const PostFeed = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
@@ -51,7 +52,7 @@ const PostFeed = () => {
       mutate();
     }, []),
   );
-
+  // console.log(data?.data?.data?.[0]);
   return (
     <View>
       {/* <Box px={'$3'} mb={'$3'} mt={'$6'}>

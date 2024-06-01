@@ -5,10 +5,11 @@ import {useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
 import {PrivateContainer} from '~/Components/container';
 import {PostFeed} from '~/Components/screens';
-import {Box, ScrollView} from '@gluestack-ui/themed';
+import {Box, FlatList, ScrollView} from '@gluestack-ui/themed';
 import {useFCMToken, useSwrApi} from '~/Hooks';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {COLORS} from '~/Styles';
+import {Image} from '@gluestack-ui/themed';
 
 const Feeds = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
@@ -57,7 +58,7 @@ const Feeds = () => {
       ]}
       image={IMAGES.LOGO}>
       <ScrollView contentContainerStyle={{paddingBottom: 50}}>
-        <Box bg={COLORS.gradientLow}>
+        <Box bg={COLORS.gradientLow} flex={1}>
           <PostFeed />
         </Box>
       </ScrollView>

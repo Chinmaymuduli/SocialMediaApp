@@ -25,7 +25,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/routes/private/types';
 import AppIcon from '~/Components/core/AppIcon';
-import {Button, PhotoPicker} from '~/Components/core';
+import {Button, LinearComponent, PhotoPicker} from '~/Components/core';
 import {PrivateContainer} from '~/Components/container';
 import {IMAGES} from '~/Assets';
 import {ModalHeader} from '@gluestack-ui/themed';
@@ -53,6 +53,7 @@ const Post = () => {
   const [createTag, setCreateTag] = useState<any>('');
   const [file, setFile] = useState('Photo');
   const [videoUrl, setVideoUrl] = useState<any>([]);
+  const [multipleMedia, setMultipleMedia] = useState<any>();
   const [tags, setTags] = useState<any>([]);
   const {mutation, isLoading} = useMutation();
   const handelTags = (i: any) => {
@@ -72,33 +73,52 @@ const Post = () => {
     try {
       let formData = new FormData();
       formData.append('caption', cation);
-      formData.append('media_type', file === 'Photo' ? 'image' : 'video');
+      // formData.append('media_type', file === 'Photo' ? 'image' : 'video');
+      multipleMedia?.length > 0 &&
+        multipleMedia?.forEach((type: any) =>
+          formData.append(
+            'media_type',
+            type?.path?.substring(type?.path?.lastIndexOf('.')) === 'mp4'
+              ? 'video'
+              : 'image',
+          ),
+        );
       tags?.forEach((tg: any) => formData.append('tags', tg?._id));
-      file === 'Photo' &&
-        images?.forEach((img: any) => {
-          formData.append('media', {
-            uri: img?.path,
-            name: `file.jpg`,
-            type: 'image/jpeg',
-          });
-        });
-      file === 'Video' &&
-        videoUrl.forEach((video: any) => {
-          if (video?.path && video?.mime) {
+      multipleMedia?.length > 0 &&
+        multipleMedia.forEach((file: any) => {
+          if (file?.path && file?.mime) {
             formData.append('media', {
-              uri: video.path,
-              name: video.path.split('/').pop(),
-              type: video.mime,
+              uri: file.path,
+              name: file.path.split('/').pop(),
+              type: file.mime,
             });
           }
         });
+      // file === 'Photo' &&
+      //   images?.forEach((img: any) => {
+      //     formData.append('media', {
+      //       uri: img?.path,
+      //       name: `file.jpg`,
+      //       type: 'image/jpeg',
+      //     });
+      //   });
+      // file === 'Video' &&
+      // videoUrl.forEach((video: any) => {
+      //   if (video?.path && video?.mime) {
+      //     formData.append('media', {
+      //       uri: video.path,
+      //       name: video.path.split('/').pop(),
+      //       type: video.mime,
+      //     });
+      //   }
+      // });
       if (userData?.is_profile_completed) {
         const res = await mutation(`posts/create`, {
           method: 'POST',
           body: formData,
           isFormData: true,
         });
-        console.log({res});
+        // console.log(res?.results?.error);
         if (res?.status === 201) {
           setImages([]);
           setVideoUrl([]);
@@ -106,7 +126,7 @@ const Post = () => {
           setTags([]);
           Alert.alert('Success', 'Post Successfully Done');
         } else {
-          Alert.alert('Error', 'Something went wrong');
+          Alert.alert('Error', res?.results?.error?.message);
         }
       } else {
         Alert.alert('Error', 'Please Complete Your Profile First Before Post');
@@ -134,11 +154,17 @@ const Post = () => {
     }
   };
 
-  const handleChooseVideo = async () => {
+  let basePath =
+    'file:///data/user/0/com.feveal/cache/react-native-image-crop-picker/';
+  // let extractedText = filePath.substring(basePath.length);
+  const handleChooseMedia = async () => {
     ImagePicker.openPicker({
-      mediaType: 'video',
-    }).then(video => {
-      setVideoUrl((prev: any) => [...prev, video]);
+      mediaType: 'any',
+      multiple: true,
+    }).then(media => {
+      console.log({media});
+      setMultipleMedia(media);
+      // setVideoUrl((prev: any) => [...prev, video]);
     });
   };
 
@@ -159,192 +185,227 @@ const Post = () => {
         },
       ]}
       image={IMAGES.LOGO}>
-      <ScrollView>
-        <Box mt={'$2'} mx={'$4'}>
-          <Text my={'$2'} fontFamily="Montserrat-Bold" fontSize={13}>
-            Description
-          </Text>
-
-          <Textarea
-            size="md"
-            isReadOnly={false}
-            isInvalid={false}
-            isDisabled={false}
-            w="$full">
-            <TextareaInput
-              placeholder="Your text goes here..."
-              fontSize={13}
-              fontFamily="Montserrat-Medium"
-              value={cation}
-              onChangeText={txt => setCaption(txt)}
-            />
-          </Textarea>
-        </Box>
-        <Box mt={'$2'} mx={'$4'}>
-          <HStack alignItems={'center'}>
+      <LinearComponent>
+        <ScrollView style={{flex: 1}}>
+          <Box mt={'$2'} mx={'$4'}>
             <Text my={'$2'} fontFamily="Montserrat-Bold" fontSize={13}>
-              Choose File
+              Description
             </Text>
-          </HStack>
-          <Box mt={'$2'}>
-            <RadioGroup value={file} onChange={setFile}>
-              <HStack gap={'$10'}>
-                <Radio
-                  value="Photo"
-                  size="md"
-                  isInvalid={false}
-                  isDisabled={false}>
-                  <RadioIndicator mr="$2">
-                    <RadioIcon as={CircleIcon} />
-                  </RadioIndicator>
-                  <RadioLabel>Photo</RadioLabel>
-                </Radio>
-                <Radio
-                  value="Video"
-                  size="md"
-                  isInvalid={false}
-                  isDisabled={false}>
-                  <RadioIndicator mr="$2">
-                    <RadioIcon as={CircleIcon} />
-                  </RadioIndicator>
-                  <RadioLabel>Video</RadioLabel>
-                </Radio>
-              </HStack>
-            </RadioGroup>
+
+            <Textarea
+              size="md"
+              isReadOnly={false}
+              isInvalid={false}
+              isDisabled={false}
+              w="$full">
+              <TextareaInput
+                placeholder="Your text goes here..."
+                fontSize={13}
+                fontFamily="Montserrat-Medium"
+                value={cation}
+                onChangeText={txt => setCaption(txt)}
+              />
+            </Textarea>
           </Box>
-          <HStack mb={'$2'} mt={'$6'} justifyContent={'space-between'}>
-            <Pressable
-              bgColor={'white'}
-              onPress={
-                file === 'Photo'
-                  ? () => setImagesPicker(true)
-                  : () => handleChooseVideo()
-              }
-              w={'$full'}
-              alignItems={'center'}
-              justifyContent={'center'}
-              borderWidth={1}
-              borderRadius={7}
-              borderColor={'$coolGray300'}>
-              <VStack>
-                {file === 'Photo' ? (
-                  <Image
-                    source={{
-                      uri:
-                        images?.length > 0
-                          ? images?.[0]?.path
-                          : 'https://cdn-icons-png.flaticon.com/256/892/892311.png',
-                    }}
-                    alt="Default Image"
-                    size={'md'}
-                  />
-                ) : (
+          <Box mt={'$2'} mx={'$4'}>
+            <HStack alignItems={'center'}>
+              <Text my={'$2'} fontFamily="Montserrat-Bold" fontSize={13}>
+                Choose File
+              </Text>
+            </HStack>
+            {/* <Box mt={'$2'}>
+              <RadioGroup value={file} onChange={setFile}>
+                <HStack gap={'$10'}>
+                  <Radio
+                    value="Photo"
+                    size="md"
+                    isInvalid={false}
+                    isDisabled={false}>
+                    <RadioIndicator mr="$2">
+                      <RadioIcon as={CircleIcon} />
+                    </RadioIndicator>
+                    <RadioLabel>Photo</RadioLabel>
+                  </Radio>
+                  <Radio
+                    value="Video"
+                    size="md"
+                    isInvalid={false}
+                    isDisabled={false}>
+                    <RadioIndicator mr="$2">
+                      <RadioIcon as={CircleIcon} />
+                    </RadioIndicator>
+                    <RadioLabel>Video</RadioLabel>
+                  </Radio>
+                </HStack>
+              </RadioGroup>
+            </Box> */}
+            <HStack mb={'$2'} mt={'$2'} justifyContent={'space-between'}>
+              <Pressable
+                bgColor={'white'}
+                // onPress={
+                //   file === 'Photo'
+                //     ? () => setImagesPicker(true)
+                //     : () => handleChooseVideo()
+                // }
+                onPress={() => handleChooseMedia()}
+                w={'$full'}
+                // alignItems={'center'}
+                // justifyContent={'center'}
+                // borderWidth={1}
+                borderRadius={7}
+                borderColor={'$coolGray300'}>
+                <HStack
+                  alignItems="center"
+                  justifyContent="center"
+                  gap={'$4'}
+                  py={'$1'}>
+                  {/* {file === 'Photo' ? (
+                    <Image
+                      source={{
+                        uri:
+                          images?.length > 0
+                            ? images?.[0]?.path
+                            : 'https://cdn-icons-png.flaticon.com/256/892/892311.png',
+                      }}
+                      alt="Default Image"
+                      size={'xs'}
+                    />
+                  ) : (
+                    <Box>
+                      {videoUrl?.length > 0 ? (
+                        <Box py={'$7'}>
+                          <Text
+                            fontFamily="Montserrat-SemiBold"
+                            color={COLORS.secondary}>
+                            {`${videoUrl?.length} Video Uploaded`}
+                          </Text>
+                        </Box>
+                      ) : (
+                        <Image
+                          source={{
+                            uri: 'https://cdn-icons-png.flaticon.com/256/892/892311.png',
+                          }}
+                          alt="Default Image"
+                          size={'md'}
+                        />
+                      )}
+                    </Box>
+                  )} */}
                   <Box>
-                    {videoUrl?.length > 0 ? (
-                      <Box py={'$7'}>
-                        <Text
-                          fontFamily="Montserrat-SemiBold"
-                          color={COLORS.secondary}>
-                          {`${videoUrl?.length} Video Uploaded`}
-                        </Text>
-                      </Box>
-                    ) : (
-                      <Image
-                        source={{
-                          uri: 'https://cdn-icons-png.flaticon.com/256/892/892311.png',
-                        }}
-                        alt="Default Image"
-                        size={'md'}
-                      />
-                    )}
+                    <Image
+                      source={{
+                        uri:
+                          images?.length > 0
+                            ? images?.[0]?.path
+                            : 'https://cdn-icons-png.flaticon.com/256/892/892311.png',
+                      }}
+                      alt="Default Image"
+                      size={'xs'}
+                    />
                   </Box>
-                )}
-              </VStack>
-              {/* <Box p={'$4'}>
-                <Text fontFamily="Montserrat-SemiBold">Photo</Text>
-              </Box> */}
-            </Pressable>
-            {/* <Pressable
-              bgColor={'white'}
-              // w={'$full'}
-              w={'$40'}
+                  <Text fontFamily="Montserrat-SemiBold" fontSize={12}>
+                    Upload Photos / Videos
+                  </Text>
+                </HStack>
+              </Pressable>
+            </HStack>
+
+            {multipleMedia?.length > 0 && (
+              <Box>
+                <Text my={'$2'} fontFamily="Montserrat-Bold" fontSize={13}>
+                  Selected File
+                </Text>
+                {multipleMedia?.map((media: any) => (
+                  <Box
+                    key={media?.path}
+                    my={'$1'}
+                    softShadow="1"
+                    bg={'$white'}
+                    py={'$2'}
+                    px={'$4'}
+                    borderRadius={20}>
+                    <Text
+                      fontFamily="Montserrat-SemiBold"
+                      fontSize={13}
+                      color={COLORS.secondary}>
+                      {media?.path.substring(basePath.length)}
+                    </Text>
+                  </Box>
+                ))}
+              </Box>
+            )}
+
+            <HStack
+              justifyContent="space-between"
               alignItems={'center'}
-              // h={150}
+              mt={'$2'}
+              mb={'$1'}>
+              <Text my={'$2'} fontFamily="Montserrat-Bold" fontSize={13}>
+                Select Tags
+              </Text>
+              <Pressable onPress={() => setShowTagModal(true)}>
+                <HStack gap={'$2'} alignItems={'center'}>
+                  <AppIcon
+                    AntDesignName="plus"
+                    size={18}
+                    color={COLORS.primary}
+                  />
+                  <Text
+                    fontFamily="Montserrat-Bold"
+                    fontSize={13}
+                    color={COLORS.primary}>
+                    Add Tag
+                  </Text>
+                </HStack>
+              </Pressable>
+            </HStack>
+            <Pressable
+              onPress={() => setShowModal(true)}
+              bgColor={'white'}
               justifyContent={'center'}
               borderWidth={1}
               borderRadius={7}
               borderColor={'$coolGray300'}>
-              <Text fontFamily="Montserrat-SemiBold">Video</Text>
-            </Pressable> */}
-          </HStack>
-
-          <HStack
-            justifyContent="space-between"
-            alignItems={'center'}
-            mt={'$2'}
-            mb={'$1'}>
-            <Text my={'$2'} fontFamily="Montserrat-Bold" fontSize={13}>
-              Select Tags
-            </Text>
-            <Pressable onPress={() => setShowTagModal(true)}>
-              <HStack gap={'$2'} alignItems={'center'}>
-                <AppIcon
-                  AntDesignName="plus"
-                  size={18}
-                  color={COLORS.primary}
-                />
-                <Text
-                  fontFamily="Montserrat-Bold"
-                  fontSize={13}
-                  color={COLORS.primary}>
-                  Add Tag
-                </Text>
+              <HStack
+                alignItems="center"
+                justifyContent="space-between"
+                p={'$3'}>
+                <Text fontFamily="Montserrat-Medium">Select Tags</Text>
+                <AppIcon AntDesignName="caretdown" size={20} />
               </HStack>
             </Pressable>
-          </HStack>
-          <Pressable
-            onPress={() => setShowModal(true)}
-            bgColor={'white'}
-            justifyContent={'center'}
-            borderWidth={1}
-            borderRadius={7}
-            borderColor={'$coolGray300'}>
-            <HStack alignItems="center" justifyContent="space-between" p={'$3'}>
-              <Text fontFamily="Montserrat-Medium">Select Tags</Text>
-              <AppIcon AntDesignName="caretdown" size={20} />
+            <HStack gap={'$1.5'} mt={'$1'} flexWrap="wrap">
+              {tags?.map((tag: any) => (
+                <Box
+                  my={'$0.5'}
+                  px={'$2'}
+                  bg={'$pink50'}
+                  borderRadius={15}
+                  key={tag?._id}>
+                  <Text fontFamily="Montserrat-Medium" py={'$1'} fontSize={13}>
+                    # {tag?.title}
+                  </Text>
+                </Box>
+              ))}
             </HStack>
-          </Pressable>
-          <HStack gap={'$1.5'} mt={'$1'} flexWrap="wrap">
-            {tags?.map((tag: any) => (
-              <Box
-                my={'$0.5'}
-                px={'$2'}
-                bg={'$pink50'}
-                borderRadius={15}
-                key={tag?._id}>
-                <Text fontFamily="Montserrat-Medium" py={'$1'} fontSize={13}>
-                  # {tag?.title}
-                </Text>
-              </Box>
-            ))}
-          </HStack>
-        </Box>
+          </Box>
 
-        <Box mt={'$7'}>
-          <Button
-            borderRadius={5}
-            btnWidth={'full'}
-            isLoading={isLoading}
-            isDisabled={isLoading}
-            mx={'$4'}
-            py={'$2'}
-            onPress={() => handelPost()}>
-            <Text color="$white" fontFamily="Montserrat-Bold" fontSize={13}>
-              Post
-            </Text>
-          </Button>
-        </Box>
-      </ScrollView>
+          <Box mt={'$7'}>
+            <Button
+              borderRadius={5}
+              btnWidth={'full'}
+              isLoading={isLoading}
+              isDisabled={isLoading}
+              mx={'$4'}
+              py={'$2'}
+              onPress={() => handelPost()}>
+              <Text color="$white" fontFamily="Montserrat-Bold" fontSize={13}>
+                Post
+              </Text>
+            </Button>
+          </Box>
+        </ScrollView>
+      </LinearComponent>
       {/* modal */}
       <Modal
         isOpen={showModal}

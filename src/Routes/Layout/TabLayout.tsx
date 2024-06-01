@@ -96,7 +96,7 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarLabelStyle: {fontFamily: 'Montserrat-Bold'},
-        tabBarActiveTintColor: COLORS.primary,
+        tabBarActiveTintColor: COLORS.secondary,
         tabBarStyle: {
           height: 50,
           position: 'absolute',

@@ -62,6 +62,7 @@ const RequestCompo = ({
     <Box>
       <FlatList
         data={data}
+        contentContainerStyle={{paddingBottom: 50}}
         renderItem={({item}: any) => (
           <Box py={'$1'}>
             <VStack px={'$4'}>
@@ -148,61 +149,61 @@ const RequestCompo = ({
             </VStack>
           </Box>
         }
-        ListFooterComponent={
-          <Box mt={'$8'} ml={'$3'}>
-            <Box my={'$4'}>
-              <Text fontFamily="Montserrat-SemiBold">
-                Suggested Connections
-              </Text>
-            </Box>
-            <FlatList
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              // contentContainerStyle={{backgroundColor: 'white'}}
-              data={recommendationData}
-              renderItem={({item}: any) => (
-                <Box w={'$32'} mr={'$2'} mb={'$1'} p={'$0.5'}>
-                  <Box
-                    borderRadius={7}
-                    softShadow="1"
-                    bg={'$white'}
-                    alignItems="center"
-                    py={'$3'}>
-                    <Image
-                      source={item?.avatar ? {uri: item?.avatar} : IMAGES.USER}
-                      alt="image"
-                      style={{height: 60, width: 60}}
-                      rounded={'$full'}
-                    />
-                    <Text
-                      mt={'$1'}
-                      fontFamily="Montserrat-SemiBold"
-                      fontSize={13}
-                      numberOfLines={1}>
-                      {item?.nick_name}
-                    </Text>
-                    <Pressable
-                      onPress={() =>
-                        navigate('UserProfile', {user_id: item?._id})
-                      }
-                      bg={COLORS.secondary}
-                      py={'$1'}
-                      px={'$3'}
-                      mt={'$2'}
-                      borderRadius={6}>
-                      <Text
-                        fontFamily="Montserrat-SemiBold"
-                        color={'$white'}
-                        fontSize={13}>
-                        Profile
-                      </Text>
-                    </Pressable>
-                  </Box>
-                </Box>
-              )}
-            />
-          </Box>
-        }
+        // ListFooterComponent={
+        //   <Box mt={'$8'} ml={'$3'}>
+        //     <Box my={'$4'}>
+        //       <Text fontFamily="Montserrat-SemiBold">
+        //         Suggested Connections
+        //       </Text>
+        //     </Box>
+        //     <FlatList
+        //       horizontal
+        //       showsHorizontalScrollIndicator={false}
+        //       // contentContainerStyle={{backgroundColor: 'white'}}
+        //       data={recommendationData}
+        //       renderItem={({item}: any) => (
+        //         <Box w={'$32'} mr={'$2'} mb={'$1'} p={'$0.5'}>
+        //           <Box
+        //             borderRadius={7}
+        //             softShadow="1"
+        //             bg={'$white'}
+        //             alignItems="center"
+        //             py={'$3'}>
+        //             <Image
+        //               source={item?.avatar ? {uri: item?.avatar} : IMAGES.USER}
+        //               alt="image"
+        //               style={{height: 60, width: 60}}
+        //               rounded={'$full'}
+        //             />
+        //             <Text
+        //               mt={'$1'}
+        //               fontFamily="Montserrat-SemiBold"
+        //               fontSize={13}
+        //               numberOfLines={1}>
+        //               {item?.nick_name}
+        //             </Text>
+        //             <Pressable
+        //               onPress={() =>
+        //                 navigate('UserProfile', {user_id: item?._id})
+        //               }
+        //               bg={COLORS.secondary}
+        //               py={'$1'}
+        //               px={'$3'}
+        //               mt={'$2'}
+        //               borderRadius={6}>
+        //               <Text
+        //                 fontFamily="Montserrat-SemiBold"
+        //                 color={'$white'}
+        //                 fontSize={13}>
+        //                 Profile
+        //               </Text>
+        //             </Pressable>
+        //           </Box>
+        //         </Box>
+        //       )}
+        //     />
+        //   </Box>
+        // }
       />
 
       <Modal
