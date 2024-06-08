@@ -50,7 +50,7 @@ const MyProfile = () => {
                 color={'$black'}
                 fontFamily="Montserrat-Medium"
                 fontSize={13}>
-                {data?.data?.data?.total_posts}
+                {data?.data?.data?.total_posts || 0}
               </Text>
               <Text color={'$black'} fontSize={12} fontFamily="Montserrat-Bold">
                 Posts
@@ -61,7 +61,7 @@ const MyProfile = () => {
                 color={'$black'}
                 fontFamily="Montserrat-Medium"
                 fontSize={13}>
-                {data?.data?.data?.total_followers}
+                {data?.data?.data?.total_followers || 0}
               </Text>
               <Text color={'$black'} fontFamily="Montserrat-Bold" fontSize={12}>
                 Followers
@@ -72,7 +72,7 @@ const MyProfile = () => {
                 color={'$black'}
                 fontFamily="Montserrat-Medium"
                 fontSize={13}>
-                {data?.data?.data?.total_followings}
+                {data?.data?.data?.total_followings || 0}
               </Text>
               <Text color={'$black'} fontFamily="Montserrat-Bold" fontSize={12}>
                 Following
@@ -122,11 +122,27 @@ const MyProfile = () => {
         <Box w={'100%'} h={'$0.5'} bgColor={'$pink300'}></Box>
 
         <Box>
-          <UserPost
-            postData={data?.data?.data?.posts}
-            isFormUser={true}
-            mutate={mutate}
-          />
+          {data?.data?.data?.posts?.length > 0 ? (
+            <UserPost
+              postData={data?.data?.data?.posts}
+              isFormUser={true}
+              mutate={mutate}
+            />
+          ) : (
+            <Box mt={'$4'} alignItems="center">
+              <Image
+                source={IMAGES.CONNECT}
+                style={{
+                  height: 120,
+                  width: 120,
+                }}
+                alt="img"
+              />
+              <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$4'}>
+                No Post Found
+              </Text>
+            </Box>
+          )}
         </Box>
       </ScrollView>
     </PrivateContainer>

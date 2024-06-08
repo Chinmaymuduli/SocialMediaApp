@@ -9,6 +9,7 @@ import {useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
 import useBasicFunction from '~/Hooks/useBasicFunctions';
 import {useAppContext} from '~/Contexts';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 
 const SettingScreen = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
@@ -109,6 +110,7 @@ const SettingScreen = () => {
   };
 
   const logout = () => {
+    GoogleSignin.signOut();
     handleLogout();
     handleClearAccessToken();
   };

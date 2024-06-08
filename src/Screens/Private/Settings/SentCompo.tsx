@@ -26,9 +26,9 @@ const SentCompo = ({data, sentMutate, isValidating}: any) => {
         contentContainerStyle={{paddingBottom: 50}}
         renderItem={({item}: any) => (
           <Pressable
-            onPress={() =>
-              navigate('UserProfile', {user_id: item?.receiver_id?._id})
-            }
+            // onPress={() =>
+            //   navigate('UserProfile', {user_id: item?.receiver_id?._id})
+            // }
             py={'$1'}
             softShadow="1"
             bg={'$white'}
