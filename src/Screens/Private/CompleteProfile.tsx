@@ -19,6 +19,8 @@ import {
   RadioIndicator,
   SafeAreaView,
   Text,
+  Textarea,
+  TextareaInput,
 } from '@gluestack-ui/themed';
 import {ScrollView} from '@gluestack-ui/themed';
 import {COLORS} from '~/Styles';
@@ -37,6 +39,7 @@ import {RadioGroup} from '@gluestack-ui/themed';
 import {Actionsheet} from '@gluestack-ui/themed';
 import {ActionsheetItemText} from '@gluestack-ui/themed';
 import {Alert} from 'react-native';
+import State from '~/Constants/State';
 
 const CompleteProfile = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
@@ -50,7 +53,7 @@ const CompleteProfile = () => {
   const [area, setArea] = useState('');
   const [expertise, setExpertise] = useState<any>();
   const [expertiseFor, setExpertiseFor] = useState<any>();
-  const [state, setState] = useState<any>();
+  const [allState, setState] = useState<any>();
   const [visiblePhoto, setVisiblePhoto] = useState(false);
   const [showStatePicker, setShowStatePicker] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -63,6 +66,13 @@ const CompleteProfile = () => {
   const [imagesPicker, setImagesPicker] = useState(false);
   const [isImagePick, setIsImagePick] = useState(false);
   const [images, setImages] = useState<any>([]);
+
+  const [showActionsheet, setShowActionsheet] = React.useState(false);
+  const [showActionsheet2, setShowActionsheet2] = React.useState(false);
+  const [citiesModal, setCitiesModal] = React.useState(false);
+
+  const [allCities, setAllCities] = useState<any>([]);
+  const [selectCity, setSelectCity] = useState<any>();
 
   const {mutation, isLoading} = useMutation();
   const {data} = useSwrApi(`interests?type=personal`);
@@ -78,7 +88,7 @@ const CompleteProfile = () => {
     setPhone(userData?.phone);
     setName(userData?.name);
     setNickName(userData?.nick_name);
-    setCity(userData?.location_details?.city);
+    setSelectCity(userData?.location_details?.city);
     setArea(userData?.location_details?.address);
     setGender(userData?.gender);
     setSelectedDate(userData?.dob);
@@ -100,8 +110,8 @@ const CompleteProfile = () => {
       const locationDetails = {
         pincode: '',
         address: area,
-        city: city,
-        state: state?.title,
+        city: selectCity,
+        state: allState?.title,
         coordinates: [12.988, 77.6895],
       };
       const interests = [expertise?._id, expertiseFor?._id];
@@ -154,8 +164,11 @@ const CompleteProfile = () => {
     setDatePickerVisibility(false);
   };
 
-  const [showActionsheet, setShowActionsheet] = React.useState(false);
-  const [showActionsheet2, setShowActionsheet2] = React.useState(false);
+  // console.log({allCities});
+  useEffect(() => {
+    const data = State?.find((item: any) => item?.title === allState?.title);
+    setAllCities(data?.Cities);
+  }, [allState]);
 
   const handleSelect = (data: any) => {
     setShowActionsheet(false);
@@ -201,6 +214,11 @@ const CompleteProfile = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handelCities = (city: any) => {
+    setSelectCity(city);
+    setCitiesModal(false);
   };
 
   return (
@@ -651,7 +669,7 @@ const CompleteProfile = () => {
                   fontSize={'$sm'}
                   color={'$coolGray500'}
                   p={'$3'}>
-                  {state?.title ? state?.title : 'Select State'}
+                  {allState?.title ? allState?.title : 'Select State'}
                 </Text>
               </Pressable>
             </VStack>
@@ -662,23 +680,23 @@ const CompleteProfile = () => {
                 <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
                   City *
                 </Text>
-                {/* <Pressable
-       
+                <Pressable
+                  onPress={() => setCitiesModal(true)}
                   borderWidth={1}
                   borderRadius={5}
-                  bg={'white'}
                   borderColor={'$coolGray300'}
+                  bg={'$coolGray100'}
                   minWidth={160}>
-                  <Box py={'$2.5'}>
+                  <Box py={'$2.5'} px={'$2'}>
                     <Text
                       fontWeight={'semibold'}
                       fontSize={'$sm'}
                       color={'$coolGray500'}>
-                      {'Select City'}
+                      {selectCity ? selectCity : 'Select City'}
                     </Text>
                   </Box>
-                </Pressable> */}
-                <Input
+                </Pressable>
+                {/* <Input
                   // flex={1}
                   variant="outline"
                   size="md"
@@ -693,7 +711,7 @@ const CompleteProfile = () => {
                     value={city}
                     onChangeText={txt => setCity(txt)}
                   />
-                </Input>
+                </Input> */}
               </VStack>
             </Box>
             <VStack gap={'$2'}>
@@ -751,53 +769,6 @@ const CompleteProfile = () => {
               <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
                 Interested / Skills *
               </Text>
-              {/* <Input
-                flex={1}
-                variant="outline"
-                size="md"
-                isDisabled={false}
-                alignItems="center"
-                borderColor="$coolGray300"
-                isInvalid={false}
-                isReadOnly={false}>
-                <InputField placeholder="Enter Text here" fontSize={12} />
-              </Input> */}
-
-              {/* <FormControl isRequired isInvalid>
-                <FormControlLabel>
-                  <FormControlLabelText>Personal</FormControlLabelText>
-                </FormControlLabel>
-                <Select>
-                  <SelectTrigger>
-                    <SelectInput placeholder="Select option" />
-                    <SelectIcon mr="$3">
-                      <Icon as={ChevronDownIcon} />
-                    </SelectIcon>
-                  </SelectTrigger>
-                  <SelectPortal>
-                    <SelectBackdrop />
-                    <SelectContent>
-                      <SelectDragIndicatorWrapper>
-                        <SelectDragIndicator />
-                      </SelectDragIndicatorWrapper>
-                      <SelectItem label="Red" value="red" />
-                      <SelectItem label="Blue" value="blue" />
-                      <SelectItem label="Black" value="black" />
-                      <SelectItem label="Pink" value="pink" isDisabled={true} />
-                      <SelectItem label="Green" value="green" />
-                    </SelectContent>
-                  </SelectPortal>
-                </Select>
-                <FormControlHelper>
-                  <FormControlHelperText>
-                    You can only select one option
-                  </FormControlHelperText>
-                </FormControlHelper>
-                <FormControlError>
-                  <FormControlErrorIcon as={AlertCircleIcon} />
-                  <FormControlErrorText>Mandatory field</FormControlErrorText>
-                </FormControlError>
-              </FormControl> */}
               <HStack justifyContent={'space-between'} mt={2}>
                 <VStack gap={'$2'} w={'45%'}>
                   <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
@@ -846,6 +817,18 @@ const CompleteProfile = () => {
                   </Pressable>
                 </VStack>
               </HStack>
+            </VStack>
+            <VStack gap={'$2'} mt={'$2'}>
+              <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
+                Description
+              </Text>
+              <Textarea
+                // size="md"
+                isReadOnly={false}
+                isInvalid={false}
+                isDisabled={false}>
+                <TextareaInput placeholder="Write description..." />
+              </Textarea>
             </VStack>
           </Box>
         </Box>
@@ -927,6 +910,23 @@ const CompleteProfile = () => {
               onPress={() => handleSelect2(item)}
               key={item?._id}>
               <ActionsheetItemText>{item?.label}</ActionsheetItemText>
+            </ActionsheetItem>
+          ))}
+        </ActionsheetContent>
+      </Actionsheet>
+      {/* Cities  */}
+      <Actionsheet
+        isOpen={citiesModal}
+        onClose={() => setCitiesModal(false)}
+        zIndex={999}>
+        <ActionsheetBackdrop />
+        <ActionsheetContent h="$72" zIndex={999}>
+          <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper>
+          {allCities?.map((item: any) => (
+            <ActionsheetItem onPress={() => handelCities(item)} key={item}>
+              <ActionsheetItemText>{item}</ActionsheetItemText>
             </ActionsheetItem>
           ))}
         </ActionsheetContent>

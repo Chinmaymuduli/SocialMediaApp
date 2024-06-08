@@ -84,12 +84,12 @@ export default ({onClose, onSelect, visible}: Props) => {
                 <TouchableOpacity
                   style={styles.flagWrapper}
                   onPress={() => onSelect(item)}>
-                  <Image
+                  {/* <Image
                     source={{
                       uri: `https://flagcdn.com/w20/${item?.code?.toLowerCase()}.png`,
                     }}
                     style={styles.flag}
-                  />
+                  /> */}
                   <Text>{item?.title}</Text>
                 </TouchableOpacity>
               )}

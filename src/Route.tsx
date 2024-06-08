@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import PrivateRoutes from './Routes/Private';
 import PublicRoutes from './Routes/Public';
-import { useAppContext } from './Contexts';
+import {useAppContext} from './Contexts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useBasicFunction from './Hooks/useBasicFunctions';
-import { SplashScreen } from './Screens/Public';
+import {SplashScreen} from './Screens/Public';
 
 const Route = () => {
   const [token, setToken] = React.useState<string | null>();
-  const { getUser } = useBasicFunction();
-  const { isLoggedIn, setIsLoggedIn, userData } = useAppContext();
+  const {getUser} = useBasicFunction();
+  const {isLoggedIn, setIsLoggedIn, userData} = useAppContext();
   const getAuthStatus = async () => {
     try {
       const value = await AsyncStorage.getItem('isLoggedIn');
-      console.log({ value });
+      console.log({value});
       if (value === 'true') {
         setIsLoggedIn(true);
       } else {
@@ -41,7 +41,7 @@ const Route = () => {
     getTokenData();
   }, []);
 
-  console.log({ userData });
+  console.log({userData});
 
   if (userData === null) return <SplashScreen />;
   return userData?._id ? (

@@ -24,7 +24,8 @@ import {
 } from '@gluestack-ui/themed';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useState} from 'react';
-import {StatusBar} from 'react-native';
+import {NativeScrollEvent} from 'react-native';
+import {NativeSyntheticEvent, StatusBar} from 'react-native';
 import {Alert} from 'react-native';
 import CircularProgress from 'react-native-circular-progress-indicator';
 import LinearGradient from 'react-native-linear-gradient';
@@ -39,6 +40,7 @@ type Props = NativeStackScreenProps<PrivateRoutesTypes, 'UserProfile'>;
 const UserProfile = ({route: {params}, navigation}: Props) => {
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState('');
+  const [scrollY, setScrollY] = useState(0);
   const {mutation, isLoading} = useMutation();
   const {data, mutate: connectMutate} = useSwrApi(
     `connections/check-is-connected/${params?.user_id}`,
@@ -94,16 +96,20 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
       },
     ]);
   };
-
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    setScrollY(event.nativeEvent.contentOffset.y);
+  };
   return (
     <>
-      <StatusBar
-        barStyle="light-content"
-        translucent
-        backgroundColor="rgba(0, 0, 0, 0.5)"
-      />
+      {scrollY < 300 && (
+        <StatusBar
+          barStyle="light-content"
+          translucent
+          backgroundColor="rgba(0, 0, 0, 0.5)"
+        />
+      )}
       <Box flex={1}>
-        <ScrollView>
+        <ScrollView onScroll={handleScroll} scrollEventThrottle={16}>
           <Box position="relative">
             <Image
               source={
@@ -554,6 +560,50 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
             </ModalFooter>
           </ModalContent>
         </Modal>
+
+        {/* Back button */}
+        {scrollY > 300 ? (
+          <Box position="absolute" top={0} zIndex={10} w={'$full'}>
+            <Box bg={'$coolGray200'} w={'$full'}>
+              <Pressable
+                // bg={scrollY > 100 ? 'white' : '$coolGray400'}
+                ml={'$2'}
+                w={'$12'}
+                py={'$2'}
+                onPress={() => navigation.goBack()}>
+                <Box
+                  bgColor={'$coolGray200'}
+                  softShadow="1"
+                  borderRadius={8}
+                  alignItems="center"
+                  justifyContent="center">
+                  <Box p={'$1'}>
+                    <AppIcon
+                      EntypoName="chevron-small-left"
+                      size={30}
+                      color={COLORS.secondary}
+                    />
+                  </Box>
+                </Box>
+              </Pressable>
+            </Box>
+          </Box>
+        ) : (
+          <Box position="absolute" top={40} left={10} zIndex={10}>
+            <Pressable
+              bg={'$coolGray400'}
+              borderRadius={8}
+              onPress={() => navigation.goBack()}>
+              <Box p={'$1'}>
+                <AppIcon
+                  EntypoName="chevron-small-left"
+                  size={30}
+                  color={'white'}
+                />
+              </Box>
+            </Pressable>
+          </Box>
+        )}
       </Box>
     </>
   );
