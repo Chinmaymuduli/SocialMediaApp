@@ -159,19 +159,18 @@ const PostCompo = ({item, mutate}: any) => {
     itemVisiblePercentThreshold: 50,
   };
 
-  const renderItem = ({item}: any) => {
-    const isVideo = item?.substring(item.lastIndexOf('.') + 1) === 'mp4';
-    if (!isVideo) {
-      return (
-        <Box alignItems="center" justifyContent="center" position="relative">
-          <Image source={{uri: item}} style={styles.media} />
-        </Box>
-      );
-    } else if (isVideo) {
-      return <VideoCompo url={item} />;
-    }
-    return null;
-  };
+  // const renderItem = ({item}: any) => {
+  //   if (item?.fileType === 'image') {
+  //     return (
+  //       <Box alignItems="center" justifyContent="center" position="relative">
+  //         <Image source={{uri: item?.url}} style={styles.media} />
+  //       </Box>
+  //     );
+  //   } else if (item?.fileType === 'video') {
+  //     return <VideoCompo url={item?.url} />;
+  //   }
+  //   return null;
+  // };
 
   return (
     <Box softShadow="1" bg={'$white'} mb={'$4'} borderRadius={6} flex={1}>
@@ -252,7 +251,7 @@ const PostCompo = ({item, mutate}: any) => {
             ) : (
               <VideoCompo url={item?.media?.[0]} />
             ))} */}
-          <FlatList
+          {/* <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
             data={item?.media}
@@ -260,7 +259,7 @@ const PostCompo = ({item, mutate}: any) => {
             renderItem={renderItem}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
-          />
+          /> */}
 
           {item?.media?.length > 1 && (
             <Box position="absolute" right={9} top={'3%'}>
