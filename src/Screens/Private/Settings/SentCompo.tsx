@@ -16,7 +16,7 @@ import AppIcon from '~/Components/core/AppIcon';
 
 const SentCompo = ({data, sentMutate, isValidating}: any) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
-
+  // console.log(data?.[0]?.receiver_id?.interests);
   return (
     <Box mt={'$2'} px={'$2'}>
       <FlatList
@@ -57,12 +57,18 @@ const SentCompo = ({data, sentMutate, isValidating}: any) => {
                   <Text fontFamily="Montserrat-SemiBold" fontSize={15}>
                     {item?.receiver_id?.nick_name}
                   </Text>
-                  <Text
-                    fontFamily="Montserrat-SemiBold"
-                    fontSize={11}
-                    color={'$coolGray400'}>
-                    Football , Photography
-                  </Text>
+                  <HStack w={'$32'}>
+                    {item?.receiver_id?.interests?.map((int: any) => (
+                      <Text
+                        key={int?._id}
+                        numberOfLines={1}
+                        fontFamily="Montserrat-SemiBold"
+                        fontSize={11}
+                        color={'$coolGray400'}>
+                        {int?.label} ,{' '}
+                      </Text>
+                    ))}
+                  </HStack>
                 </VStack>
               </HStack>
               {/* button */}

@@ -156,9 +156,9 @@ const SettingScreen = () => {
 
   const cacheAndCellularItems = [
     {
-      icon: 'bookmark-add',
-      text: 'Sent Connections',
-      action: navigateToRequest,
+      icon: 'diversity-1',
+      text: 'My Connections',
+      action: () => navigate('AllMyConnect'),
     },
     // {
     //   icon: 'diversity-1',

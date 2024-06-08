@@ -16,7 +16,6 @@ import AppIcon from '~/Components/core/AppIcon';
 
 const Suggestions = ({data}: any) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
-  //   console.log(data?.[0]);
   return (
     <Box px={'$2'}>
       <FlatList
@@ -25,7 +24,9 @@ const Suggestions = ({data}: any) => {
         showsVerticalScrollIndicator={false}
         renderItem={({item}: any) => (
           <Pressable
-            onPress={() => navigate('UserProfile', {user_id: item?._id})}
+            onPress={() =>
+              navigate('UserProfile', {user_id: item?._id, isFromConnect: true})
+            }
             py={'$1'}
             softShadow="1"
             bg={'$white'}
@@ -53,6 +54,7 @@ const Suggestions = ({data}: any) => {
                   <HStack w={'$32'}>
                     {item?.interests?.map((int: any) => (
                       <Text
+                        key={int?._id}
                         numberOfLines={1}
                         fontFamily="Montserrat-SemiBold"
                         fontSize={11}

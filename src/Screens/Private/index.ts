@@ -16,6 +16,7 @@ export {default as Reviews} from './Settings/Reviews';
 export {default as MyProfile} from './Settings/MyProfile';
 export {default as Support} from './Settings/Support';
 export {default as ContactUs} from './Settings/ContactUs';
+export {default as AllMyConnect} from './Settings/AllMyConnect';
 export {default as SentConnections} from './Settings/SentConnections';
 export {default as AdminDashboard} from './Admin/AdminDashboard';
 export {default as AllUsers} from './Admin/AllUsers';

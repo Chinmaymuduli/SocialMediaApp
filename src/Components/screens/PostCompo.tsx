@@ -1,4 +1,4 @@
-import React, {useMemo, useRef, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {View, Image, TouchableOpacity, Alert, Share} from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
@@ -159,18 +159,23 @@ const PostCompo = ({item, mutate}: any) => {
     itemVisiblePercentThreshold: 50,
   };
 
-  // const renderItem = ({item}: any) => {
-  //   if (item?.fileType === 'image') {
-  //     return (
-  //       <Box alignItems="center" justifyContent="center" position="relative">
-  //         <Image source={{uri: item?.url}} style={styles.media} />
-  //       </Box>
-  //     );
-  //   } else if (item?.fileType === 'video') {
-  //     return <VideoCompo url={item?.url} />;
-  //   }
-  //   return null;
-  // };
+  const renderItem = useCallback(({item}: any) => {
+    if (item?.fileType === 'image') {
+      return (
+        <Box alignItems="center" justifyContent="center" position="relative">
+          <Image source={{uri: item?.url}} style={styles.media} />
+        </Box>
+      );
+    }
+    // else if (item?.fileType === 'video') {
+    //   return <VideoCompo url={item?.url} />;
+    // }
+    return null;
+  }, []);
+  const keyExtractor = useCallback(
+    (item: any, index: any) => item._id || index.toString(),
+    [],
+  );
 
   return (
     <Box softShadow="1" bg={'$white'} mb={'$4'} borderRadius={6} flex={1}>
@@ -251,15 +256,15 @@ const PostCompo = ({item, mutate}: any) => {
             ) : (
               <VideoCompo url={item?.media?.[0]} />
             ))} */}
-          {/* <FlatList
+          <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
             data={item?.media}
-            // data={mediaData}
             renderItem={renderItem}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
-          /> */}
+            keyExtractor={keyExtractor}
+          />
 
           {item?.media?.length > 1 && (
             <Box position="absolute" right={9} top={'3%'}>

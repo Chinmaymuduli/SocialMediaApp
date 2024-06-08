@@ -8,6 +8,7 @@ import {
   Box,
   FlatList,
   HStack,
+  Image,
   Pressable,
   Text,
 } from '@gluestack-ui/themed';
@@ -64,7 +65,7 @@ const Messages = () => {
               }>
               <HStack gap={'$3'} alignItems={'center'}>
                 <Pressable>
-                  <Avatar>
+                  {/* <Avatar>
                     <AvatarFallbackText>
                       {item?.is_received
                         ? item?.sender_id?.nick_name
@@ -82,7 +83,20 @@ const Messages = () => {
                         w={'$12'}
                       />
                     )}
-                  </Avatar>
+                  </Avatar> */}
+                  <Image
+                    source={{
+                      uri: item?.is_received
+                        ? item?.sender_id?.avatar ||
+                          'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?size=626&ext=jpg'
+                        : item?.receiver_id?.avatar ||
+                          'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?size=626&ext=jpg',
+                    }}
+                    alt="image"
+                    h={'$12'}
+                    w={'$12'}
+                    borderRadius={30}
+                  />
                 </Pressable>
                 <VStack flex={1}>
                   <Text fontFamily={'Montserrat-Bold'} fontSize={12}>

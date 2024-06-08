@@ -190,7 +190,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                     color={'$black'}
                     fontFamily="Montserrat-Bold"
                     fontSize={13}>
-                    {userData?.data?.data?.total_posts}
+                    {userData?.data?.data?.total_posts || 0}
                   </Text>
                   <Text
                     color={'$black'}
@@ -204,7 +204,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                     color={'$black'}
                     fontFamily="Montserrat-Bold"
                     fontSize={13}>
-                    {userData?.data?.data?.total_followers}
+                    {userData?.data?.data?.total_followers || 0}
                   </Text>
                   <Text
                     color={'$black'}
@@ -218,7 +218,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                     color={'$black'}
                     fontFamily="Montserrat-Bold"
                     fontSize={13}>
-                    {userData?.data?.data?.total_followings}
+                    {userData?.data?.data?.total_followings || 0}
                   </Text>
                   <Text
                     color={'$black'}
@@ -297,149 +297,139 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                 </Box>
               </Box>
             )}
-
-            {/* {data?.data?.data?.connection?._id && (
-            <Text fontFamily="Montserrat-Medium" fontSize={13}>
-              {userData?.data?.data?.location_details?.city +
-                ' | ' +
-                userData?.data?.data?.location_details?.state}
-            </Text>
-          )}
-          {data?.data?.data?.connection?._id && (
-            <Text fontFamily="Montserrat-Medium" fontSize={13}>
-              {userData?.data?.data?.email}
-            </Text>
-          )} */}
             {/* Connect Button Section */}
-            <Box px={'$4'} mt={'$4'}>
-              <Box bg={COLORS.secondary} borderRadius={7}>
-                {data?.data?.data?.connection?._id &&
-                data?.data?.data?.connection?.is_accepted ? (
-                  <HStack py={'$3'}>
-                    {!data?.data?.data?.connection?._id ? (
+            {!params?.isFromConnect && (
+              <Box px={'$4'} mt={'$4'}>
+                <Box bg={COLORS.secondary} borderRadius={7}>
+                  {data?.data?.data?.connection?._id &&
+                  data?.data?.data?.connection?.is_accepted ? (
+                    <HStack py={'$3'}>
+                      {!data?.data?.data?.connection?._id ? (
+                        <Pressable
+                          w={'$1/3'}
+                          onPress={() => {
+                            setShowModal(true);
+                          }}
+                          justifyContent="center"
+                          alignItems="center">
+                          <Text
+                            color="$white"
+                            fontFamily="Montserrat-Medium"
+                            fontSize={13}>
+                            Connect
+                          </Text>
+                        </Pressable>
+                      ) : (
+                        <Pressable
+                          w={'$1/3'}
+                          onPress={
+                            data?.data?.data?.connection?.is_accepted
+                              ? () =>
+                                  handelRemoveUser(
+                                    data?.data?.data?.connection?._id,
+                                  )
+                              : () => {}
+                          }
+                          justifyContent="center"
+                          alignItems="center">
+                          {data?.data?.data?.connection?.is_accepted ? (
+                            <Text
+                              color="$white"
+                              fontFamily="Montserrat-Medium"
+                              fontSize={13}>
+                              Remove
+                            </Text>
+                          ) : (
+                            <Text
+                              color="$white"
+                              fontFamily="Montserrat-Medium"
+                              fontSize={13}>
+                              Pending
+                            </Text>
+                          )}
+                        </Pressable>
+                      )}
+                      <Divider orientation="vertical" />
                       <Pressable
+                        onPress={() =>
+                          navigation.navigate('ChatDetails', {
+                            connection_id: data?.data?.data?.connection?._id,
+                            userNickName: data?.data?.data?.nick_name,
+                            isReceived: data?.data?.data?.is_received,
+                            name: data?.data?.data?.name,
+                          })
+                        }
                         w={'$1/3'}
-                        onPress={() => {
-                          setShowModal(true);
-                        }}
                         justifyContent="center"
                         alignItems="center">
                         <Text
                           color="$white"
                           fontFamily="Montserrat-Medium"
                           fontSize={13}>
-                          Connect
+                          Message
                         </Text>
                       </Pressable>
-                    ) : (
+                      <Divider orientation="vertical" />
                       <Pressable
                         w={'$1/3'}
+                        justifyContent="center"
+                        alignItems="center">
+                        <Text
+                          color="$white"
+                          fontFamily="Montserrat-Medium"
+                          fontSize={13}>
+                          Review
+                        </Text>
+                      </Pressable>
+                    </HStack>
+                  ) : (
+                    <HStack py={'$3'}>
+                      <Pressable
+                        w={'$2/4'}
                         onPress={
-                          data?.data?.data?.connection?.is_accepted
-                            ? () =>
-                                handelRemoveUser(
-                                  data?.data?.data?.connection?._id,
-                                )
-                            : () => {}
+                          data?.data?.data?.connection?.connection?._id
+                            ? () => {}
+                            : () => {
+                                setShowModal(true);
+                              }
                         }
                         justifyContent="center"
                         alignItems="center">
-                        {data?.data?.data?.connection?.is_accepted ? (
-                          <Text
-                            color="$white"
-                            fontFamily="Montserrat-Medium"
-                            fontSize={13}>
-                            Remove
-                          </Text>
-                        ) : (
+                        {!data?.data?.data?.connection?.is_accepted &&
+                        data?.data?.data?.connection?.connection?._id ? (
                           <Text
                             color="$white"
                             fontFamily="Montserrat-Medium"
                             fontSize={13}>
                             Pending
                           </Text>
+                        ) : (
+                          <Text
+                            color="$white"
+                            fontFamily="Montserrat-Medium"
+                            fontSize={13}>
+                            Connect
+                          </Text>
                         )}
                       </Pressable>
-                    )}
-                    <Divider orientation="vertical" />
-                    <Pressable
-                      onPress={() =>
-                        navigation.navigate('ChatDetails', {
-                          connection_id: data?.data?.data?.connection?._id,
-                          userNickName: data?.data?.data?.nick_name,
-                          isReceived: data?.data?.data?.is_received,
-                          name: data?.data?.data?.name,
-                        })
-                      }
-                      w={'$1/3'}
-                      justifyContent="center"
-                      alignItems="center">
-                      <Text
-                        color="$white"
-                        fontFamily="Montserrat-Medium"
-                        fontSize={13}>
-                        Message
-                      </Text>
-                    </Pressable>
-                    <Divider orientation="vertical" />
-                    <Pressable
-                      w={'$1/3'}
-                      justifyContent="center"
-                      alignItems="center">
-                      <Text
-                        color="$white"
-                        fontFamily="Montserrat-Medium"
-                        fontSize={13}>
-                        Review
-                      </Text>
-                    </Pressable>
-                  </HStack>
-                ) : (
-                  <HStack py={'$3'}>
-                    <Pressable
-                      w={'$2/4'}
-                      onPress={
-                        data?.data?.data?.connection?.connection?._id
-                          ? () => {}
-                          : () => {
-                              setShowModal(true);
-                            }
-                      }
-                      justifyContent="center"
-                      alignItems="center">
-                      {!data?.data?.data?.connection?.is_accepted ? (
+                      <Divider orientation="vertical" />
+                      <Pressable
+                        onPress={() => navigation.navigate('Reviews')}
+                        w={'$2/4'}
+                        justifyContent="center"
+                        alignItems="center">
                         <Text
                           color="$white"
                           fontFamily="Montserrat-Medium"
                           fontSize={13}>
-                          Pending
+                          Review
                         </Text>
-                      ) : (
-                        <Text
-                          color="$white"
-                          fontFamily="Montserrat-Medium"
-                          fontSize={13}>
-                          Connect
-                        </Text>
-                      )}
-                    </Pressable>
-                    <Divider orientation="vertical" />
-                    <Pressable
-                      onPress={() => navigation.navigate('Reviews')}
-                      w={'$2/4'}
-                      justifyContent="center"
-                      alignItems="center">
-                      <Text
-                        color="$white"
-                        fontFamily="Montserrat-Medium"
-                        fontSize={13}>
-                        Review
-                      </Text>
-                    </Pressable>
-                  </HStack>
-                )}
+                      </Pressable>
+                    </HStack>
+                  )}
+                </Box>
               </Box>
-            </Box>
+            )}
             {/* All Posts */}
             <Box px={'$4'} mt={'$7'}>
               <Box>

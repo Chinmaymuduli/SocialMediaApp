@@ -52,7 +52,7 @@ const Meetings = () => {
   const {userData} = useAppContext();
 
   const {data, isValidating, mutate} = useSwrApi(
-    `meetings?require_all=true&user_id=${userData?._id}`,
+    `meetings?require_all=true&user_id=${userData?._id}&type=all`,
   );
   const {data: reviewData, mutate: reviewMutate} = useSwrApi(
     `meetings/reviews?meeting_id=${meetingData?._id}`,

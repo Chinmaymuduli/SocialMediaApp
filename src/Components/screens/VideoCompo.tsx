@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
 import Video from 'react-native-video';
 import {WIDTH} from '~/Utils';
@@ -6,6 +6,12 @@ import {WIDTH} from '~/Utils';
 const VideoCompo = ({url}: any) => {
   const [paused, setPaused] = useState(true);
   const ref = useRef<any>();
+  useEffect(() => {
+    // Ensure the video is paused when the component is unmounted
+    return () => {
+      ref.current?.pause();
+    };
+  }, []);
   return (
     <Pressable
       // style={{width: '100%'}}

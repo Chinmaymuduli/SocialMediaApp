@@ -10,21 +10,23 @@ import {Text} from '@gluestack-ui/themed';
 import {useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
 import AppIcon from '~/Components/core/AppIcon';
-import {COLORS} from '~/Styles';
 
 const MyConnectionCompo = ({data}: any) => {
-  // const {navigate} = useNavigation<PrivateScreenProps>();
-  // console.log(data?.[0]);
-
   return (
-    <Box px={'$2'}>
+    <Box px={'$2'} mt={'$3'}>
       <FlatList
         data={data}
         renderItem={({item}: any) => (
-          <Box py={'$1'} softShadow="1" bg={'$white'} borderRadius={6}>
+          <Box
+            py={'$1'}
+            mx={'$2'}
+            softShadow="1"
+            bg={'$white'}
+            borderRadius={6}
+            mb={'$3'}>
             <HStack
-              px={'$4'}
               py={'$2'}
+              px={'$2'}
               justifyContent="space-between"
               alignItems="center">
               <HStack gap={'$1'} alignItems="center">
@@ -54,12 +56,29 @@ const MyConnectionCompo = ({data}: any) => {
                       ? item?.sender_id?.nick_name
                       : item?.receiver_id?.nick_name}
                   </Text>
-                  <Text
-                    fontFamily="Montserrat-SemiBold"
-                    fontSize={11}
-                    color={'$coolGray400'}>
-                    Football , Photography
-                  </Text>
+                  <HStack w={'$32'}>
+                    {item?.is_received
+                      ? item?.sender_id?.interests?.map((int: any) => (
+                          <Text
+                            key={int?._id}
+                            numberOfLines={1}
+                            fontFamily="Montserrat-SemiBold"
+                            fontSize={11}
+                            color={'$coolGray400'}>
+                            {int?.label} ,{' '}
+                          </Text>
+                        ))
+                      : item?.receiver_id?.interests?.map((int: any) => (
+                          <Text
+                            key={int?._id}
+                            numberOfLines={1}
+                            fontFamily="Montserrat-SemiBold"
+                            fontSize={11}
+                            color={'$coolGray400'}>
+                            {int?.label} ,{' '}
+                          </Text>
+                        ))}
+                  </HStack>
                 </VStack>
               </HStack>
               {/* <HStack gap={'$10'} mt={'$1'} px={'$10'} alignItems="center">
@@ -100,7 +119,7 @@ const MyConnectionCompo = ({data}: any) => {
                   </ButtonText>
                 </Button>
               </HStack> */}
-              <Box bg={'#753CEF'} borderRadius={5}>
+              {/* <Box bg={'#753CEF'} borderRadius={5}>
                 <Box p={'$1'}>
                   <AppIcon
                     MaterialCommunityIconsName={'message-outline'}
@@ -108,7 +127,7 @@ const MyConnectionCompo = ({data}: any) => {
                     color={'white'}
                   />
                 </Box>
-              </Box>
+              </Box> */}
             </HStack>
             {/* <Divider mt={'$4'} /> */}
           </Box>
