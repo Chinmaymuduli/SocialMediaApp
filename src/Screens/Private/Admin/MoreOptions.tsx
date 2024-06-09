@@ -113,31 +113,31 @@ const MoreOptions = () => {
       text: 'User Engagement',
       action: User_Engagement,
     },
-    {
-      icon: 'connect-without-contact',
-      text: 'All Reviews',
-      action: User_Feedback,
-    },
+    // {
+    //   icon: 'connect-without-contact',
+    //   text: 'All Reviews',
+    //   action: User_Feedback,
+    // },
     {
       icon: 'monetization-on',
       text: 'Revenue Metrics',
       action: Revenue_Metrics,
     },
-    {
-      icon: 'military-tech',
-      text: 'Technical Metrics',
-      action: Technical_Metrics,
-    },
-    {
-      icon: 'add-moderator',
-      text: 'Demographic Metrics',
-      action: Demographic_Metrics,
-    },
-    {
-      icon: 'family-restroom',
-      text: 'Acquisition Metrics',
-      action: Acquisition_Metrics,
-    },
+    // {
+    //   icon: 'military-tech',
+    //   text: 'Technical Metrics',
+    //   action: Technical_Metrics,
+    // },
+    // {
+    //   icon: 'add-moderator',
+    //   text: 'Demographic Metrics',
+    //   action: Demographic_Metrics,
+    // },
+    // {
+    //   icon: 'family-restroom',
+    //   text: 'Acquisition Metrics',
+    //   action: Acquisition_Metrics,
+    // },
   ];
 
   const actionsItems = [

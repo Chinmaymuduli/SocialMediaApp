@@ -14,17 +14,18 @@ import {
   Text,
   VStack,
 } from '@gluestack-ui/themed';
-import React, {useEffect, useState} from 'react';
-import {PrivateContainer} from '~/Components/container';
+import React, { useEffect, useState } from 'react';
+import { PrivateContainer } from '~/Components/container';
 import AppIcon from '~/Components/core/AppIcon';
-import {IMAGES} from '~/Assets';
-import {MeetingData} from '../Settings/Meetings';
-import {StyleSheet} from 'react-native';
-import {COLORS} from '~/Styles';
+import { IMAGES } from '~/Assets';
+import { MeetingData } from '../Settings/Meetings';
+import { StyleSheet } from 'react-native';
+import { COLORS } from '~/Styles';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import BottomSheet from '~/Components/core/BottomSheet';
-import {useNavigation} from '@react-navigation/native';
-import {PrivateScreenProps} from '~/Routes/Private/types';
+import { useNavigation } from '@react-navigation/native';
+import { PrivateScreenProps } from '~/Routes/Private/types';
+import { useAppContext } from '~/Contexts';
 interface Meeting {
   id: string;
   name: string;
@@ -42,13 +43,13 @@ interface Meeting {
   type: string;
 }
 const AllMeetings = () => {
-  const {navigate} = useNavigation<PrivateScreenProps>();
+  const { navigate } = useNavigation<PrivateScreenProps>();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [showSearch, setShowSearch] = React.useState(false);
   const [order, setOrder] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState<Meeting[]>();
-
+  const { userData } = useAppContext();
   const Sort_Array = [
     {
       id: '13',
@@ -80,13 +81,13 @@ const AllMeetings = () => {
     <PrivateContainer
       icons={[
         {
-          icon: {IoniconsName: 'notifications'},
+          icon: { IoniconsName: 'notifications' },
           onPress: () => navigate('Notifications'),
           side: 'RIGHT',
         },
         {
-          icon: {EntypoName: 'dots-three-vertical'},
-          onPress: () => navigate('Settings'),
+          icon: { EntypoName: 'dots-three-vertical' },
+          onPress: userData?.role === 'admin' ? () => navigate('MoreOptions') : () => navigate('Settings'),
           side: 'RIGHT',
         },
       ]}
@@ -113,7 +114,7 @@ const AllMeetings = () => {
       <FlatList
         mb={'$10'}
         data={order?.length ? data : MeetingData}
-        renderItem={({item}: any) => (
+        renderItem={({ item }: any) => (
           <Pressable
             mx={'$3'}
             key={item?.id}

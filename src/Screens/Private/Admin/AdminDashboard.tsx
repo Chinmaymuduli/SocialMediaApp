@@ -24,13 +24,25 @@ import { COLORS } from '~/Styles';
 import { useNavigation } from '@react-navigation/native';
 import { PrivateScreenProps } from '~/Routes/Private/types';
 import { useAppContext } from '~/Contexts';
+import { useSwrApi } from '~/Hooks';
 
 const AdminDashboard = () => {
+
+  const { data, isValidating } = useSwrApi(`dashboard/users/stats`);
+  const { data: meeting, isValidating: meetingsValidating } = useSwrApi(`dashboard/admin/stats`);
+  const { data: post, isValidating: postValidating } = useSwrApi(`dashboard/admin/posts?require_all=true&search=Crazy`);
+  console.log(post?.data?.data);
+  const { navigate } = useNavigation<PrivateScreenProps>();
+  const [commission, setCommission] = useState('');
+  const { userData } = useAppContext();
+  const handleCommissionChange = (value: any) => {
+    setCommission(value);
+  };
   const boxData = [
     {
       id: '1',
       name: 'Total Users',
-      count: '760',
+      count: data?.data?.data?.total_users,
       icon: (
         <AppIcon IoniconsName={'people'} size={28} color={COLORS.secondary} />
       ),
@@ -39,7 +51,7 @@ const AdminDashboard = () => {
     {
       id: '2',
       name: 'Total Meetings',
-      count: '180',
+      count: meeting?.data?.data?.total_meetings,
       icon: (
         <AppIcon
           MaterialCommunityIconsName={'folder-account'}
@@ -76,12 +88,8 @@ const AdminDashboard = () => {
       source: IMAGES.USER,
     },
   ];
-  const { navigate } = useNavigation<PrivateScreenProps>();
-  const [commission, setCommission] = useState('');
-  const { userData } = useAppContext();
-  const handleCommissionChange = (value: any) => {
-    setCommission(value);
-  };
+
+
   return (
     <PrivateContainer
       icons={[
@@ -176,6 +184,87 @@ const AdminDashboard = () => {
                   <ButtonText color="$white">Delete</ButtonText>
                 </Button>
               </HStack>
+              <FormControl>
+                <VStack space="xs">
+                  <Text fontFamily={'Montserrat-Bold'} fontSize={13}>
+                    Add Extra Amount
+                  </Text>
+                  <Input
+                    my={'$2'}
+                  >
+                    <InputField
+                      type="text"
+                      value={commission}
+                      onChangeText={handleCommissionChange}
+
+                    />
+                    <InputSlot pr="$3">
+                      <AppIcon
+                        MaterialIconsName="currency-rupee"
+                        size={25}
+                        color="black"
+                      />
+                    </InputSlot>
+                  </Input>
+                  <Input>
+                    <InputField
+                      type="text"
+                      value={commission}
+                      onChangeText={handleCommissionChange}
+                    />
+                    <InputSlot pr="$3">
+                      <AppIcon
+                        MaterialIconsName="currency-rupee"
+                        size={25}
+                        color="black"
+                      />
+                    </InputSlot>
+                  </Input>
+                  <Input
+                    my={'$2'}
+
+                  >
+                    <InputField
+                      type="text"
+                      value={commission}
+                      onChangeText={handleCommissionChange}
+                    />
+                    <InputSlot pr="$3">
+                      <AppIcon
+                        MaterialIconsName="currency-rupee"
+                        size={25}
+                        color="black"
+                      />
+                    </InputSlot>
+                  </Input>
+                  <Input
+                    mb={'$2'}
+                  >
+                    <InputField
+                      type="text"
+                      value={commission}
+                      onChangeText={handleCommissionChange}
+                    />
+                    <InputSlot pr="$3">
+                      <AppIcon
+                        MaterialIconsName="currency-rupee"
+                        size={25}
+                        color="black"
+                      />
+                    </InputSlot>
+                  </Input>
+                  <HStack justifyContent={'flex-end'} gap={'$2'}>
+                    <Button
+                      onPress={() => {
+                        // setShowModal(false);
+                      }}>
+                      <ButtonText color="$white">Add</ButtonText>
+                    </Button>
+
+                  </HStack>
+
+                </VStack>
+              </FormControl>
               <Image
                 source={IMAGES.COMMISSION}
                 style={{
@@ -187,6 +276,7 @@ const AdminDashboard = () => {
               />
             </VStack>
           </FormControl>
+
         </Box>
       </ScrollView>
     </PrivateContainer>
