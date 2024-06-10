@@ -1,5 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {
+  ActionsheetBackdrop,
+  ActionsheetContent,
+  ActionsheetDragIndicatorWrapper,
   Avatar,
   Box,
   CloseIcon,
@@ -33,6 +36,9 @@ import moment from 'moment';
 import {useAppContext} from '~/Contexts';
 import LinearGradient from 'react-native-linear-gradient';
 import RenderHTML from 'react-native-render-html';
+import {Actionsheet} from '@gluestack-ui/themed';
+import {ActionsheetDragIndicator} from '@gluestack-ui/themed';
+import {COLORS} from '~/Styles';
 
 type Props = NativeStackScreenProps<PrivateRoutesTypes, 'ChatDetails'>;
 const ChatDetails = ({route: {params}}: Props) => {
@@ -145,6 +151,7 @@ const ChatDetails = ({route: {params}}: Props) => {
         console.log(error);
       });
   };
+
   return (
     <PrivateContainer
       hasBackIcon={true}
@@ -178,8 +185,8 @@ const ChatDetails = ({route: {params}}: Props) => {
         style={styles.linearGradient}>
         <Box flex={1} mt={'$3'}>
           <FlatList
-            onRefresh={() => mutate()}
-            refreshing={isValidating}
+            // onRefresh={() => mutate()}
+            // refreshing={isValidating}
             data={data?.data?.data}
             renderItem={({item}: any) => (
               <Box my={'$2'}>
@@ -368,7 +375,7 @@ const ChatDetails = ({route: {params}}: Props) => {
                   />
                 </Input>
               </VStack>
-              <VStack gap={'$0.5'}>
+              {/* <VStack gap={'$0.5'}>
                 <Text fontFamily="Montserrat-Medium">Latitude</Text>
                 <Input borderRadius={'$lg'}>
                   <InputField
@@ -389,7 +396,7 @@ const ChatDetails = ({route: {params}}: Props) => {
                     onChangeText={txt => setLongitude(txt)}
                   />
                 </Input>
-              </VStack>
+              </VStack> */}
               <Button
                 borderRadius={5}
                 isLoading={isLoading}
@@ -409,7 +416,7 @@ const ChatDetails = ({route: {params}}: Props) => {
       </Modal>
       {/* Send money */}
 
-      <Modal
+      {/* <Modal
         isOpen={showPaymentModal}
         onClose={() => {
           setShowPaymentModal(false);
@@ -482,7 +489,105 @@ const ChatDetails = ({route: {params}}: Props) => {
             </VStack>
           </ModalBody>
         </ModalContent>
-      </Modal>
+      </Modal> */}
+      <Actionsheet
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}>
+        <ActionsheetBackdrop />
+        <ActionsheetContent>
+          {/* <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper> */}
+          <Box w={'$full'}>
+            <Box
+              py={'$3'}
+              px={'$3'}
+              borderBottomWidth={1}
+              borderStyle={'dashed'}>
+              <Text
+                fontSize={15}
+                fontFamily="Montserrat-SemiBold"
+                color={'$black'}>
+                Meeting Details
+              </Text>
+            </Box>
+            <Box px={'$3'} py={'$3'}>
+              <VStack>
+                <Text
+                  fontFamily="Montserrat-SemiBold"
+                  fontSize={15}
+                  color="$black">
+                  Meeting Address :-
+                </Text>
+                <Box mt={'$2'}>
+                  <Text fontFamily="Montserrat-Medium" fontSize={14}>
+                    {'Dharamsala , Bangalore , karanatak , 321056'}
+                  </Text>
+                </Box>
+              </VStack>
+              <VStack mt={'$5'} gap={'$2'}>
+                <Text
+                  fontFamily="Montserrat-SemiBold"
+                  fontSize={15}
+                  color="$black">
+                  Meeting Date & Timing :-
+                </Text>
+                <Box>
+                  <Text fontFamily="Montserrat-Medium" fontSize={15}>
+                    {'15 Feb 2022 , 10:00 AM'}
+                  </Text>
+                </Box>
+              </VStack>
+              <VStack mt={'$5'} gap={'$2'}>
+                <Text
+                  fontFamily="Montserrat-SemiBold"
+                  fontSize={15}
+                  color="$black">
+                  Meeting Price :-
+                </Text>
+                <Box>
+                  <Text
+                    fontFamily="Montserrat-SemiBold"
+                    color={COLORS.secondary}
+                    fontSize={15}>
+                    {'RS 1200'}
+                  </Text>
+                </Box>
+              </VStack>
+              <VStack mt={'$5'} gap={'$2'}>
+                <Text
+                  fontFamily="Montserrat-SemiBold"
+                  fontSize={15}
+                  color="$black">
+                  Add Extra Features :-
+                </Text>
+                <Box>
+                  <Text
+                    fontFamily="Montserrat-Bold"
+                    color={COLORS.secondary}
+                    fontSize={15}>
+                    {'RS 1200'}
+                  </Text>
+                </Box>
+              </VStack>
+              <Box mt={'$10'}>
+                <Button
+                  borderRadius={5}
+                  py={'$2'}
+                  onPress={() => makePayment()}
+                  btnWidth={'100%'}>
+                  <Text
+                    color="$white"
+                    fontFamily="Montserrat-SemiBold"
+                    fontSize={13}>
+                    Make Payment
+                  </Text>
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        </ActionsheetContent>
+      </Actionsheet>
 
       <DateTimePicker
         isVisible={isDatePickerVisible}

@@ -23,7 +23,6 @@ const Messages = () => {
   const {data} = useSwrApi(
     `chats/read-chat-heads?is_accepted=true&is_blocked=false`,
   );
-  console.log(data?.data?.data);
   return (
     <PrivateContainer
       icons={[
@@ -65,25 +64,6 @@ const Messages = () => {
               }>
               <HStack gap={'$3'} alignItems={'center'}>
                 <Pressable>
-                  {/* <Avatar>
-                    <AvatarFallbackText>
-                      {item?.is_received
-                        ? item?.sender_id?.nick_name
-                        : item?.receiver_id?.nick_name}
-                    </AvatarFallbackText>
-                    {(item?.sender_id?.avatar || item?.receiver_id?.avatar) && (
-                      <AvatarImage
-                        source={{
-                          uri: item?.is_received
-                            ? item?.sender_id?.avatar
-                            : item?.receiver_id?.avatar,
-                        }}
-                        alt="img"
-                        h={'$12'}
-                        w={'$12'}
-                      />
-                    )}
-                  </Avatar> */}
                   <Image
                     source={{
                       uri: item?.is_received

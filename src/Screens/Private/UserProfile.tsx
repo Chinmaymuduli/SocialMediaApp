@@ -1,4 +1,4 @@
-import {Divider, TextareaInput} from '@gluestack-ui/themed';
+import {Divider, Spinner, TextareaInput} from '@gluestack-ui/themed';
 import {
   CloseIcon,
   Modal,
@@ -45,7 +45,11 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
   const {data, mutate: connectMutate} = useSwrApi(
     `connections/check-is-connected/${params?.user_id}`,
   );
-  const {data: userData, mutate} = useSwrApi(`users/read/${params?.user_id}`);
+  const {
+    data: userData,
+    isValidating,
+    mutate,
+  } = useSwrApi(`users/read/${params?.user_id}`);
   const handelConnectRequest = async () => {
     try {
       const res = await mutation(`connections/send-request`, {
@@ -99,6 +103,13 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     setScrollY(event.nativeEvent.contentOffset.y);
   };
+
+  if (isValidating)
+    return (
+      <Box flex={1} justifyContent="center" alignItems="center">
+        <Spinner size={'large'} />
+      </Box>
+    );
   return (
     <>
       {scrollY < 300 && (
@@ -401,8 +412,8 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                         }
                         justifyContent="center"
                         alignItems="center">
-                        {!data?.data?.data?.connection?.is_accepted &&
-                        data?.data?.data?.connection?.connection?._id ? (
+                        {data?.data?.data?.connection?.is_accepted === false &&
+                        data?.data?.data?.connection?._id ? (
                           <Text
                             color="$white"
                             fontFamily="Montserrat-Medium"
@@ -452,7 +463,14 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                     numColumns={3}
                     data={userData?.data?.data?.posts}
                     renderItem={({item}: any) => (
-                      <Pressable mr={'$0.5'} mb={'$0.5'}>
+                      <Pressable
+                        mr={'$0.5'}
+                        mb={'$0.5'}
+                        onPress={() =>
+                          navigation.navigate('ShareScreenDetails', {
+                            postId: item?._id,
+                          })
+                        }>
                         {item?.media?.[0]?.fileType === 'image' && (
                           <Box>
                             <Image
@@ -483,6 +501,20 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                         )}
                       </Pressable>
                     )}
+                    ListEmptyComponent={
+                      <Box alignItems="center" mt={'$10'}>
+                        <VStack alignItems="center" gap={10}>
+                          <Image
+                            source={IMAGES.CONNECT_BG_REMOVE}
+                            alt="img"
+                            style={{width: 100, height: 100}}
+                          />
+                          <Text fontFamily="Montserrat-SemiBold">
+                            No Post found
+                          </Text>
+                        </VStack>
+                      </Box>
+                    }
                   />
                 </Box>
               ) : (

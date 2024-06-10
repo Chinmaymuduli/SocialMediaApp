@@ -42,6 +42,7 @@ const PostCompo = ({item, mutate}: any) => {
   const [loading, setLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const {userData} = useAppContext();
+
   const {
     data: allLikeData,
     isValidating: likeValidating,
