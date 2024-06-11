@@ -6,108 +6,66 @@ import {
   VStack,
   Text,
   Box,
+  Spinner,
 } from '@gluestack-ui/themed';
 import {COLORS} from '~/Styles';
 import AppIcon from '~/Components/core/AppIcon';
 import {PrivateContainer} from '~/Components/container';
-import {useSwrApi} from '~/Hooks';
+import {useMutation, useSwrApi} from '~/Hooks';
 import {useAppContext} from '~/Contexts';
+import {Image} from '@gluestack-ui/themed';
+import {IMAGES} from '~/Assets';
 
 const Notifications = () => {
   const [notificationTitle, setNotificationTitle] = useState('');
   const [notificationDesc, setNotificationDesc] = useState('');
   const {userData} = useAppContext();
-  const {data, isValidating} = useSwrApi(`notifications`);
-  // console.log(data?.data?.data);
+  const {data, isValidating, mutate} = useSwrApi(
+    `notifications?user_id=${userData?._id}`,
+  );
 
-  const NOTIFICATION_DATA: {
-    id: string;
-    title: string;
-    description: string;
-    type: string;
-    isReceived: boolean;
-  }[] = [
-    {
-      id: '1',
-      title: 'Tax Deadline Approaching',
-      description:
-        'The deadline for tax filing is approaching. Ensure timely submission.',
-      type: 'tax',
-      isReceived: true,
-    },
-    {
-      id: '2',
-      title: 'Audit Report Ready',
-      description:
-        'Your audit report for this quarter is ready for review and download.',
-      type: 'report',
-      isReceived: true,
-    },
-    {
-      id: '3',
-      title: 'Accounting Consultation Request',
-      description:
-        'You have received a request for an accounting consultation from a client.',
-      type: 'request',
-      isReceived: false,
-    },
-    {
-      id: '4',
-      title: 'Financial Statement Analysis',
-      description:
-        'New insights on financial statement analysis have been published.',
-      type: 'analysis',
-      isReceived: true,
-    },
-    {
-      id: '5',
-      title: 'Payment Received',
-      description:
-        'You have received a payment from a client for accounting services rendered.',
-      type: 'payment',
-      isReceived: true,
-    },
-    {
-      id: '6',
-      title: 'Tax Law Update',
-      description:
-        'Recent changes in tax laws may impact your clients. Stay informed.',
-      type: 'update',
-      isReceived: true,
-    },
-    {
-      id: '7',
-      title: 'Client Meeting Reminder',
-      description:
-        'Reminder: You have a scheduled client meeting tomorrow at 10 AM.',
-      type: 'reminder',
-      isReceived: false,
-    },
-    {
-      id: '8',
-      title: 'Task Complete',
-      description:
-        'The financial reconciliation task has been successfully completed.',
-      type: 'task',
-      isReceived: true,
-    },
-    {
-      id: '9',
-      title: 'System Error Notification',
-      description:
-        'An error has occurred in the accounting software. Please address it immediately.',
-      type: 'error',
-      isReceived: false,
-    },
-    {
-      id: '10',
-      title: 'Regulatory Compliance Alert',
-      description:
-        'New regulatory requirements have been introduced. Ensure compliance for clients.',
-      type: 'alert',
-      isReceived: true,
-    },
-  ];
+  const {mutation, isLoading} = useMutation();
+  const queryString = data?.data?.data
+    ?.map((item: any) => `notificationIds=${item?._id}`)
+    .join('&');
+  const deleteAll = async () => {
+    try {
+      const res = await mutation(
+        `notifications?user_id=${userData?._id}&${queryString}`,
+        {
+          method: 'DELETE',
+        },
+      );
+      if (res?.results?.success === true) {
+        mutate();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const readAll = async () => {
+    try {
+      const res = await mutation(
+        `notifications/mark-as-read?user_id=${userData?._id}&${queryString}`,
+        {
+          method: 'PUT',
+        },
+      );
+      if (res?.results?.success === true) {
+        mutate();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  if (isValidating)
+    return (
+      <Box flex={1} justifyContent="center" alignItems="center">
+        <Spinner size={'large'} />
+      </Box>
+    );
 
   return (
     <PrivateContainer title={'Notifications'} hasBackIcon={true}>
@@ -118,7 +76,12 @@ const Notifications = () => {
           my={'$3'}
           alignItems={'center'}
           justifyContent={'space-between'}>
-          <Pressable bg={'white'} softShadow={'1'} rounded={'$lg'} p={'$2'}>
+          <Pressable
+            bg={'white'}
+            softShadow={'1'}
+            rounded={'$lg'}
+            p={'$2'}
+            onPress={() => readAll()}>
             <HStack gap={'$2'} alignItems={'center'}>
               <AppIcon
                 MaterialCommunityIconsName={'playlist-check'}
@@ -130,7 +93,12 @@ const Notifications = () => {
               </Text>
             </HStack>
           </Pressable>
-          <Pressable bg={'white'} softShadow={'1'} rounded={'$lg'} p={'$2'}>
+          <Pressable
+            bg={'white'}
+            softShadow={'1'}
+            rounded={'$lg'}
+            p={'$2'}
+            onPress={() => deleteAll()}>
             <HStack gap={'$2'} alignItems={'center'}>
               <AppIcon
                 MaterialCommunityIconsName={'delete'}
@@ -146,7 +114,7 @@ const Notifications = () => {
 
         {/* content  */}
         <FlatList
-          data={NOTIFICATION_DATA}
+          data={data?.data?.data}
           showsVerticalScrollIndicator={false}
           renderItem={({item, index}: any) => (
             <Pressable>
@@ -182,6 +150,20 @@ const Notifications = () => {
               </HStack>
             </Pressable>
           )}
+          ListEmptyComponent={
+            <Box alignItems="center" mt={'$10'}>
+              <VStack alignItems="center" gap={10}>
+                <Image
+                  source={IMAGES.CONNECT_BG_REMOVE}
+                  alt="img"
+                  style={{width: 200, height: 200}}
+                />
+                <Text fontFamily="Montserrat-SemiBold">
+                  No Notifications found
+                </Text>
+              </VStack>
+            </Box>
+          }
         />
 
         {/* Notification details bottomSheet  */}

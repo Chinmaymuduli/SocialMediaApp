@@ -168,11 +168,11 @@ const SettingScreen = () => {
     //   action: navigateToMyConnections,
     // },
     {icon: 'event-note', text: 'My Meetings', action: navigateToMeetings},
-    {
-      icon: 'rate-review',
-      text: 'Reviews & Ratings',
-      action: navigateToDateSaver,
-    },
+    // {
+    //   icon: 'rate-review',
+    //   text: 'Reviews & Ratings',
+    //   action: () => navigate('Reviews'),
+    // },
   ];
 
   const actionsItems = [
