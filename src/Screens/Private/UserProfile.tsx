@@ -22,6 +22,7 @@ import {
   Text,
   VStack,
 } from '@gluestack-ui/themed';
+import {useFocusEffect} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useState} from 'react';
 import {NativeScrollEvent} from 'react-native';
@@ -103,6 +104,20 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     setScrollY(event.nativeEvent.contentOffset.y);
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      StatusBar.setBarStyle('light-content');
+      StatusBar.setTranslucent(true);
+      StatusBar.setBackgroundColor('rgba(0, 0, 0, 0.5)');
+
+      return () => {
+        StatusBar.setBarStyle('default');
+        StatusBar.setTranslucent(false);
+        StatusBar.setBackgroundColor('#000');
+      };
+    }, []),
+  );
 
   if (isValidating)
     return (
@@ -388,6 +403,11 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                       </Pressable>
                       <Divider orientation="vertical" />
                       <Pressable
+                        onPress={() =>
+                          navigation.navigate('Reviews', {
+                            user_id: params?.user_id,
+                          })
+                        }
                         w={'$1/3'}
                         justifyContent="center"
                         alignItems="center">
@@ -431,7 +451,11 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                       </Pressable>
                       <Divider orientation="vertical" />
                       <Pressable
-                        onPress={() => navigation.navigate('Reviews')}
+                        onPress={() =>
+                          navigation.navigate('Reviews', {
+                            user_id: params?.user_id,
+                          })
+                        }
                         w={'$2/4'}
                         justifyContent="center"
                         alignItems="center">
@@ -598,7 +622,6 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
           <Box position="absolute" top={0} zIndex={10} w={'$full'}>
             <Box bg={'$coolGray200'} w={'$full'}>
               <Pressable
-                // bg={scrollY > 100 ? 'white' : '$coolGray400'}
                 ml={'$2'}
                 w={'$12'}
                 py={'$2'}
