@@ -10,12 +10,59 @@ import {PrivateScreenProps} from '~/Routes/Private/types';
 import useBasicFunction from '~/Hooks/useBasicFunctions';
 import {useAppContext} from '~/Contexts';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {useMutation} from '~/Hooks';
+import {Alert} from 'react-native';
+import {Linking} from 'react-native';
 
 const SettingScreen = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
   const {handleLogout, handleClearAccessToken} = useBasicFunction();
   const bgColor = (i: number) => colorsArray[i % colorsArray.length];
   const {userData} = useAppContext();
+  const {mutation} = useMutation();
+  const logout = () => {
+    GoogleSignin.signOut();
+    handleLogout();
+    ``;
+    handleClearAccessToken();
+  };
+  const deleteAccount = async () => {
+    try {
+      Alert.alert(
+        'Delete Account',
+        'Are you sure you want to delete account?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'OK',
+            onPress: async () => {
+              try {
+                const res = await mutation(`users/self/update`, {
+                  method: 'PUT',
+                  body: {
+                    is_deleted: true,
+                  },
+                });
+                console.log(res?.results?.error);
+                if (res?.results?.success === true) {
+                  logout();
+                } else {
+                  Alert.alert('Error', res?.results?.error?.message);
+                }
+              } catch (error) {
+                console.log(error);
+              }
+            },
+          },
+        ],
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const navigateToEditProfile = () => {
     navigate('CompleteProfile');
   };
@@ -34,7 +81,7 @@ const SettingScreen = () => {
   };
 
   const navigateToSubscription = () => {
-    console.log('Subscription function');
+    Linking.openURL('https://www.feveal.in/privacy-policy');
   };
 
   const navigateToSupport = () => {
@@ -46,7 +93,7 @@ const SettingScreen = () => {
   };
 
   const navigateToTermsAndPolicies = () => {
-    console.log('Terms and Policies function');
+    Linking.openURL('https://www.feveal.in/privacy-policy');
   };
 
   const navigateToFreeSpace = () => {
@@ -107,12 +154,6 @@ const SettingScreen = () => {
   };
   const Acquisition_Metrics = () => {
     navigate('AcquisitionMetrics');
-  };
-
-  const logout = () => {
-    GoogleSignin.signOut();
-    handleLogout();
-    handleClearAccessToken();
   };
 
   const accountItems = [
@@ -179,7 +220,7 @@ const SettingScreen = () => {
     {
       icon: 'delete-outline',
       text: 'Delete Account',
-      action: navigateToReportProblem,
+      action: deleteAccount,
     },
     {icon: 'logout', text: 'Log out', action: logout},
   ];

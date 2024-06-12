@@ -1,8 +1,11 @@
 import {useCallback, useEffect} from 'react';
 import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import useMutation from './useMutation';
+import {Platform} from 'react-native';
 
 const useFCMToken = () => {
+  const {mutation} = useMutation();
   const requestUserPermission = useCallback(async () => {
     const authStatus = await messaging().requestPermission();
     const enabled =
@@ -19,13 +22,15 @@ const useFCMToken = () => {
       const fcmToken = await messaging().getToken();
       if (!fcmToken) return console.log("user doesn't have a device token yet");
       console.log('FCM Token:', fcmToken);
-      const data: any = {
-        token,
-      };
-      //   if (Platform.OS === 'android') data.androidToken = fcmToken;
-      //   if (Platform.OS === 'ios') data.iosToken = fcmToken;
-      //   await updateToken(data);
+      const data: any = {};
+      if (Platform.OS === 'android') data.android = fcmToken;
+      if (Platform.OS === 'ios') data.ios = fcmToken;
       //update token to api
+      const res = await mutation(`users/self/update`, {
+        method: 'PUT',
+        body: {fcm_tokens: data},
+      });
+      // console.log({res});
     } catch (error) {
       console.log(error);
     }

@@ -187,10 +187,11 @@ const ChatDetails = ({route: {params}}: Props) => {
           <FlatList
             // onRefresh={() => mutate()}
             // refreshing={isValidating}
+            showsVerticalScrollIndicator={false}
             data={data?.data?.data}
             renderItem={({item}: any) => (
               <Box my={'$2'}>
-                <Box alignItems="center">
+                <Box alignItems="center" my={'$2'}>
                   <Text fontSize={13} fontFamily="Montserrat-SemiBold">
                     {item?.date === new Date().toDateString()
                       ? 'Today'
@@ -201,15 +202,45 @@ const ChatDetails = ({route: {params}}: Props) => {
                   <Box key={key} my={'$1'}>
                     {/* {console.log({msg})} */}
                     {msg?.is_received && msg?.message_type === 'text' ? (
-                      <Text ml={'$2'} fontFamily="Montserrat-Medium">
-                        {msg?.text}
-                      </Text>
+                      <Box
+                        alignSelf="flex-start"
+                        bg={'$white'}
+                        px={'$2'}
+                        py={'$1'}
+                        borderRadius={'$lg'}>
+                        <Text fontFamily="Montserrat-Medium" fontSize={14}>
+                          {msg?.text}
+                        </Text>
+                        <Box alignSelf="flex-end" pl={'$5'} mt={'$0.5'}>
+                          <Text
+                            fontFamily="Montserrat-Medium"
+                            fontSize={11}
+                            color={'$coolGray400'}>
+                            {moment(item?.created_at).format('hh:mm A')}
+                          </Text>
+                        </Box>
+                      </Box>
                     ) : (
                       msg?.message_type === 'text' && (
                         <Box alignSelf="flex-end" pr={'$4'}>
-                          <Text fontFamily="Montserrat-Medium">
-                            {msg?.text}
-                          </Text>
+                          <Box
+                            alignSelf="flex-start"
+                            bg={'$white'}
+                            px={'$2'}
+                            py={'$1'}
+                            borderRadius={'$lg'}>
+                            <Text fontFamily="Montserrat-Medium">
+                              {msg?.text}
+                            </Text>
+                            <Box alignSelf="flex-end" pl={'$5'} mt={'$0.5'}>
+                              <Text
+                                fontFamily="Montserrat-Medium"
+                                fontSize={11}
+                                color={'$coolGray400'}>
+                                {moment(item?.created_at).format('hh:mm A')}
+                              </Text>
+                            </Box>
+                          </Box>
                         </Box>
                       )
                     )}

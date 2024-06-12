@@ -126,31 +126,31 @@ const PostCompo = ({item, mutate}: any) => {
     {
       id: '1',
       img: IMAGES.HEART_EMOJI,
-      value: 52,
+      value: item?.like_counts?.love || 0,
       name: 'love',
     },
     {
       id: '2',
       img: IMAGES.MONEY_EMOJI,
-      value: 12,
+      value: item?.like_counts?.funny || 0,
       name: 'funny',
     },
     {
       id: '3',
       img: IMAGES.SAD_EMOJI,
-      value: 32,
+      value: item?.like_counts?.sad || 0,
       name: 'sad',
     },
     {
       id: '4',
       img: IMAGES.YELLOW_EMOJI,
-      value: 42,
+      value: item?.like_counts?.liked || 0,
       name: 'liked',
     },
     {
       id: '5',
       img: IMAGES.THUMB_EMOJI,
-      value: 88,
+      value: item?.like_counts?.not_liked || 0,
       name: 'not_liked',
     },
   ];
@@ -202,6 +202,8 @@ const PostCompo = ({item, mutate}: any) => {
     (item: any, index: any) => item._id || index.toString(),
     [],
   );
+
+  // console.log({item});
 
   return (
     <Box

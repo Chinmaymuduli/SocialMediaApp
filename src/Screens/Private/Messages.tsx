@@ -10,6 +10,7 @@ import {
   HStack,
   Image,
   Pressable,
+  Spinner,
   Text,
 } from '@gluestack-ui/themed';
 import {PrivateScreenProps} from '~/Routes/Private/types';
@@ -17,12 +18,19 @@ import {useNavigation} from '@react-navigation/native';
 import {VStack} from '@gluestack-ui/themed';
 import {useSwrApi} from '~/Hooks';
 import moment from 'moment';
+import {COLORS} from '~/Styles';
 
 const Messages = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
-  const {data} = useSwrApi(
+  const {data, isValidating} = useSwrApi(
     `chats/read-chat-heads?is_accepted=true&is_blocked=false`,
   );
+  if (isValidating)
+    return (
+      <Box flex={1} justifyContent="center" alignItems="center">
+        <Spinner size={'large'} color={COLORS.secondary} />
+      </Box>
+    );
   return (
     <PrivateContainer
       icons={[

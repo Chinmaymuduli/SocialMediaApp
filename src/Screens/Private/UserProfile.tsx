@@ -88,7 +88,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                 is_accepted: false,
               },
             });
-            console.log(res);
+            console.log(res?.results?.error);
             if (res?.results?.success === true) {
               mutate();
             } else {
@@ -500,6 +500,34 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                             <Image
                               source={{
                                 uri: item?.media?.[0]?.url,
+                              }}
+                              alt="image"
+                              style={{height: 110, width: 110}}
+                            />
+                            {item?.media?.length > 1 && (
+                              <Box
+                                style={{
+                                  position: 'absolute',
+                                  top: 5,
+                                  right: 5,
+                                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                                  borderRadius: 20,
+                                  padding: 5,
+                                }}>
+                                <AppIcon
+                                  MaterialCommunityIconsName="checkbox-multiple-blank"
+                                  color={'white'}
+                                  size={18}
+                                />
+                              </Box>
+                            )}
+                          </Box>
+                        )}
+                        {item?.media?.[0]?.fileType === 'video' && (
+                          <Box>
+                            <Image
+                              source={{
+                                uri: 'https://imgs.search.brave.com/ZQKFWt71y6kyxaexg-bVvHR_3oR1RaCfjeDmspvxgJk/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wMzQv/OTU0LzMwMC9zbWFs/bC9wbGF5LXZpZGVv/LWljb24tcG5nLnBu/Zw',
                               }}
                               alt="image"
                               style={{height: 110, width: 110}}
