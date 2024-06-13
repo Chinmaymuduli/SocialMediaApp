@@ -49,6 +49,7 @@ import {COLORS} from '~/Styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import moment from 'moment';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
+import {Spinner} from '@gluestack-ui/themed';
 
 type Props = NativeStackScreenProps<PrivateRoutesTypes, 'ShareScreenDetails'>;
 const ShareScreenDetails = ({route: {params}}: Props) => {
@@ -59,7 +60,7 @@ const ShareScreenDetails = ({route: {params}}: Props) => {
   const [loading, setLoading] = useState(false);
   const {userData} = useAppContext();
 
-  const {data} = useSwrApi(`posts/read/${params?.postId}`);
+  const {data, isValidating} = useSwrApi(`posts/read/${params?.postId}`);
 
   const {mutation, isLoading} = useMutation();
   const DeletePost = async (id: string) => {
@@ -174,6 +175,13 @@ const ShareScreenDetails = ({route: {params}}: Props) => {
   };
 
   // console.log(data?.data?.data);
+
+  if (isValidating)
+    return (
+      <Box flex={1} justifyContent="center" alignItems="center">
+        <Spinner color={COLORS.secondary} size={'large'} />
+      </Box>
+    );
 
   return (
     <PrivateContainer image={IMAGES.LOGO} hasBackIcon={true}>

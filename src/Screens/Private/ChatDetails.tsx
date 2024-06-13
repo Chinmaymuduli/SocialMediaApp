@@ -25,7 +25,7 @@ import {useNavigation} from '@react-navigation/native';
 import {PrivateRoutesTypes, PrivateScreenProps} from '~/routes/private/types';
 import AppIcon from '~/Components/core/AppIcon';
 import {PrivateContainer} from '~/Components/container';
-import {StyleSheet, useWindowDimensions} from 'react-native';
+import {Alert, StyleSheet, useWindowDimensions} from 'react-native';
 import {useMutation, useSwrApi} from '~/Hooks';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {Modal} from '@gluestack-ui/themed';
@@ -46,10 +46,6 @@ const ChatDetails = ({route: {params}}: Props) => {
   const {socketRef} = useAppContext();
   const [showModal, setShowModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const {userData} = useAppContext();
-  const {data, mutate, isValidating} = useSwrApi(
-    `chats/read-all?connection_id=${params?.connection_id}`,
-  );
   const [message, setMessage] = useState('');
   const [amount, setAmount] = useState('');
   const [pin, setPin] = useState('');
@@ -57,12 +53,18 @@ const ChatDetails = ({route: {params}}: Props) => {
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [upiId, setUpiId] = useState('');
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
+  const [latitude, setLatitude] = useState('12.9880');
+  const [longitude, setLongitude] = useState('77.6895');
   const [selectedDate, setSelectedDate] = useState('');
-  const {mutation, isLoading} = useMutation();
+  const [selectedItems, setSelectedItems] = useState<any>([]);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const {mutation, isLoading} = useMutation();
   const {width} = useWindowDimensions();
+  const {userData} = useAppContext();
+  const {data, mutate, isValidating} = useSwrApi(
+    `chats/read-all?connection_id=${params?.connection_id}`,
+  );
+  const {data: productsData} = useSwrApi(`products`);
   useEffect(() => {
     socketRef?.current?.on('join-to-connection', params?.connection_id);
     socketRef?.current?.emit('new-user-joined', {
@@ -126,30 +128,118 @@ const ChatDetails = ({route: {params}}: Props) => {
     }
   };
 
-  const makePayment = () => {
-    paymentMethod();
+  const makePayment = async () => {
+    try {
+      const data: any = {
+        meeting_id: '666b22b45388108fe9486a47',
+        product: {
+          list: [],
+        },
+      };
+      if (selectedItems?.length > 0) {
+        data.product.list = selectedItems.map((item: any) => ({
+          title: item?.title,
+          price: item?.price,
+          product_id: item?._id,
+        }));
+      }
+      const orderResponse = await mutation(`payments/orders/create`, {
+        method: 'POST',
+        body: data,
+      });
+      console.log(orderResponse);
+      if (orderResponse?.results?.success === true) {
+        checkOutOrder(orderResponse?.results?.data?._id);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const paymentMethod = () => {
+  const checkOutOrder = async (orderId: any) => {
+    try {
+      const res = await mutation(`payments/orders/checkout`, {
+        method: 'POST',
+        body: {
+          order_id: orderId,
+          payment_type: 'send',
+        },
+      });
+      if (res?.results?.success === true) {
+        paymentMethod(res?.results?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const paymentMethod = (paymentData: any) => {
     const options = {
       description: 'Feveal',
       currency: 'INR',
-      key: 'rzp_test_hs7GKWV7szSVEA', // Your api key
-      amount: 2450,
+      key: 'rzp_test_hs7GKWV7szSVEA',
+      amount: paymentData?.total_fare * 100,
       name: userData?.name,
+      order_id: paymentData?.metadata?.razorpay_order_id,
       prefill: {
         email: userData?.email || 'demo@gmail.com',
-        contact: userData?.phoneNumber || 8956325102,
+        contact: userData?.phoneNumber,
         name: userData?.name,
       },
     };
     RazorpayCheckout.open(options)
       .then(async (data: any) => {
-        console.log({data});
+        const verifyOrder = await mutation(`payments/orders/verify`, {
+          method: 'PUT',
+          body: {
+            payment_order_id: paymentData?.order_id,
+            razorpay_order_id: paymentData?.metadata?.razorpay_order_id,
+            razorpay_payment_id: data.razorpay_payment_id,
+            razorpay_signature: data.razorpay_signature,
+          },
+        });
+        if (verifyOrder?.results?.success === true) {
+          mutate();
+          Alert.alert('Success', 'Payment Successful');
+        }
       })
       .catch((error: any) => {
         console.log(error);
       });
+  };
+
+  // const paymentMethod = () => {
+  //   const options = {
+  //     description: 'Feveal',
+  //     currency: 'INR',
+  //     key: 'rzp_test_hs7GKWV7szSVEA', // Your api key
+  //     amount: 2450,
+  //     name: userData?.name,
+  //     prefill: {
+  //       email: userData?.email || 'demo@gmail.com',
+  //       contact: userData?.phoneNumber || 8956325102,
+  //       name: userData?.name,
+  //     },
+  //   };
+  //   RazorpayCheckout.open(options)
+  //     .then(async (data: any) => {
+  //       console.log({data});
+  //     })
+  //     .catch((error: any) => {
+  //       console.log(error);
+  //     });
+  // };
+
+  // console.log(productsData?.data?.data);
+  const addExtraItem = (extraItem: any) => {
+    let exist = selectedItems?.find((_: any) => _?._id === extraItem?._id);
+    if (exist) {
+      const updatedItems = selectedItems?.filter(
+        (item: any) => item?._id !== extraItem?._id,
+      );
+      setSelectedItems(updatedItems);
+    } else {
+      setSelectedItems((prevItems: any) => [...prevItems, extraItem]);
+    }
   };
 
   return (
@@ -519,6 +609,7 @@ const ChatDetails = ({route: {params}}: Props) => {
               </Button>
             </VStack>
           </ModalBody>
+
         </ModalContent>
       </Modal> */}
       <Actionsheet
@@ -590,15 +681,48 @@ const ChatDetails = ({route: {params}}: Props) => {
                   fontFamily="Montserrat-SemiBold"
                   fontSize={15}
                   color="$black">
-                  Add Extra Features :-
+                  Add Extra Items :-
                 </Text>
                 <Box>
-                  <Text
-                    fontFamily="Montserrat-Bold"
-                    color={COLORS.secondary}
-                    fontSize={15}>
-                    {'RS 1200'}
-                  </Text>
+                  {productsData?.data?.data?.map((item: any) => (
+                    <HStack
+                      key={item?._id}
+                      alignItems="center"
+                      justifyContent="space-between">
+                      <HStack alignItems="center" gap={'$3'}>
+                        <Text
+                          fontFamily="Montserrat-SemiBold"
+                          // color={COLORS.secondary}
+                          fontSize={15}>
+                          {item?.title}
+                        </Text>
+                        <Text
+                          fontFamily="Montserrat-Medium"
+                          // color={COLORS.secondary}
+                          fontSize={15}>
+                          {`(RS ${item?.price} /-)`}
+                        </Text>
+                      </HStack>
+                      <Pressable onPress={() => addExtraItem(item)}>
+                        {selectedItems?.find(
+                          (_: any) => _?._id === item?._id,
+                        ) ? (
+                          <Text
+                            fontFamily="Montserrat-SemiBold"
+                            fontSize={13}
+                            color={'$red400'}>
+                            Remove
+                          </Text>
+                        ) : (
+                          <Text
+                            fontFamily="Montserrat-SemiBold"
+                            color={COLORS.secondary}>
+                            Add
+                          </Text>
+                        )}
+                      </Pressable>
+                    </HStack>
+                  ))}
                 </Box>
               </VStack>
               <Box mt={'$10'}>

@@ -120,8 +120,8 @@ const Post = () => {
         });
         // console.log(res?.results?.error);
         if (res?.status === 201) {
-          setImages([]);
-          setVideoUrl([]);
+          setMultipleMedia([]);
+          // setVideoUrl([]);
           setCaption('');
           setTags([]);
           Alert.alert('Success', 'Post Successfully Done');

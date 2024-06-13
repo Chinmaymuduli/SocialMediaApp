@@ -125,6 +125,8 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
         <Spinner size={'large'} />
       </Box>
     );
+
+  // console.log(userData?.data?.data);
   return (
     <>
       {scrollY < 300 && (
