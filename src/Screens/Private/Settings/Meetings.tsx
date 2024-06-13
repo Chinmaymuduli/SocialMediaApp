@@ -550,39 +550,78 @@ const Meetings = () => {
                   </Box>
                 </Box>
 
-                <Box px={'$3'} py={'$1'} mt={'$2'}>
-                  <Pressable mr={'$1'} w={'$80'}>
-                    <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
-                      All Reviews
+                <HStack px={'$3'} justifyContent="space-between" my={'$4'}>
+                  <Pressable
+                    borderWidth={1}
+                    w={'40%'}
+                    alignItems="center"
+                    justifyContent="center"
+                    py={'$2'}
+                    borderRadius={8}
+                    borderColor={COLORS.secondary}>
+                    <Text
+                      fontSize={12}
+                      fontFamily="Montserrat-Bold"
+                      color={COLORS.secondary}>
+                      Report
                     </Text>
-                    <Box mt={'$3'}>
-                      {reviewData?.data?.data?.map((rev: any) => (
-                        <VStack
-                          px={'$1'}
-                          py={'$1'}
-                          mb={'$2'}
-                          key={rev?._id}
-                          borderWidth={1}
-                          borderColor="$coolGray200">
-                          <HStack>
-                            <Text fontFamily="Montserrat-Medium" fontSize={12}>
-                              Ratings :{' '}
-                            </Text>
-                            <Text fontFamily="Montserrat-Medium" fontSize={12}>
-                              {rev?.rating}
-                            </Text>
-                          </HStack>
-                          <Text
-                            fontSize={12}
-                            fontFamily="Montserrat-Medium"
-                            mt={'$1'}>
-                            {rev?.comment}
-                          </Text>
-                        </VStack>
-                      ))}
-                    </Box>
                   </Pressable>
-                </Box>
+                  <Pressable
+                    py={'$2'}
+                    borderRadius={8}
+                    borderColor={'$red400'}
+                    borderWidth={1}
+                    w={'40%'}
+                    alignItems="center"
+                    justifyContent="center">
+                    <Text
+                      fontSize={12}
+                      fontFamily="Montserrat-Bold"
+                      color={'$red400'}>
+                      Report & Block
+                    </Text>
+                  </Pressable>
+                </HStack>
+
+                {reviewData?.data?.data?.length > 0 && (
+                  <Box px={'$3'} py={'$1'} mt={'$2'}>
+                    <Pressable mr={'$1'} w={'$80'}>
+                      <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                        All Reviews
+                      </Text>
+                      <Box mt={'$3'}>
+                        {reviewData?.data?.data?.map((rev: any) => (
+                          <VStack
+                            px={'$1'}
+                            py={'$1'}
+                            mb={'$2'}
+                            key={rev?._id}
+                            borderWidth={1}
+                            borderColor="$coolGray200">
+                            <HStack>
+                              <Text
+                                fontFamily="Montserrat-Medium"
+                                fontSize={12}>
+                                Ratings :{' '}
+                              </Text>
+                              <Text
+                                fontFamily="Montserrat-Medium"
+                                fontSize={12}>
+                                {rev?.rating}
+                              </Text>
+                            </HStack>
+                            <Text
+                              fontSize={12}
+                              fontFamily="Montserrat-Medium"
+                              mt={'$1'}>
+                              {rev?.comment}
+                            </Text>
+                          </VStack>
+                        ))}
+                      </Box>
+                    </Pressable>
+                  </Box>
+                )}
               </Pressable>
             </ScrollView>
           </Box>
