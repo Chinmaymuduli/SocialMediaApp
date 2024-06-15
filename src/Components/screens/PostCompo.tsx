@@ -192,10 +192,9 @@ const PostCompo = ({item, mutate}: any) => {
           <Image source={{uri: item?.url}} style={styles.media} />
         </Box>
       );
+    } else if (item?.fileType === 'video') {
+      return <VideoCompo url={item?.url} />;
     }
-    // else if (item?.fileType === 'video') {
-    //   return <VideoCompo url={item?.url} />;
-    // }
     return null;
   }, []);
   const keyExtractor = useCallback(
