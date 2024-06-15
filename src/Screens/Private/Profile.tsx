@@ -64,6 +64,8 @@ const Profile = () => {
   useEffect(() => {
     setImages(data?.data?.data?.avatars);
   });
+
+  console.log(data?.data?.data);
   return (
     <PrivateContainer
       icons={[
@@ -309,8 +311,8 @@ const Profile = () => {
                     <Text>
                       {
                         data?.data?.data?.interests?.find(
-                          (i: any) => i?.type === 'personal',
-                        )?.label
+                          (i: any) => i?.type === 'professional',
+                        )?.category
                       }
                     </Text>
                   </VStack>

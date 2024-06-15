@@ -57,7 +57,7 @@ const Feeds = () => {
         },
       ]}
       image={IMAGES.LOGO}>
-      <ScrollView contentContainerStyle={{paddingBottom: 50}}>
+      <ScrollView contentContainerStyle={{paddingBottom: 50, flex: 1}}>
         <Box bg={COLORS.gradientLow} flex={1}>
           <PostFeed />
         </Box>

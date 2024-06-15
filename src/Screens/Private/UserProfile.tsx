@@ -41,7 +41,6 @@ type Props = NativeStackScreenProps<PrivateRoutesTypes, 'UserProfile'>;
 const UserProfile = ({route: {params}, navigation}: Props) => {
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState('');
-  const [allImage, setAllImage] = useState<any>([]);
   const [scrollY, setScrollY] = useState(0);
   const {mutation, isLoading} = useMutation();
   const {data, mutate: connectMutate} = useSwrApi(
@@ -120,12 +119,6 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
     }, []),
   );
 
-  useEffect(() => {
-    const allAvatar = userData?.data?.data?.avatars?.map((i: any) => i?.avatar);
-    setAllImage([...allAvatar, userData?.data?.data?.avatar]);
-  }, [userData?.data?.data?.length]);
-  // console.log(allImage?.length);
-
   if (isValidating)
     return (
       <Box flex={1} justifyContent="center" alignItems="center">
@@ -133,7 +126,6 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
       </Box>
     );
 
-  console.log(allImage?.length);
   return (
     <>
       {scrollY < 300 && (

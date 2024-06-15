@@ -66,18 +66,20 @@ const CompleteProfile = () => {
   const [imagesPicker, setImagesPicker] = useState(false);
   const [isImagePick, setIsImagePick] = useState(false);
   const [images, setImages] = useState<any>([]);
+  const [allCategory, setAllCategory] = useState<any>([]);
 
   const [showActionsheet, setShowActionsheet] = React.useState(false);
   const [showActionsheet2, setShowActionsheet2] = React.useState(false);
   const [citiesModal, setCitiesModal] = React.useState(false);
 
   const [allCities, setAllCities] = useState<any>([]);
+  const [multipleSubCategory, setMultipleSubCategory] = useState<any>([]);
   const [selectCity, setSelectCity] = useState<any>();
 
   const {mutation, isLoading} = useMutation();
-  const {data} = useSwrApi(`interests?type=personal`);
+  const {data} = useSwrApi(`interests`);
   const {data: professionalData} = useSwrApi(
-    `interests?type=professional&search=${expertise}`,
+    `interests?search=${expertise?.category}`,
   );
 
   const {getUser} = useBasicFunctions();
@@ -98,11 +100,12 @@ const CompleteProfile = () => {
     });
 
     setExpertise(
-      userData?.interests?.find((item: any) => item?.type === 'personal'),
-    );
-    setExpertiseFor(
       userData?.interests?.find((item: any) => item?.type === 'professional'),
     );
+    // setExpertiseFor(
+    //   userData?.interests?.find((item: any) => item?.type === 'professional'),
+    // );
+    setMultipleSubCategory(userData?.interests);
   }, [userData]);
 
   const handelUpdateProfile = async () => {
@@ -121,9 +124,12 @@ const CompleteProfile = () => {
       formData.append('nick_name', nickName);
       formData.append('gender', gender);
       formData.append('dob', moment(selectedDate).toISOString());
-      interests.forEach(interest => {
-        formData.append('interests', interest);
+      multipleSubCategory.forEach((interest: any) => {
+        formData.append('interests', interest?._id);
       });
+      // interests.forEach(interest => {
+      //   formData.append('interests', interest);
+      // });
       formData.append('location_details', locationDetailsString);
       profileImage?.path &&
         formData.append('avatar', {
@@ -154,7 +160,7 @@ const CompleteProfile = () => {
     }
   };
 
-  // console.log({expertise, expertiseFor});
+  console.log({expertise});
   const handleStateSelect = (state: any) => {
     setShowStatePicker(false);
     setState(state);
@@ -164,7 +170,6 @@ const CompleteProfile = () => {
     setDatePickerVisibility(false);
   };
 
-  // console.log({allCities});
   useEffect(() => {
     const data = State?.find((item: any) => item?.title === allState?.title);
     setAllCities(data?.Cities);
@@ -175,13 +180,89 @@ const CompleteProfile = () => {
     setExpertise(data);
   };
   const handleSelect2 = (data: any) => {
-    setShowActionsheet2(false);
-    setExpertiseFor(data);
+    let exist = multipleSubCategory?.find((i: any) => i?.label === data?.label);
+    if (exist) {
+      const removeLabel = multipleSubCategory.filter(
+        (i: any) => i?.label !== data?.label,
+      );
+      setMultipleSubCategory(removeLabel);
+    } else {
+      setMultipleSubCategory([...multipleSubCategory, data]);
+    }
+    // setShowActionsheet2(false);
+    // setExpertiseFor(data);
   };
+
+  console.log({multipleSubCategory});
 
   const handelVerifyPhone = async () => {
     try {
       setIsPhoneVerify(!isPhoneVerify);
+      const res = await mutation(`users/generate-otp`, {
+        method: 'POST',
+        body: {
+          phone: phone,
+          country_details: {
+            name: 'IN',
+            code: '+91',
+          },
+        },
+      });
+      console.log(res?.results);
+      // 483600
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const verifyPhoneNumber = async () => {
+    try {
+      const res = await mutation(`users/verify-otp`, {
+        method: 'PUT',
+        body: {
+          phone,
+          country_details: {
+            name: 'IN',
+            code: '+91',
+          },
+          otp: otp,
+        },
+      });
+      console.log(res?.results);
+      if (res?.results?.success === true) {
+        Alert.alert('Success', 'Phone Number verified successfully');
+        getUser();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handelEmailVerify = async () => {
+    setIsEmailVerify(true);
+    const res = await mutation(`users/generate-otp`, {
+      method: 'POST',
+      body: {
+        email: email,
+      },
+    });
+  };
+
+  const emailVerification = async () => {
+    try {
+      const res = await mutation(`users/verify-otp`, {
+        method: 'PUT',
+        body: {
+          email,
+          password: 'feveal',
+          otp: otp,
+        },
+      });
+      console.log(res?.results);
+      if (res?.results?.status === 200) {
+        Alert.alert('Success', 'Phone Number verified successfully');
+        getUser();
+      }
     } catch (error) {
       console.log(error);
     }
@@ -220,6 +301,24 @@ const CompleteProfile = () => {
     setSelectCity(city);
     setCitiesModal(false);
   };
+
+  useEffect(() => {
+    const removeDuplicatesByCategory = (data: any) => {
+      const categoryMap = new Map();
+
+      data.forEach((item: any) => {
+        if (!categoryMap.has(item.category)) {
+          categoryMap.set(item.category, item);
+        }
+      });
+
+      return Array.from(categoryMap.values());
+    };
+
+    const filteredData = removeDuplicatesByCategory(data?.data?.data);
+
+    setAllCategory(filteredData);
+  }, [data?.data?.data]);
 
   return (
     <SafeAreaView>
@@ -555,7 +654,7 @@ const CompleteProfile = () => {
               )}
             </VStack>
 
-            {!isPhoneVerify && (
+            {isPhoneVerify && (
               <VStack>
                 <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
                   Enter OTP
@@ -574,7 +673,10 @@ const CompleteProfile = () => {
                       onChangeText={text => setOtp(text)}
                     />
                   </Input>
-                  <Pressable bg={COLORS.secondary} borderRadius={'$xl'}>
+                  <Pressable
+                    bg={COLORS.secondary}
+                    borderRadius={'$xl'}
+                    onPress={() => verifyPhoneNumber()}>
                     <Text
                       fontFamily="Montserrat-Bold"
                       color={'$white'}
@@ -608,7 +710,7 @@ const CompleteProfile = () => {
               </Input>
               {!userData?.email_verify?.is_verified && (
                 <Pressable
-                  onPress={() => setIsEmailVerify(true)}
+                  onPress={() => handelEmailVerify()}
                   alignSelf="flex-end">
                   <Text
                     fontFamily="Montserrat-Bold"
@@ -639,7 +741,10 @@ const CompleteProfile = () => {
                       onChangeText={text => setOtp(text)}
                     />
                   </Input>
-                  <Pressable bg={COLORS.secondary} borderRadius={'$xl'}>
+                  <Pressable
+                    bg={COLORS.secondary}
+                    borderRadius={'$xl'}
+                    onPress={() => emailVerification()}>
                     <Text
                       fontFamily="Montserrat-Bold"
                       color={'$white'}
@@ -788,7 +893,9 @@ const CompleteProfile = () => {
                       fontSize={'$sm'}
                       color={'$coolGray500'}
                       p={'$3'}>
-                      {expertise?.label ? expertise?.label : 'Select Personal'}
+                      {expertise?.category
+                        ? expertise?.category
+                        : 'Select Personal'}
                     </Text>
                   </Pressable>
                 </VStack>
@@ -806,13 +913,13 @@ const CompleteProfile = () => {
                     bg={'white'}
                     borderColor={'$coolGray300'}>
                     <Text
-                      fontWeight={'semibold'}
-                      fontSize={'$sm'}
+                      fontWeight={'bold'}
+                      fontSize={'$xs'}
                       color={'$coolGray500'}
                       p={'$3'}>
-                      {expertiseFor?.label
-                        ? expertiseFor?.label
-                        : 'Select Personal'}
+                      {multipleSubCategory?.length > 0
+                        ? multipleSubCategory?.length + ' ' + 'Professional'
+                        : 'Select Professional '}
                     </Text>
                   </Pressable>
                 </VStack>
@@ -888,9 +995,9 @@ const CompleteProfile = () => {
           <ActionsheetDragIndicatorWrapper>
             <ActionsheetDragIndicator />
           </ActionsheetDragIndicatorWrapper>
-          {data?.data?.data?.map((item: any) => (
+          {allCategory?.map((item: any) => (
             <ActionsheetItem onPress={() => handleSelect(item)} key={item?._id}>
-              <ActionsheetItemText>{item?.label}</ActionsheetItemText>
+              <ActionsheetItemText>{item?.category}</ActionsheetItemText>
             </ActionsheetItem>
           ))}
         </ActionsheetContent>
@@ -908,8 +1015,24 @@ const CompleteProfile = () => {
           {professionalData?.data?.data?.map((item: any) => (
             <ActionsheetItem
               onPress={() => handleSelect2(item)}
+              bg={
+                multipleSubCategory?.find((i: any) => i?.label === item?.label)
+                  ? COLORS.secondary
+                  : '$white'
+              }
+              mb={'$2'}
               key={item?._id}>
-              <ActionsheetItemText>{item?.label}</ActionsheetItemText>
+              <ActionsheetItemText
+                color={
+                  multipleSubCategory?.find(
+                    (i: any) => i?.label === item?.label,
+                  )
+                    ? '$white'
+                    : COLORS.secondary
+                }
+                fontFamily="Montserrat-Medium">
+                {item?.label}
+              </ActionsheetItemText>
             </ActionsheetItem>
           ))}
         </ActionsheetContent>

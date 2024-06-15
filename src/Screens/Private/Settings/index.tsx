@@ -21,9 +21,14 @@ const SettingScreen = () => {
   const {userData} = useAppContext();
   const {mutation} = useMutation();
   const logout = () => {
-    GoogleSignin.signOut();
+    GoogleSignin.signOut()
+      .then(res => {
+        console.log('Sign out successful:', res);
+      })
+      .catch(err => {
+        console.error('Error signing out:', err);
+      });
     handleLogout();
-    ``;
     handleClearAccessToken();
   };
   const deleteAccount = async () => {

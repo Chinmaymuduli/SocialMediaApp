@@ -105,6 +105,18 @@ const Messages = () => {
               </HStack>
             </Pressable>
           )}
+          ListEmptyComponent={
+            <Box alignItems="center" mt={'$10'}>
+              <VStack alignItems="center" gap={10}>
+                <Image
+                  source={IMAGES.CONNECT_BG_REMOVE}
+                  alt="img"
+                  style={{width: 200, height: 200}}
+                />
+                <Text fontFamily="Montserrat-SemiBold">No Messages found</Text>
+              </VStack>
+            </Box>
+          }
         />
       </Box>
     </PrivateContainer>

@@ -638,121 +638,129 @@ const ChatDetails = ({route: {params}}: Props) => {
                 Meeting Details
               </Text>
             </Box>
-            <Box px={'$3'} py={'$3'}>
-              <VStack>
-                <Text
-                  fontFamily="Montserrat-SemiBold"
-                  fontSize={15}
-                  color="$black">
-                  Meeting Address :-
-                </Text>
-                <Box mt={'$2'}>
-                  <Text fontFamily="Montserrat-Medium" fontSize={14}>
-                    {latestMeetingData?.data?.data?.location_details?.address +
-                      ' , ' +
-                      latestMeetingData?.data?.data?.location_details?.city +
-                      ' , ' +
-                      latestMeetingData?.data?.data?.location_details?.state +
-                      ' , ' +
-                      latestMeetingData?.data?.data?.location_details?.pincode}
-                  </Text>
-                </Box>
-              </VStack>
-              <VStack mt={'$5'} gap={'$2'}>
-                <Text
-                  fontFamily="Montserrat-SemiBold"
-                  fontSize={15}
-                  color="$black">
-                  Meeting Date & Timing :-
-                </Text>
-                <Box>
-                  <Text fontFamily="Montserrat-Medium" fontSize={15}>
-                    {moment(latestMeetingData?.data?.data?.date).format(
-                      'LL LT',
-                    )}
-                  </Text>
-                </Box>
-              </VStack>
-              <VStack mt={'$5'} gap={'$2'}>
-                <Text
-                  fontFamily="Montserrat-SemiBold"
-                  fontSize={15}
-                  color="$black">
-                  Meeting Price :-
-                </Text>
-                <Box>
+            {latestMeetingData?.data?.data?._id ? (
+              <Box px={'$3'} py={'$3'}>
+                <VStack>
                   <Text
                     fontFamily="Montserrat-SemiBold"
-                    color={COLORS.secondary}
-                    fontSize={15}>
-                    {`RS ${latestMeetingData?.data?.data?.amount}`}
+                    fontSize={15}
+                    color="$black">
+                    Meeting Address :-
                   </Text>
-                </Box>
-              </VStack>
-              <VStack mt={'$5'} gap={'$2'}>
-                <Text
-                  fontFamily="Montserrat-SemiBold"
-                  fontSize={15}
-                  color="$black">
-                  Add Extra Items :-
-                </Text>
-                <Box>
-                  {productsData?.data?.data?.map((item: any) => (
-                    <HStack
-                      key={item?._id}
-                      alignItems="center"
-                      justifyContent="space-between">
-                      <HStack alignItems="center" gap={'$3'}>
-                        <Text
-                          fontFamily="Montserrat-SemiBold"
-                          // color={COLORS.secondary}
-                          fontSize={15}>
-                          {item?.title}
-                        </Text>
-                        <Text
-                          fontFamily="Montserrat-Medium"
-                          // color={COLORS.secondary}
-                          fontSize={15}>
-                          {`(RS ${item?.price} /-)`}
-                        </Text>
+                  <Box mt={'$2'}>
+                    <Text fontFamily="Montserrat-Medium" fontSize={14}>
+                      {latestMeetingData?.data?.data?.location_details
+                        ?.address +
+                        ' , ' +
+                        latestMeetingData?.data?.data?.location_details?.city +
+                        ' , ' +
+                        latestMeetingData?.data?.data?.location_details?.state +
+                        ' , ' +
+                        latestMeetingData?.data?.data?.location_details
+                          ?.pincode}
+                    </Text>
+                  </Box>
+                </VStack>
+                <VStack mt={'$5'} gap={'$2'}>
+                  <Text
+                    fontFamily="Montserrat-SemiBold"
+                    fontSize={15}
+                    color="$black">
+                    Meeting Date & Timing :-
+                  </Text>
+                  <Box>
+                    <Text fontFamily="Montserrat-Medium" fontSize={15}>
+                      {moment(latestMeetingData?.data?.data?.date).format(
+                        'LL LT',
+                      )}
+                    </Text>
+                  </Box>
+                </VStack>
+                <VStack mt={'$5'} gap={'$2'}>
+                  <Text
+                    fontFamily="Montserrat-SemiBold"
+                    fontSize={15}
+                    color="$black">
+                    Meeting Price :-
+                  </Text>
+                  <Box>
+                    <Text
+                      fontFamily="Montserrat-SemiBold"
+                      color={COLORS.secondary}
+                      fontSize={15}>
+                      {`RS ${latestMeetingData?.data?.data?.amount}`}
+                    </Text>
+                  </Box>
+                </VStack>
+                <VStack mt={'$5'} gap={'$2'}>
+                  <Text
+                    fontFamily="Montserrat-SemiBold"
+                    fontSize={15}
+                    color="$black">
+                    Add Extra Items :-
+                  </Text>
+                  <Box>
+                    {productsData?.data?.data?.map((item: any) => (
+                      <HStack
+                        key={item?._id}
+                        alignItems="center"
+                        justifyContent="space-between">
+                        <HStack alignItems="center" gap={'$3'}>
+                          <Text
+                            fontFamily="Montserrat-SemiBold"
+                            // color={COLORS.secondary}
+                            fontSize={15}>
+                            {item?.title}
+                          </Text>
+                          <Text
+                            fontFamily="Montserrat-Medium"
+                            // color={COLORS.secondary}
+                            fontSize={15}>
+                            {`(RS ${item?.price} /-)`}
+                          </Text>
+                        </HStack>
+                        <Pressable onPress={() => addExtraItem(item)}>
+                          {selectedItems?.find(
+                            (_: any) => _?._id === item?._id,
+                          ) ? (
+                            <Text
+                              fontFamily="Montserrat-SemiBold"
+                              fontSize={13}
+                              color={'$red400'}>
+                              Remove
+                            </Text>
+                          ) : (
+                            <Text
+                              fontFamily="Montserrat-SemiBold"
+                              color={COLORS.secondary}>
+                              Add
+                            </Text>
+                          )}
+                        </Pressable>
                       </HStack>
-                      <Pressable onPress={() => addExtraItem(item)}>
-                        {selectedItems?.find(
-                          (_: any) => _?._id === item?._id,
-                        ) ? (
-                          <Text
-                            fontFamily="Montserrat-SemiBold"
-                            fontSize={13}
-                            color={'$red400'}>
-                            Remove
-                          </Text>
-                        ) : (
-                          <Text
-                            fontFamily="Montserrat-SemiBold"
-                            color={COLORS.secondary}>
-                            Add
-                          </Text>
-                        )}
-                      </Pressable>
-                    </HStack>
-                  ))}
+                    ))}
+                  </Box>
+                </VStack>
+                <Box mt={'$10'}>
+                  <Button
+                    borderRadius={5}
+                    py={'$2'}
+                    onPress={() => makePayment()}
+                    btnWidth={'100%'}>
+                    <Text
+                      color="$white"
+                      fontFamily="Montserrat-SemiBold"
+                      fontSize={13}>
+                      Make Payment
+                    </Text>
+                  </Button>
                 </Box>
-              </VStack>
-              <Box mt={'$10'}>
-                <Button
-                  borderRadius={5}
-                  py={'$2'}
-                  onPress={() => makePayment()}
-                  btnWidth={'100%'}>
-                  <Text
-                    color="$white"
-                    fontFamily="Montserrat-SemiBold"
-                    fontSize={13}>
-                    Make Payment
-                  </Text>
-                </Button>
               </Box>
-            </Box>
+            ) : (
+              <Box>
+                <Text>No Meeting Found</Text>
+              </Box>
+            )}
           </Box>
         </ActionsheetContent>
       </Actionsheet>
