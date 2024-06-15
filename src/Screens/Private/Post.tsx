@@ -186,7 +186,7 @@ const Post = () => {
       ]}
       image={IMAGES.LOGO}>
       <LinearComponent>
-        <ScrollView style={{flex: 1}}>
+        <ScrollView contentContainerStyle={{paddingBottom: 60}}>
           <Box mt={'$2'} mx={'$4'}>
             <Text my={'$2'} fontFamily="Montserrat-Bold" fontSize={13}>
               Description
