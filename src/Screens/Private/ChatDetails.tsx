@@ -242,6 +242,11 @@ const ChatDetails = ({route: {params}}: Props) => {
     }
   };
 
+  const {data: latestMeetingData} = useSwrApi(
+    `meetings/read-latest/${params?.connection_id}`,
+  );
+  // console.log(latestMeetingData?.data?.data, '=========>');
+
   return (
     <PrivateContainer
       hasBackIcon={true}
@@ -643,7 +648,13 @@ const ChatDetails = ({route: {params}}: Props) => {
                 </Text>
                 <Box mt={'$2'}>
                   <Text fontFamily="Montserrat-Medium" fontSize={14}>
-                    {'Dharamsala , Bangalore , karanatak , 321056'}
+                    {latestMeetingData?.data?.data?.location_details?.address +
+                      ' , ' +
+                      latestMeetingData?.data?.data?.location_details?.city +
+                      ' , ' +
+                      latestMeetingData?.data?.data?.location_details?.state +
+                      ' , ' +
+                      latestMeetingData?.data?.data?.location_details?.pincode}
                   </Text>
                 </Box>
               </VStack>
@@ -656,7 +667,9 @@ const ChatDetails = ({route: {params}}: Props) => {
                 </Text>
                 <Box>
                   <Text fontFamily="Montserrat-Medium" fontSize={15}>
-                    {'15 Feb 2022 , 10:00 AM'}
+                    {moment(latestMeetingData?.data?.data?.date).format(
+                      'LL LT',
+                    )}
                   </Text>
                 </Box>
               </VStack>
@@ -672,7 +685,7 @@ const ChatDetails = ({route: {params}}: Props) => {
                     fontFamily="Montserrat-SemiBold"
                     color={COLORS.secondary}
                     fontSize={15}>
-                    {'RS 1200'}
+                    {`RS ${latestMeetingData?.data?.data?.amount}`}
                   </Text>
                 </Box>
               </VStack>

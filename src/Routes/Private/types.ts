@@ -17,7 +17,8 @@ type OmittedScreens =
   | 'ChatDetails'
   | 'AgoraVoiceCall'
   | 'ShareScreenDetails'
-  | 'Reviews';
+  | 'Reviews'
+  | 'UserAllPhotos';
 
 export type PrivateNavigationProp = Omit<PrivateScreens, OmittedScreens> & {
   // OtpScreen: {
@@ -47,6 +48,9 @@ export type PrivateNavigationProp = Omit<PrivateScreens, OmittedScreens> & {
   };
   Reviews: {
     user_id?: any;
+  };
+  UserAllPhotos: {
+    photos?: any;
   };
 };
 
