@@ -194,24 +194,46 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                 <Box position="absolute" bottom={25} left="30%">
                   <Box bg={'$white'} px={'$3'} borderRadius={40}>
                     <HStack alignItems="center" gap={'$3'} py={'$1'}>
-                      <CircularProgress
-                        value={
-                          userData?.data?.data?.personal_matching_percentage ||
-                          0
-                        }
-                        radius={25}
-                        duration={2500}
-                        progressValueColor={COLORS.secondary}
-                        maxValue={100}
-                        activeStrokeColor={COLORS.secondary}
-                        activeStrokeSecondaryColor={COLORS.secondary}
-                        valueSuffix={'%'}
-                      />
-                      <Text
-                        fontFamily="Montserrat-SemiBold"
-                        color={COLORS.secondary}>
-                        Match
-                      </Text>
+                      <HStack alignItems="center" gap={'$2'}>
+                        <CircularProgress
+                          value={
+                            userData?.data?.data
+                              ?.personal_matching_percentage || 0
+                          }
+                          radius={25}
+                          duration={2500}
+                          progressValueColor={COLORS.secondary}
+                          maxValue={100}
+                          activeStrokeColor={COLORS.secondary}
+                          activeStrokeSecondaryColor={COLORS.secondary}
+                          valueSuffix={'%'}
+                        />
+                        <Text
+                          fontFamily="Montserrat-SemiBold"
+                          color={COLORS.secondary}>
+                          social
+                        </Text>
+                      </HStack>
+                      <HStack alignItems="center" gap={'$2'} py={'$1'}>
+                        <CircularProgress
+                          value={
+                            userData?.data?.data
+                              ?.personal_matching_percentage || 0
+                          }
+                          radius={25}
+                          duration={2500}
+                          progressValueColor={COLORS.secondary}
+                          maxValue={100}
+                          activeStrokeColor={COLORS.secondary}
+                          activeStrokeSecondaryColor={COLORS.secondary}
+                          valueSuffix={'%'}
+                        />
+                        <Text
+                          fontFamily="Montserrat-SemiBold"
+                          color={COLORS.secondary}>
+                          skill
+                        </Text>
+                      </HStack>
                     </HStack>
                   </Box>
                 </Box>
@@ -286,35 +308,35 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                 color={COLORS.secondary}>
                 Interests
               </Text>
-              {data?.data?.data?.connection?._id ? (
-                <HStack flexWrap="wrap" mt={'$3'}>
-                  {userData?.data?.data?.interests?.map((int: any) => (
-                    <Box
-                      key={int._id}
-                      borderWidth={1}
-                      borderColor={COLORS.secondary}
-                      borderRadius={20}
-                      mr={'$2'}>
-                      <Text
-                        px={'$2'}
-                        py={'$1'}
-                        fontFamily="Montserrat-SemiBold"
-                        fontSize={12}
-                        color={'$black'}>
-                        {int?.label}
-                      </Text>
-                    </Box>
-                  ))}
-                </HStack>
-              ) : (
-                <Box mt={'$2'}>
-                  <Box bg={'$pink50'} py={'$2'} px={'$2'} borderRadius={7}>
-                    <Text fontFamily="Montserrat-SemiBold" fontSize={11}>
-                      After connected with user you can see their interests !
+              {/* {data?.data?.data?.connection?._id ? ( */}
+              <HStack flexWrap="wrap" mt={'$3'}>
+                {userData?.data?.data?.interests?.map((int: any) => (
+                  <Box
+                    key={int._id}
+                    borderWidth={1}
+                    borderColor={COLORS.secondary}
+                    borderRadius={20}
+                    mr={'$2'}>
+                    <Text
+                      px={'$2'}
+                      py={'$1'}
+                      fontFamily="Montserrat-SemiBold"
+                      fontSize={12}
+                      color={'$black'}>
+                      {int?.label}
                     </Text>
                   </Box>
-                </Box>
-              )}
+                ))}
+              </HStack>
+              {/* // ) : (
+              //   <Box mt={'$2'}>
+              //     <Box bg={'$pink50'} py={'$2'} px={'$2'} borderRadius={7}>
+              //       <Text fontFamily="Montserrat-SemiBold" fontSize={11}>
+              //         After connected with user you can see their interests !
+              //       </Text>
+              //     </Box>
+              //   </Box>
+              // )} */}
             </Box>
 
             <Box px={'$4'} mt={'$5'}>
