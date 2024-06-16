@@ -37,8 +37,10 @@ const AuthRoute = ({route: {params}, navigation}: Props) => {
     GoogleSignin.configure({
       webClientId:
         '1061452931939-vfokpioaef88sn5bcpiev4v1squj2ui1.apps.googleusercontent.com',
+      offlineAccess: true,
     });
   }, []);
+
   const SignIn = async () => {
     try {
       const res = await GoogleSignin.hasPlayServices();
@@ -93,10 +95,6 @@ const AuthRoute = ({route: {params}, navigation}: Props) => {
       console.log(error);
     }
   };
-
-  // useEffect(() => {
-  //   loginRegisterGoogle();
-  // }, [googleUser]);
 
   if (isLoading)
     return (

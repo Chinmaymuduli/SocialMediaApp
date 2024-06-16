@@ -21,6 +21,7 @@ const SettingScreen = () => {
   const {userData} = useAppContext();
   const {mutation} = useMutation();
   const logout = () => {
+    GoogleSignin.revokeAccess();
     GoogleSignin.signOut()
       .then(res => {
         console.log('Sign out successful:', res);

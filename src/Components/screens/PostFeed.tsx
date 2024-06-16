@@ -61,6 +61,7 @@ const PostFeed = () => {
         ))} */}
         <FlatList
           data={data?.data?.data}
+          showsVerticalScrollIndicator={false}
           renderItem={({item, index}) => (
             <PostCompo item={item} mutate={mutate} key={index} />
           )}

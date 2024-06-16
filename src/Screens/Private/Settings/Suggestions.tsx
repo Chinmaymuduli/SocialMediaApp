@@ -24,9 +24,7 @@ const Suggestions = ({data}: any) => {
         showsVerticalScrollIndicator={false}
         renderItem={({item}: any) => (
           <Pressable
-            onPress={() =>
-              navigate('UserProfile', {user_id: item?._id, isFromConnect: true})
-            }
+            onPress={() => navigate('UserProfile', {user_id: item?._id})}
             py={'$1'}
             softShadow="1"
             bg={'$white'}
@@ -66,7 +64,10 @@ const Suggestions = ({data}: any) => {
                 </VStack>
               </HStack>
 
-              <Pressable bg={'#753CEF'} borderRadius={5}>
+              <Pressable
+                bg={'#753CEF'}
+                borderRadius={5}
+                onPress={() => navigate('UserProfile', {user_id: item?._id})}>
                 <Box p={'$1'}>
                   <AppIcon
                     FontAwesome5Name={'user-plus'}

@@ -128,6 +128,35 @@ const ChatDetails = ({route: {params}}: Props) => {
     }
   };
 
+  const handelUpdateMeeting = async () => {
+    try {
+      const res = await mutation(
+        `meetings/${latestMeetingData?.data?.data?._id}`,
+        {
+          method: 'PUT',
+          body: {
+            connection_id: params?.connection_id,
+            upi_id: upiId,
+            amount: amount,
+            date: selectedDate,
+            location_details: {
+              address: address,
+              city: city,
+              state: state,
+              coordinates: [latitude, longitude],
+              pincode: Number(pin),
+            },
+          },
+        },
+      );
+      if (res?.results?.status === true) {
+        setShowModal(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const makePayment = async () => {
     try {
       const data: any = {
@@ -245,7 +274,16 @@ const ChatDetails = ({route: {params}}: Props) => {
   const {data: latestMeetingData} = useSwrApi(
     `meetings/read-latest/${params?.connection_id}`,
   );
-  // console.log(latestMeetingData?.data?.data, '=========>');
+
+  useEffect(() => {
+    setAmount(latestMeetingData?.data?.data?.amount?.toString());
+    setUpiId(latestMeetingData?.data?.data?.upi_id);
+    setSelectedDate(latestMeetingData?.data?.data?.date);
+    setPin(latestMeetingData?.data?.data?.location_details?.pincode);
+    setAddress(latestMeetingData?.data?.data?.location_details?.address);
+    setCity(latestMeetingData?.data?.data?.location_details?.city);
+    setState(latestMeetingData?.data?.data?.location_details?.state);
+  }, [latestMeetingData?.data?.data]);
 
   return (
     <PrivateContainer
@@ -527,7 +565,11 @@ const ChatDetails = ({route: {params}}: Props) => {
                 borderRadius={5}
                 isLoading={isLoading}
                 py={'$2'}
-                onPress={() => handelCreatePayment()}
+                onPress={
+                  latestMeetingData?.data?.data?._id
+                    ? () => handelUpdateMeeting()
+                    : () => handelCreatePayment()
+                }
                 btnWidth={'100%'}>
                 <Text
                   color="$white"
@@ -757,8 +799,10 @@ const ChatDetails = ({route: {params}}: Props) => {
                 </Box>
               </Box>
             ) : (
-              <Box>
-                <Text>No Meeting Found</Text>
+              <Box py={'$3'} alignItems="center" justifyContent="center">
+                <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                  No Meeting Found
+                </Text>
               </Box>
             )}
           </Box>

@@ -46,11 +46,15 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
   const {data, mutate: connectMutate} = useSwrApi(
     `connections/check-is-connected/${params?.user_id}`,
   );
+
+  console.log(params?.user_id);
   const {
     data: userData,
     isValidating,
     mutate,
   } = useSwrApi(`users/read/${params?.user_id}`);
+  console.log(userData);
+
   const handelConnectRequest = async () => {
     try {
       const res = await mutation(`connections/send-request`, {
@@ -191,7 +195,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                     {userData?.data?.data?.location_details?.state}
                   </Text>
                 </VStack>
-                <Box position="absolute" bottom={25} left="30%">
+                <Box position="absolute" bottom={25} left="18%">
                   <Box bg={'$white'} px={'$3'} borderRadius={40}>
                     <HStack alignItems="center" gap={'$3'} py={'$1'}>
                       <HStack alignItems="center" gap={'$2'}>
@@ -218,7 +222,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                         <CircularProgress
                           value={
                             userData?.data?.data
-                              ?.personal_matching_percentage || 0
+                              ?.professional_matching_percentage || 0
                           }
                           radius={25}
                           duration={2500}

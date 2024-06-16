@@ -300,7 +300,7 @@ const Profile = () => {
                 <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
                   Interested/Skills
                 </Text>
-                <HStack justifyContent={'space-between'} mt={2}>
+                <VStack mt={2}>
                   <VStack gap={'$2'} w={'45%'}>
                     <Text
                       fontFamily="Montserrat-Medium"
@@ -316,22 +316,22 @@ const Profile = () => {
                       }
                     </Text>
                   </VStack>
-                  <VStack w={'45%'} gap={'$2'}>
+                  <VStack w={'45%'} gap={'$2'} mt={'$2'}>
                     <Text
                       fontFamily="Montserrat-Medium"
                       fontSize={13}
                       mt={'$1'}>
                       Professional
                     </Text>
-                    <Text>
-                      {
-                        data?.data?.data?.interests?.find(
-                          (i: any) => i?.type === 'professional',
-                        )?.label
-                      }
-                    </Text>
+                    <HStack gap={'$1'}>
+                      {data?.data?.data?.interests?.map((item: any) => (
+                        <Box key={item?._id}>
+                          <Text>{item?.label},</Text>
+                        </Box>
+                      ))}
+                    </HStack>
                   </VStack>
-                </HStack>
+                </VStack>
               </VStack>
             </Box>
           </Box>

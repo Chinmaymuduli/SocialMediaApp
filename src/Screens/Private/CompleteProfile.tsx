@@ -85,7 +85,7 @@ const CompleteProfile = () => {
   const {getUser} = useBasicFunctions();
 
   useEffect(() => {
-    setEmail(userData?.email);
+    setEmail(userData?.email || '');
     setProfileImage({path: userData?.avatar});
     setPhone(userData?.phone);
     setName(userData?.name);
@@ -124,9 +124,10 @@ const CompleteProfile = () => {
       formData.append('nick_name', nickName);
       formData.append('gender', gender);
       formData.append('dob', moment(selectedDate).toISOString());
-      multipleSubCategory.forEach((interest: any) => {
-        formData.append('interests', interest?._id);
-      });
+      multipleSubCategory?.length > 0 &&
+        multipleSubCategory?.forEach((interest: any) => {
+          formData.append('interests', interest?._id);
+        });
       // interests.forEach(interest => {
       //   formData.append('interests', interest);
       // });
@@ -182,7 +183,7 @@ const CompleteProfile = () => {
   const handleSelect2 = (data: any) => {
     let exist = multipleSubCategory?.find((i: any) => i?.label === data?.label);
     if (exist) {
-      const removeLabel = multipleSubCategory.filter(
+      const removeLabel = multipleSubCategory?.filter(
         (i: any) => i?.label !== data?.label,
       );
       setMultipleSubCategory(removeLabel);
@@ -254,13 +255,13 @@ const CompleteProfile = () => {
         method: 'PUT',
         body: {
           email,
-          password: 'feveal',
+          password: 'Feveal@96',
           otp: otp,
         },
       });
       console.log(res?.results);
-      if (res?.results?.status === 200) {
-        Alert.alert('Success', 'Phone Number verified successfully');
+      if (res?.results?.success === true) {
+        Alert.alert('Success', 'Email verified successfully');
         getUser();
       }
     } catch (error) {
@@ -306,7 +307,7 @@ const CompleteProfile = () => {
     const removeDuplicatesByCategory = (data: any) => {
       const categoryMap = new Map();
 
-      data.forEach((item: any) => {
+      data?.forEach((item: any) => {
         if (!categoryMap.has(item.category)) {
           categoryMap.set(item.category, item);
         }
@@ -1008,33 +1009,39 @@ const CompleteProfile = () => {
         onClose={() => setShowActionsheet2(false)}
         zIndex={999}>
         <ActionsheetBackdrop />
-        <ActionsheetContent h="$72" zIndex={999}>
+        <ActionsheetContent zIndex={999}>
           <ActionsheetDragIndicatorWrapper>
             <ActionsheetDragIndicator />
           </ActionsheetDragIndicatorWrapper>
-          {professionalData?.data?.data?.map((item: any) => (
-            <ActionsheetItem
-              onPress={() => handleSelect2(item)}
-              bg={
-                multipleSubCategory?.find((i: any) => i?.label === item?.label)
-                  ? COLORS.secondary
-                  : '$white'
-              }
-              mb={'$2'}
-              key={item?._id}>
-              <ActionsheetItemText
-                color={
-                  multipleSubCategory?.find(
-                    (i: any) => i?.label === item?.label,
-                  )
-                    ? '$white'
-                    : COLORS.secondary
-                }
-                fontFamily="Montserrat-Medium">
-                {item?.label}
-              </ActionsheetItemText>
-            </ActionsheetItem>
-          ))}
+          <Box w={'$full'}>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {professionalData?.data?.data?.map((item: any) => (
+                <ActionsheetItem
+                  onPress={() => handleSelect2(item)}
+                  bg={
+                    multipleSubCategory?.find(
+                      (i: any) => i?.label === item?.label,
+                    )
+                      ? COLORS.secondary
+                      : '$white'
+                  }
+                  mb={'$2'}
+                  key={item?._id}>
+                  <ActionsheetItemText
+                    color={
+                      multipleSubCategory?.find(
+                        (i: any) => i?.label === item?.label,
+                      )
+                        ? '$white'
+                        : COLORS.secondary
+                    }
+                    fontFamily="Montserrat-Medium">
+                    {item?.label}
+                  </ActionsheetItemText>
+                </ActionsheetItem>
+              ))}
+            </ScrollView>
+          </Box>
         </ActionsheetContent>
       </Actionsheet>
       {/* Cities  */}

@@ -47,8 +47,11 @@ const Meetings = () => {
   const [showActionsheet, setShowActionsheet] = React.useState(false);
   const [meetingData, setMeetingData] = React.useState<any>();
   const [showModal, setShowModal] = React.useState(false);
+  const [showReportModal, setShowReportModal] = React.useState(false);
   const [ratings, setRatings] = React.useState(0);
   const [reviews, setReviews] = React.useState('');
+  const [reportType, setReportType] = React.useState('');
+  const [comment, setComment] = React.useState('');
   const [meetingId, setMeetingId] = useState('');
   const ref = React.useRef(null);
   const {userData} = useAppContext();
@@ -165,6 +168,40 @@ const Meetings = () => {
     }
   };
 
+  const handelReport = (type: string) => {
+    setReportType(type), setShowActionsheet(false), setShowReportModal(true);
+  };
+
+  const handelReportPost = async () => {
+    try {
+      const res = await mutation(`meetings/report`, {
+        method: 'POST',
+        body: {
+          connection_id: meetingData?.connection_id,
+          meeting_id: meetingData?._id,
+          report_receiver_id: meetingData?.is_received
+            ? meetingData?.sender_id?._id
+            : meetingData?.receiver_id?._id,
+          comment: comment,
+          is_blocked: reportType === 'report' ? false : true,
+        },
+      });
+      if (res?.results?.success === true) {
+        setShowReportModal(false);
+        Alert.alert(
+          'Success',
+          `${
+            reportType === 'report' ? 'Report' : 'Report & Block'
+          } done successfully !`,
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // console.log(data?.data?.data?.[0]);
+
   if (isValidating) {
     <Spinner size={'large'} />;
   }
@@ -265,7 +302,7 @@ const Meetings = () => {
                   </HStack>
                 </HStack>
 
-                {!item?.is_accepted && (
+                {item?.is_accepted && (
                   <Box pt={'$3'}>
                     <HStack mr={'$1'} alignItems={'center'} gap={'$4'}>
                       <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
@@ -286,7 +323,7 @@ const Meetings = () => {
                             Yes
                           </Text>
                         </Pressable>
-                        {!item?.is_accepted && (
+                        {!item?.is_accepted && !item?.is_received && (
                           <Pressable
                             bg={COLORS.secondary}
                             borderRadius={5}
@@ -552,6 +589,7 @@ const Meetings = () => {
 
                 <HStack px={'$3'} justifyContent="space-between" my={'$4'}>
                   <Pressable
+                    onPress={() => handelReport('report')}
                     borderWidth={1}
                     w={'40%'}
                     alignItems="center"
@@ -567,6 +605,7 @@ const Meetings = () => {
                     </Text>
                   </Pressable>
                   <Pressable
+                    onPress={() => handelReport('report&block')}
                     py={'$2'}
                     borderRadius={8}
                     borderColor={'$red400'}
@@ -696,6 +735,65 @@ const Meetings = () => {
               borderWidth="$0"
               onPress={() => addReviews()}>
               <ButtonText>Send</ButtonText>
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      {/* Report */}
+      <Modal
+        isOpen={showReportModal}
+        onClose={() => {
+          setShowReportModal(false);
+        }}
+        finalFocusRef={ref}>
+        <ModalBackdrop />
+        <ModalContent>
+          <ModalHeader>
+            <Heading size="lg">
+              {reportType === 'report' ? 'Report' : 'Report & Block'}
+            </Heading>
+            <ModalCloseButton>
+              <Icon as={CloseIcon} />
+            </ModalCloseButton>
+          </ModalHeader>
+          <ModalBody>
+            <VStack gap={'$1'}>
+              <Text fontFamily="Montserrat-Medium">Comments</Text>
+              <Textarea
+                size="md"
+                isReadOnly={false}
+                isInvalid={false}
+                isDisabled={false}
+                w="$64">
+                <TextareaInput
+                  placeholder="Your text goes here..."
+                  value={comment}
+                  onChangeText={txt => {
+                    setComment(txt);
+                  }}
+                />
+              </Textarea>
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="outline"
+              size="sm"
+              action="secondary"
+              mr="$3"
+              onPress={() => {
+                setShowReportModal(false);
+              }}>
+              <ButtonText>Cancel</ButtonText>
+            </Button>
+            <Button
+              size="sm"
+              action="positive"
+              borderWidth="$0"
+              onPress={() => handelReportPost()}>
+              <ButtonText>
+                {reportType === 'report' ? 'Report' : 'Report & Block'}
+              </ButtonText>
             </Button>
           </ModalFooter>
         </ModalContent>
