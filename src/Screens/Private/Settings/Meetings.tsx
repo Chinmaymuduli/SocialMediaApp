@@ -587,42 +587,42 @@ const Meetings = () => {
                   </Box>
                 </Box>
 
-                {meetingData?.is_meeting_finished && (
-                  <HStack px={'$3'} justifyContent="space-between" my={'$4'}>
-                    <Pressable
-                      onPress={() => handelReport('report')}
-                      borderWidth={1}
-                      w={'40%'}
-                      alignItems="center"
-                      justifyContent="center"
-                      py={'$2'}
-                      borderRadius={8}
-                      borderColor={COLORS.secondary}>
-                      <Text
-                        fontSize={12}
-                        fontFamily="Montserrat-Bold"
-                        color={COLORS.secondary}>
-                        Report
-                      </Text>
-                    </Pressable>
-                    <Pressable
-                      onPress={() => handelReport('report&block')}
-                      py={'$2'}
-                      borderRadius={8}
-                      borderColor={'$red400'}
-                      borderWidth={1}
-                      w={'40%'}
-                      alignItems="center"
-                      justifyContent="center">
-                      <Text
-                        fontSize={12}
-                        fontFamily="Montserrat-Bold"
-                        color={'$red400'}>
-                        Report & Block
-                      </Text>
-                    </Pressable>
-                  </HStack>
-                )}
+                {/* {meetingData?.is_meeting_finished && ( */}
+                <HStack px={'$3'} justifyContent="space-between" my={'$4'}>
+                  <Pressable
+                    onPress={() => handelReport('report')}
+                    borderWidth={1}
+                    w={'40%'}
+                    alignItems="center"
+                    justifyContent="center"
+                    py={'$2'}
+                    borderRadius={8}
+                    borderColor={COLORS.secondary}>
+                    <Text
+                      fontSize={12}
+                      fontFamily="Montserrat-Bold"
+                      color={COLORS.secondary}>
+                      Report
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => handelReport('report&block')}
+                    py={'$2'}
+                    borderRadius={8}
+                    borderColor={'$red400'}
+                    borderWidth={1}
+                    w={'40%'}
+                    alignItems="center"
+                    justifyContent="center">
+                    <Text
+                      fontSize={12}
+                      fontFamily="Montserrat-Bold"
+                      color={'$red400'}>
+                      Report & Block
+                    </Text>
+                  </Pressable>
+                </HStack>
+                {/* )} */}
 
                 {reviewData?.data?.data?.length > 0 && (
                   <Box px={'$3'} py={'$1'} mt={'$2'}>
