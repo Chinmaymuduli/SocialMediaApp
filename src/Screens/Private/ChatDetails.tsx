@@ -65,6 +65,10 @@ const ChatDetails = ({route: {params}}: Props) => {
     `chats/read-all?connection_id=${params?.connection_id}`,
   );
   const {data: productsData} = useSwrApi(`products`);
+  const {data: commissionData} = useSwrApi(`commission`);
+  const {data: latestMeetingData, mutate: latestMutate} = useSwrApi(
+    `meetings/read-latest/${params?.connection_id}`,
+  );
   useEffect(() => {
     socketRef?.current?.on('join-to-connection', params?.connection_id);
     socketRef?.current?.emit('new-user-joined', {
@@ -160,7 +164,7 @@ const ChatDetails = ({route: {params}}: Props) => {
   const makePayment = async () => {
     try {
       const data: any = {
-        meeting_id: '666b22b45388108fe9486a47',
+        meeting_id: latestMeetingData?.data?.data?._id,
         product: {
           list: [],
         },
@@ -228,6 +232,8 @@ const ChatDetails = ({route: {params}}: Props) => {
         });
         if (verifyOrder?.results?.success === true) {
           mutate();
+          setShowPaymentModal(false);
+          latestMutate();
           Alert.alert('Success', 'Payment Successful');
         }
       })
@@ -271,10 +277,6 @@ const ChatDetails = ({route: {params}}: Props) => {
     }
   };
 
-  const {data: latestMeetingData} = useSwrApi(
-    `meetings/read-latest/${params?.connection_id}`,
-  );
-
   useEffect(() => {
     setAmount(latestMeetingData?.data?.data?.amount?.toString());
     setUpiId(latestMeetingData?.data?.data?.upi_id);
@@ -284,6 +286,8 @@ const ChatDetails = ({route: {params}}: Props) => {
     setCity(latestMeetingData?.data?.data?.location_details?.city);
     setState(latestMeetingData?.data?.data?.location_details?.state);
   }, [latestMeetingData?.data?.data]);
+
+  // console.log(latestMeetingData?.data?.data?.is_sender_paid);
 
   return (
     <PrivateContainer
@@ -734,69 +738,112 @@ const ChatDetails = ({route: {params}}: Props) => {
                     </Text>
                   </Box>
                 </VStack>
+                {!latestMeetingData?.data?.data?.is_sender_paid && (
+                  <VStack mt={'$5'} gap={'$2'}>
+                    <Text
+                      fontFamily="Montserrat-SemiBold"
+                      fontSize={15}
+                      color="$black">
+                      Add Extra Items :-
+                    </Text>
+                    <Box>
+                      {productsData?.data?.data?.map((item: any) => (
+                        <HStack
+                          key={item?._id}
+                          alignItems="center"
+                          justifyContent="space-between">
+                          <HStack alignItems="center" gap={'$3'}>
+                            <Text
+                              fontFamily="Montserrat-SemiBold"
+                              // color={COLORS.secondary}
+                              fontSize={15}>
+                              {item?.title}
+                            </Text>
+                            <Text
+                              fontFamily="Montserrat-Medium"
+                              // color={COLORS.secondary}
+                              fontSize={15}>
+                              {`(RS ${item?.price} /-)`}
+                            </Text>
+                          </HStack>
+                          <Pressable onPress={() => addExtraItem(item)}>
+                            {selectedItems?.find(
+                              (_: any) => _?._id === item?._id,
+                            ) ? (
+                              <Text
+                                fontFamily="Montserrat-SemiBold"
+                                fontSize={13}
+                                color={'$red400'}>
+                                Remove
+                              </Text>
+                            ) : (
+                              <Text
+                                fontFamily="Montserrat-SemiBold"
+                                color={COLORS.secondary}>
+                                Add
+                              </Text>
+                            )}
+                          </Pressable>
+                        </HStack>
+                      ))}
+                    </Box>
+                  </VStack>
+                )}
                 <VStack mt={'$5'} gap={'$2'}>
                   <Text
                     fontFamily="Montserrat-SemiBold"
                     fontSize={15}
                     color="$black">
-                    Add Extra Items :-
+                    Platform Fee :-
                   </Text>
                   <Box>
-                    {productsData?.data?.data?.map((item: any) => (
-                      <HStack
-                        key={item?._id}
-                        alignItems="center"
-                        justifyContent="space-between">
-                        <HStack alignItems="center" gap={'$3'}>
-                          <Text
-                            fontFamily="Montserrat-SemiBold"
-                            // color={COLORS.secondary}
-                            fontSize={15}>
-                            {item?.title}
-                          </Text>
-                          <Text
-                            fontFamily="Montserrat-Medium"
-                            // color={COLORS.secondary}
-                            fontSize={15}>
-                            {`(RS ${item?.price} /-)`}
-                          </Text>
-                        </HStack>
-                        <Pressable onPress={() => addExtraItem(item)}>
-                          {selectedItems?.find(
-                            (_: any) => _?._id === item?._id,
-                          ) ? (
-                            <Text
-                              fontFamily="Montserrat-SemiBold"
-                              fontSize={13}
-                              color={'$red400'}>
-                              Remove
-                            </Text>
-                          ) : (
-                            <Text
-                              fontFamily="Montserrat-SemiBold"
-                              color={COLORS.secondary}>
-                              Add
-                            </Text>
-                          )}
-                        </Pressable>
-                      </HStack>
-                    ))}
+                    <Text
+                      fontFamily="Montserrat-SemiBold"
+                      color={COLORS.secondary}
+                      fontSize={15}>
+                      {`RS ${
+                        (latestMeetingData?.data?.data?.amount *
+                          commissionData?.data?.data?.percent) /
+                        100
+                      } `}
+                    </Text>
                   </Box>
                 </VStack>
-                <Box mt={'$10'}>
-                  <Button
-                    borderRadius={5}
-                    py={'$2'}
-                    onPress={() => makePayment()}
-                    btnWidth={'100%'}>
+                {latestMeetingData?.data?.data?.is_sender_paid && (
+                  <VStack mt={'$5'} gap={'$2'}>
                     <Text
-                      color="$white"
                       fontFamily="Montserrat-SemiBold"
-                      fontSize={13}>
-                      Make Payment
+                      fontSize={15}
+                      color="$black">
+                      Payment Status :-
                     </Text>
-                  </Button>
-                </Box>
+                    <Box>
+                      <Text
+                        fontFamily="Montserrat-SemiBold"
+                        color={'$green500'}
+                        fontSize={15}>
+                        {'Paid'}
+                      </Text>
+                    </Box>
+                  </VStack>
+                )}
+                {!latestMeetingData?.data?.data?.is_sender_paid && (
+                  <Box mt={'$10'}>
+                    <Button
+                      borderRadius={5}
+                      isLoading={isLoading}
+                      py={'$2'}
+                      onPress={() => makePayment()}
+                      btnWidth={'100%'}>
+                      <Text
+                        color="$white"
+                        fontFamily="Montserrat-SemiBold"
+                        fontSize={13}>
+                        Make Payment
+                      </Text>
+                    </Button>
+                  </Box>
+                )}
               </Box>
             ) : (
               <Box py={'$3'} alignItems="center" justifyContent="center">
