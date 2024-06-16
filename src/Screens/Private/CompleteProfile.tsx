@@ -261,8 +261,8 @@ const CompleteProfile = () => {
       });
       console.log(res?.results);
       if (res?.results?.success === true) {
-        Alert.alert('Success', 'Email verified successfully');
         getUser();
+        Alert.alert('Success', 'Email verified successfully');
       }
     } catch (error) {
       console.log(error);

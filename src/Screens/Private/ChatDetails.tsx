@@ -124,7 +124,8 @@ const ChatDetails = ({route: {params}}: Props) => {
         },
       });
       console.log({res: res?.results});
-      if (res?.status === 201) {
+      if (res?.results?.success === true) {
+        Alert.alert('Success', 'Meeting scheduled successfully');
         setShowModal(false);
       }
     } catch (error) {
@@ -153,7 +154,8 @@ const ChatDetails = ({route: {params}}: Props) => {
           },
         },
       );
-      if (res?.results?.status === true) {
+      if (res?.results?.success === true) {
+        Alert.alert('Success', 'Meeting updated successfully');
         setShowModal(false);
       }
     } catch (error) {

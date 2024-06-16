@@ -14,7 +14,7 @@ import {
   Text,
 } from '@gluestack-ui/themed';
 import {PrivateScreenProps} from '~/Routes/Private/types';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {VStack} from '@gluestack-ui/themed';
 import {useSwrApi} from '~/Hooks';
 import moment from 'moment';
@@ -22,9 +22,16 @@ import {COLORS} from '~/Styles';
 
 const Messages = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
-  const {data, isValidating} = useSwrApi(
+  const {data, isValidating, mutate} = useSwrApi(
     `chats/read-chat-heads?is_accepted=true&is_blocked=false`,
   );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      mutate();
+    }, []),
+  );
+
   if (isValidating)
     return (
       <Box flex={1} justifyContent="center" alignItems="center">
@@ -100,7 +107,7 @@ const Messages = () => {
                   </Text>
                 </VStack>
                 <Text color={'#94a3b8'} fontSize={11}>
-                  {moment(item?.receiver_id?.created_at).fromNow()}
+                  {moment(item?.last_message?.updated_at).fromNow()}
                 </Text>
               </HStack>
             </Pressable>
