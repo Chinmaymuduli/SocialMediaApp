@@ -67,8 +67,14 @@ const CompleteProfile = () => {
   const [isImagePick, setIsImagePick] = useState(false);
   const [images, setImages] = useState<any>([]);
   const [allCategory, setAllCategory] = useState<any>([]);
+  const [selectProfessional, setSelectProfessional] = useState<any>();
+  const [allProfessionalCategory, setAllProfessionalCategory] = useState<any>(
+    [],
+  );
 
   const [showActionsheet, setShowActionsheet] = React.useState(false);
+  const [showActionsheetPrecessional, setShowActionsheetPrecessional] =
+    React.useState(false);
   const [showActionsheet2, setShowActionsheet2] = React.useState(false);
   const [showActionsheetSubProfessional, setShowActionsheetSubProfessional] =
     React.useState(false);
@@ -82,9 +88,13 @@ const CompleteProfile = () => {
   const [selectCity, setSelectCity] = useState<any>();
 
   const {mutation, isLoading} = useMutation();
-  const {data} = useSwrApi(`interests`);
-  const {data: professionalData} = useSwrApi(
+  const {data} = useSwrApi(`interests?type=personal`);
+  const {data: professionalCategory} = useSwrApi(`interests?type=professional`);
+  const {data: personalData} = useSwrApi(
     `interests?search=${expertise?.category}`,
+  );
+  const {data: professionalData} = useSwrApi(
+    `interests?search=${selectProfessional?.category}`,
   );
 
   const {getUser} = useBasicFunctions();
@@ -187,6 +197,10 @@ const CompleteProfile = () => {
   const handleSelect = (data: any) => {
     setShowActionsheet(false);
     setExpertise(data);
+  };
+  const handlePerfessionalSelect = (data: any) => {
+    setShowActionsheetPrecessional(false);
+    setSelectProfessional(data);
   };
   const handleSelect2 = (data: any) => {
     let exist = multipleSubCategory?.find((i: any) => i?.label === data?.label);
@@ -338,9 +352,15 @@ const CompleteProfile = () => {
     };
 
     const filteredData = removeDuplicatesByCategory(data?.data?.data);
+    const filteredAllProfessionalData = removeDuplicatesByCategory(
+      professionalCategory?.data?.data,
+    );
 
     setAllCategory(filteredData);
-  }, [data?.data?.data]);
+    setAllProfessionalCategory(filteredAllProfessionalData);
+  }, [data?.data?.data, professionalCategory?.data?.data]);
+
+  // console.log(data?.data?.data);
 
   return (
     <SafeAreaView>
@@ -955,7 +975,7 @@ const CompleteProfile = () => {
                     Professional
                   </Text>
                   <Pressable
-                    onPress={() => setShowActionsheet(true)}
+                    onPress={() => setShowActionsheetPrecessional(true)}
                     borderWidth={1}
                     borderRadius={5}
                     style={{
@@ -968,9 +988,9 @@ const CompleteProfile = () => {
                       fontSize={'$sm'}
                       color={'$coolGray500'}
                       p={'$3'}>
-                      {expertise?.category
-                        ? expertise?.category
-                        : 'Select Personal'}
+                      {selectProfessional?.category
+                        ? selectProfessional?.category
+                        : 'Select Professional'}
                     </Text>
                   </Pressable>
                 </VStack>
@@ -1059,7 +1079,7 @@ const CompleteProfile = () => {
         onCancel={() => setDatePickerVisibility(false)}
         maximumDate={new Date()}
       />
-      {/* ActionSheet */}
+      {/* ActionSheet PerFectional*/}
       <Actionsheet
         isOpen={showActionsheet}
         onClose={() => setShowActionsheet(false)}
@@ -1071,6 +1091,25 @@ const CompleteProfile = () => {
           </ActionsheetDragIndicatorWrapper>
           {allCategory?.map((item: any) => (
             <ActionsheetItem onPress={() => handleSelect(item)} key={item?._id}>
+              <ActionsheetItemText>{item?.category}</ActionsheetItemText>
+            </ActionsheetItem>
+          ))}
+        </ActionsheetContent>
+      </Actionsheet>
+      {/* ActionSheet */}
+      <Actionsheet
+        isOpen={showActionsheetPrecessional}
+        onClose={() => setShowActionsheetPrecessional(false)}
+        zIndex={999}>
+        <ActionsheetBackdrop />
+        <ActionsheetContent h="$72" zIndex={999}>
+          <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper>
+          {allProfessionalCategory?.map((item: any) => (
+            <ActionsheetItem
+              onPress={() => handlePerfessionalSelect(item)}
+              key={item?._id}>
               <ActionsheetItemText>{item?.category}</ActionsheetItemText>
             </ActionsheetItem>
           ))}
@@ -1088,7 +1127,7 @@ const CompleteProfile = () => {
           </ActionsheetDragIndicatorWrapper>
           <Box w={'$full'}>
             <ScrollView showsVerticalScrollIndicator={false}>
-              {professionalData?.data?.data?.map((item: any) => (
+              {personalData?.data?.data?.map((item: any) => (
                 <ActionsheetItem
                   onPress={() => handleSelect2(item)}
                   bg={

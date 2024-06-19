@@ -39,11 +39,13 @@ import RenderHTML from 'react-native-render-html';
 import {Actionsheet} from '@gluestack-ui/themed';
 import {ActionsheetDragIndicator} from '@gluestack-ui/themed';
 import {COLORS} from '~/Styles';
+import {SOCKET_BASE_URL} from '~/Utils';
+import {io} from 'socket.io-client';
 
 type Props = NativeStackScreenProps<PrivateRoutesTypes, 'ChatDetails'>;
 const ChatDetails = ({route: {params}}: Props) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
-  const {socketRef} = useAppContext();
+  // const {socketRef} = useAppContext();
   const [showModal, setShowModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [message, setMessage] = useState('');
@@ -58,6 +60,8 @@ const ChatDetails = ({route: {params}}: Props) => {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedItems, setSelectedItems] = useState<any>([]);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [allMessages, setAllMessages] = useState<any>([]);
+
   const {mutation, isLoading} = useMutation();
   const {width} = useWindowDimensions();
   const {userData} = useAppContext();
@@ -69,20 +73,105 @@ const ChatDetails = ({route: {params}}: Props) => {
   const {data: latestMeetingData, mutate: latestMutate} = useSwrApi(
     `meetings/read-latest/${params?.connection_id}`,
   );
+
   useEffect(() => {
-    socketRef?.current?.emit('join-to-connection', params?.connection_id);
-    socketRef?.current?.on('message-received', (data: any) => {
-      console.log('=========>', data);
-      mutate();
+    setAllMessages(data?.data?.data);
+  }, [data?.data?.data]);
+
+  const socket = io(SOCKET_BASE_URL);
+  useEffect(() => {
+    // Listen for new users joining
+    socket.on('new-user-joined', (data: any) => {
+      console.log(data.message);
     });
-  }, [socketRef]);
+
+    socket.emit('join-to-connection', {
+      connection_id: params?.connection_id,
+    });
+
+    // Listen for new messages
+    socket.on('message-received', (data: any) => {
+      console.log('====>', data);
+      // setAllMessages((prevMessages: any) => [...prevMessages, data?.data]);
+      addMessage(data.data);
+    });
+
+    // Listen for revalidate data
+    socket.on('revalidate-data', (data: any) => {
+      console.log(data.message);
+      // Handle data refetch here
+    });
+
+    // Listen for user typing
+    socket.on('user-is-typing', (data: any) => {
+      // setTyping(true);
+      console.log({data});
+    });
+
+    // Listen for user stopped typing
+    socket.on('user-typing-stopped', (data: any) => {
+      // setTyping(false);
+      console.log('object');
+    });
+
+    // // Listen for user disconnect
+    // socket.on("user_disconnected", (data) => {
+    //   console.log(`User with ID ${data.user_id} disconnected.`);
+    // });
+
+    // Cleanup on component unmount
+    return () => {
+      socket.off('new-user-joined');
+      socket.off('message-received');
+      socket.off('revalidate-data');
+      socket.off('user-is-typing');
+      socket.off('user-typing-stopped');
+      socket.off('user_disconnected');
+    };
+  }, []);
+
+  const addMessage = (newMessage: any) => {
+    setAllMessages((prevMessages: any) => {
+      const newMessages = [...prevMessages];
+      const messageDate = new Date(newMessage?.created_at)
+        ?.toISOString()
+        ?.split('T')[0];
+
+      const dateGroup = newMessages.find(group => group?.date === messageDate);
+      if (dateGroup) {
+        dateGroup?.messages?.push(newMessage);
+      } else {
+        newMessages.push({
+          date: messageDate,
+          messages: [newMessage],
+        });
+      }
+
+      return newMessages;
+    });
+  };
   const handelChat = async () => {
     try {
-      socketRef?.current.emit('send-message', {
-        message: message,
-        userId: userData?._id,
+      setMessage('');
+      const messageData = {
         connection_id: params?.connection_id,
-      });
+        _id: Date.now() * Math.random(),
+        created_at: new Date().toISOString(),
+        deleted_by: [],
+        is_deleted: false,
+        is_delivered: false,
+        is_edited: false,
+        is_read: false,
+        is_received: false,
+        is_replied: false,
+        message_date: new Date()?.toISOString()?.split('T')[0],
+        message_type: 'text',
+        reactions: [],
+        replies: [],
+        text: message,
+        updated_at: new Date().toISOString(),
+      };
+      socket.emit('send-message', messageData);
 
       const res = await mutation(`chats/send-message`, {
         method: 'POST',
@@ -92,10 +181,10 @@ const ChatDetails = ({route: {params}}: Props) => {
           text: message,
         },
       });
-      if (res?.status === 201) {
-        mutate();
-        setMessage('');
-      }
+      // if (res?.status === 201) {
+      //   mutate();
+      //   setMessage('');
+      // }
     } catch (error) {
       console.log(error);
     }
@@ -290,7 +379,7 @@ const ChatDetails = ({route: {params}}: Props) => {
     setState(latestMeetingData?.data?.data?.location_details?.state);
   }, [latestMeetingData?.data?.data]);
 
-  // console.log(latestMeetingData?.data?.data?.is_sender_paid);
+  console.log(data?.data?.data);
 
   return (
     <PrivateContainer
@@ -328,7 +417,8 @@ const ChatDetails = ({route: {params}}: Props) => {
             // onRefresh={() => mutate()}
             // refreshing={isValidating}
             showsVerticalScrollIndicator={false}
-            data={data?.data?.data}
+            // data={data?.data?.data}
+            data={allMessages}
             renderItem={({item}: any) => (
               <Box my={'$2'}>
                 <Box alignItems="center" my={'$2'}>

@@ -36,19 +36,19 @@ export default ({children}: AppContextProviderProps) => {
   useEffect(() => {
     let mounted = true;
 
-    if (mounted) {
-      socketRef.current = io(SOCKET_BASE_URL);
+    // if (mounted) {
+    //   socketRef.current = io(SOCKET_BASE_URL);
 
-      socketRef?.current?.on('connect', () => {
-        console.log('socket connected');
+    //   socketRef?.current?.on('connect', () => {
+    //     console.log('socket connected');
 
-        // socketRef?.current.emit('user-online', user?._id);
-      });
-    }
+    //     // socketRef?.current.emit('user-online', user?._id);
+    //   });
+    // }
 
-    return () => {
-      mounted = false;
-    };
+    // return () => {
+    //   mounted = false;
+    // };
   }, [userData, socketRef]);
   return (
     <AppContext.Provider
