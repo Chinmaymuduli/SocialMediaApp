@@ -70,9 +70,10 @@ const ChatDetails = ({route: {params}}: Props) => {
     `meetings/read-latest/${params?.connection_id}`,
   );
   useEffect(() => {
-    socketRef?.current?.on('join-to-connection', params?.connection_id);
-    socketRef?.current?.emit('new-user-joined', {
-      message: 'New user joined.',
+    socketRef?.current?.emit('join-to-connection', params?.connection_id);
+    socketRef?.current?.on('message-received', (data: any) => {
+      console.log('=========>', data);
+      mutate();
     });
   }, [socketRef]);
   const handelChat = async () => {

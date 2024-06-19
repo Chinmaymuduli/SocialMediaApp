@@ -70,10 +70,15 @@ const CompleteProfile = () => {
 
   const [showActionsheet, setShowActionsheet] = React.useState(false);
   const [showActionsheet2, setShowActionsheet2] = React.useState(false);
+  const [showActionsheetSubProfessional, setShowActionsheetSubProfessional] =
+    React.useState(false);
   const [citiesModal, setCitiesModal] = React.useState(false);
 
   const [allCities, setAllCities] = useState<any>([]);
   const [multipleSubCategory, setMultipleSubCategory] = useState<any>([]);
+  const [multipleSubProfessional, setMultipleSubProfessional] = useState<any>(
+    [],
+  );
   const [selectCity, setSelectCity] = useState<any>();
 
   const {mutation, isLoading} = useMutation();
@@ -108,6 +113,10 @@ const CompleteProfile = () => {
     setMultipleSubCategory(userData?.interests);
   }, [userData]);
 
+  useEffect(() => {
+    setMultipleSubCategory([]);
+  }, [expertise]);
+
   const handelUpdateProfile = async () => {
     try {
       const locationDetails = {
@@ -117,7 +126,7 @@ const CompleteProfile = () => {
         state: allState?.title,
         coordinates: [12.988, 77.6895],
       };
-      const interests = [expertise?._id, expertiseFor?._id];
+      // const interests = [expertise?._id, expertiseFor?._id];
       const locationDetailsString = JSON.stringify(locationDetails);
       const formData = new FormData();
       formData.append('name', name);
@@ -161,7 +170,6 @@ const CompleteProfile = () => {
     }
   };
 
-  console.log({expertise});
   const handleStateSelect = (state: any) => {
     setShowStatePicker(false);
     setState(state);
@@ -193,8 +201,21 @@ const CompleteProfile = () => {
     // setShowActionsheet2(false);
     // setExpertiseFor(data);
   };
-
-  console.log({multipleSubCategory});
+  const handleSelectProfessional = (data: any) => {
+    let exist = multipleSubProfessional?.find(
+      (i: any) => i?.label === data?.label,
+    );
+    if (exist) {
+      const removeLabel = multipleSubProfessional?.filter(
+        (i: any) => i?.label !== data?.label,
+      );
+      setMultipleSubProfessional(removeLabel);
+    } else {
+      setMultipleSubProfessional([...multipleSubProfessional, data]);
+    }
+    // setShowActionsheet2(false);
+    // setExpertiseFor(data);
+  };
 
   const handelVerifyPhone = async () => {
     try {
@@ -323,7 +344,9 @@ const CompleteProfile = () => {
 
   return (
     <SafeAreaView>
-      <ScrollView contentContainerStyle={{paddingBottom: 50}}>
+      <ScrollView
+        contentContainerStyle={{paddingBottom: 50}}
+        showsVerticalScrollIndicator={false}>
         <Box bg={'$pink300'}>
           <Text
             textAlign={'center'}
@@ -902,7 +925,7 @@ const CompleteProfile = () => {
                 </VStack>
                 <VStack w={'45%'} gap={'$2'}>
                   <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
-                    Professional
+                    Expertise in
                   </Text>
                   <Pressable
                     onPress={() => setShowActionsheet2(true)}
@@ -919,25 +942,75 @@ const CompleteProfile = () => {
                       color={'$coolGray500'}
                       p={'$3'}>
                       {multipleSubCategory?.length > 0
-                        ? multipleSubCategory?.length + ' ' + 'Professional'
+                        ? multipleSubCategory?.length + ' ' + 'Expertises'
                         : 'Select Professional '}
                     </Text>
                   </Pressable>
                 </VStack>
               </HStack>
+
+              <HStack justifyContent={'space-between'} mt={2}>
+                <VStack gap={'$2'} w={'45%'}>
+                  <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
+                    Professional
+                  </Text>
+                  <Pressable
+                    onPress={() => setShowActionsheet(true)}
+                    borderWidth={1}
+                    borderRadius={5}
+                    style={{
+                      height: 45,
+                    }}
+                    bg={'white'}
+                    borderColor={'$coolGray300'}>
+                    <Text
+                      fontWeight={'semibold'}
+                      fontSize={'$sm'}
+                      color={'$coolGray500'}
+                      p={'$3'}>
+                      {expertise?.category
+                        ? expertise?.category
+                        : 'Select Personal'}
+                    </Text>
+                  </Pressable>
+                </VStack>
+                <VStack w={'45%'} gap={'$2'}>
+                  <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
+                    Expertise in
+                  </Text>
+                  <Pressable
+                    onPress={() => setShowActionsheetSubProfessional(true)}
+                    borderWidth={1}
+                    borderRadius={5}
+                    style={{
+                      height: 45,
+                    }}
+                    bg={'white'}
+                    borderColor={'$coolGray300'}>
+                    <Text
+                      fontWeight={'bold'}
+                      fontSize={'$xs'}
+                      color={'$coolGray500'}
+                      p={'$3'}>
+                      {multipleSubProfessional?.length > 0
+                        ? multipleSubProfessional?.length + ' ' + 'Expertise'
+                        : 'Select Expertise  '}
+                    </Text>
+                  </Pressable>
+                </VStack>
+              </HStack>
             </VStack>
-            <VStack gap={'$2'} mt={'$2'}>
+            {/* <VStack gap={'$2'} mt={'$2'}>
               <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
                 Description
               </Text>
               <Textarea
-                // size="md"
                 isReadOnly={false}
                 isInvalid={false}
                 isDisabled={false}>
                 <TextareaInput placeholder="Write description..." />
               </Textarea>
-            </VStack>
+            </VStack> */}
           </Box>
         </Box>
 
@@ -1030,6 +1103,47 @@ const CompleteProfile = () => {
                   <ActionsheetItemText
                     color={
                       multipleSubCategory?.find(
+                        (i: any) => i?.label === item?.label,
+                      )
+                        ? '$white'
+                        : COLORS.secondary
+                    }
+                    fontFamily="Montserrat-Medium">
+                    {item?.label}
+                  </ActionsheetItemText>
+                </ActionsheetItem>
+              ))}
+            </ScrollView>
+          </Box>
+        </ActionsheetContent>
+      </Actionsheet>
+      {/* sub category */}
+      <Actionsheet
+        isOpen={showActionsheetSubProfessional}
+        onClose={() => setShowActionsheetSubProfessional(false)}
+        zIndex={999}>
+        <ActionsheetBackdrop />
+        <ActionsheetContent zIndex={999}>
+          <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper>
+          <Box w={'$full'}>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {professionalData?.data?.data?.map((item: any) => (
+                <ActionsheetItem
+                  onPress={() => handleSelectProfessional(item)}
+                  bg={
+                    multipleSubProfessional?.find(
+                      (i: any) => i?.label === item?.label,
+                    )
+                      ? COLORS.secondary
+                      : '$white'
+                  }
+                  mb={'$2'}
+                  key={item?._id}>
+                  <ActionsheetItemText
+                    color={
+                      multipleSubProfessional?.find(
                         (i: any) => i?.label === item?.label,
                       )
                         ? '$white'
