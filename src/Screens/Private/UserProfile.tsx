@@ -115,6 +115,8 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
       StatusBar.setBarStyle('light-content');
       StatusBar.setTranslucent(true);
       StatusBar.setBackgroundColor('rgba(0, 0, 0, 0.5)');
+      connectMutate();
+      mutate();
 
       return () => {
         StatusBar.setBarStyle('default');

@@ -27,8 +27,9 @@
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
+        <data android:host="feveal.page.link" />
         <data android:scheme="https"  />
-        <data android:host="feveal.page.link" android:pathPrefix="/" />
+        <data android:scheme="http"  />
     </intent-filter>
     <!-- Deeplinking -->
     <!-- <intent-filter android:autoVerify="true">

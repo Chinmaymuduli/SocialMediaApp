@@ -157,6 +157,7 @@ const ChatDetails = ({route: {params}}: Props) => {
         connection_id: params?.connection_id,
         _id: Date.now() * Math.random(),
         created_at: new Date().toISOString(),
+        sender_id: userData?._id,
         deleted_by: [],
         is_deleted: false,
         is_delivered: false,
@@ -379,7 +380,7 @@ const ChatDetails = ({route: {params}}: Props) => {
     setState(latestMeetingData?.data?.data?.location_details?.state);
   }, [latestMeetingData?.data?.data]);
 
-  console.log(data?.data?.data);
+  // console.log(data?.data?.data?.[1]);
 
   return (
     <PrivateContainer
@@ -430,8 +431,8 @@ const ChatDetails = ({route: {params}}: Props) => {
                 </Box>
                 {item?.messages?.map((msg: any, key: any) => (
                   <Box key={key} my={'$1'}>
-                    {/* {console.log({msg})} */}
-                    {msg?.is_received && msg?.message_type === 'text' ? (
+                    {msg?.sender_id !== userData?._id &&
+                    msg?.message_type === 'text' ? (
                       <Box
                         alignSelf="flex-start"
                         bg={'$white'}

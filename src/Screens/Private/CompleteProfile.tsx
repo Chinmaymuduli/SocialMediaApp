@@ -82,6 +82,7 @@ const CompleteProfile = () => {
 
   const [allCities, setAllCities] = useState<any>([]);
   const [multipleSubCategory, setMultipleSubCategory] = useState<any>([]);
+  const [allSubCategory, setAllSubCategory] = useState<any>([]);
   const [multipleSubProfessional, setMultipleSubProfessional] = useState<any>(
     [],
   );
@@ -127,6 +128,12 @@ const CompleteProfile = () => {
     setMultipleSubCategory([]);
   }, [expertise]);
 
+  useEffect(() => {
+    setAllSubCategory([...multipleSubCategory, ...multipleSubProfessional]);
+  }, [multipleSubCategory, multipleSubProfessional]);
+
+  // console.log({allSubCategory});
+
   const handelUpdateProfile = async () => {
     try {
       const locationDetails = {
@@ -143,8 +150,8 @@ const CompleteProfile = () => {
       formData.append('nick_name', nickName);
       formData.append('gender', gender);
       formData.append('dob', moment(selectedDate).toISOString());
-      multipleSubCategory?.length > 0 &&
-        multipleSubCategory?.forEach((interest: any) => {
+      allSubCategory?.length > 0 &&
+        allSubCategory?.forEach((interest: any) => {
           formData.append('interests', interest?._id);
         });
       // interests.forEach(interest => {
