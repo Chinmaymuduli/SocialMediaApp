@@ -185,10 +185,31 @@ const AdminDashboard = () => {
                 </Button>
               </HStack>
               <FormControl>
+                <VStack>
+
+                </VStack>
                 <VStack space="xs">
                   <Text fontFamily={'Montserrat-Bold'} fontSize={13}>
                     Add Extra Amount
                   </Text>
+                  <Input
+                    my={'$2'}
+                  >
+                    <InputField
+                      type="text"
+                      value={commission}
+                      onChangeText={handleCommissionChange}
+                      placeholder='Enter Amount Title '
+
+                    />
+                    <InputSlot pr="$3">
+                      <AppIcon
+                        MaterialCommunityIconsName="account-details"
+                        size={25}
+                        color="black"
+                      />
+                    </InputSlot>
+                  </Input>
                   <Input
                     my={'$2'}
                   >
