@@ -1,6 +1,6 @@
 import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import {Box} from '@gluestack-ui/themed';
+import {Box, Spinner} from '@gluestack-ui/themed';
 import MyConnectionCompo from './MyConnectionCompo';
 import {useSwrApi} from '~/Hooks';
 import {PrivateContainer} from '~/Components/container';
@@ -10,7 +10,12 @@ const AllMyConnect = () => {
     `connections/read-all?type=all&is_accepted=true&require_all=true`,
   );
 
-  console.log(data?.data?.data);
+  if (isValidating)
+    return (
+      <Box flex={1} justifyContent="center" alignItems="center">
+        <Spinner size={'large'} />
+      </Box>
+    );
   return (
     <PrivateContainer title={'My Connections'} hasBackIcon={true}>
       <MyConnectionCompo data={data?.data?.data} />

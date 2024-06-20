@@ -17,6 +17,7 @@ import {InputField} from '@gluestack-ui/themed';
 import {COLORS} from '~/Styles';
 import AppIcon from '~/Components/core/AppIcon';
 import {useAppContext} from '~/Contexts';
+import moment from 'moment';
 const CommonCompo = ({item, mutate}: any) => {
   const [isReplay, setIsReplay] = useState(false);
   const [replayComment, setReplayComments] = useState('');
@@ -64,12 +65,12 @@ const CommonCompo = ({item, mutate}: any) => {
     }
   };
 
-  // console.log(data?.data?.data);
+  // console.log(item);
 
   return (
     <Box py={'$1'}>
       <VStack px={'$4'}>
-        <HStack justifyContent="space-between">
+        <HStack justifyContent="space-between" mb={'$1'}>
           <HStack gap={'$2'} alignItems="center">
             <Image
               source={
@@ -98,6 +99,11 @@ const CommonCompo = ({item, mutate}: any) => {
         <Text fontFamily="Montserrat-Medium" fontSize={14} mt={'$1'}>
           {item?.message}
         </Text>
+        <Box mt={'$1'}>
+          <Text fontFamily="Montserrat-Medium" fontSize={12}>
+            {moment(item?.created_at).fromNow()}
+          </Text>
+        </Box>
         {/* Replay Comments */}
         <Box px={'$4'} mt={'$5'}>
           {data?.data?.data?.map((item: any) => (
@@ -131,6 +137,11 @@ const CommonCompo = ({item, mutate}: any) => {
               <Text fontFamily="Montserrat-Medium" fontSize={14}>
                 {item?.message}
               </Text>
+              <Box mt={'$1'}>
+                <Text fontFamily="Montserrat-Medium" fontSize={12}>
+                  {moment(item?.created_at).fromNow()}
+                </Text>
+              </Box>
             </Box>
           ))}
         </Box>

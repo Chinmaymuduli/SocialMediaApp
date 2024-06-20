@@ -42,6 +42,7 @@ const PostCompo = ({item, mutate}: any) => {
   const [loading, setLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const {userData} = useAppContext();
+
   const {
     data: allLikeData,
     isValidating: likeValidating,
@@ -92,7 +93,7 @@ const PostCompo = ({item, mutate}: any) => {
     const link = await dynamicLinks().buildLink({
       link: `https://invertase.io?id=${id}`,
       // domainUriPrefix is created in your Firebase console
-      domainUriPrefix: 'https://fevealapp.page.link',
+      domainUriPrefix: 'https://feveal.page.link',
     });
 
     return link;
@@ -125,29 +126,54 @@ const PostCompo = ({item, mutate}: any) => {
     {
       id: '1',
       img: IMAGES.HEART_EMOJI,
-      value: 52,
+      value: item?.like_counts?.love || 0,
+      name: 'love',
     },
     {
       id: '2',
       img: IMAGES.MONEY_EMOJI,
-      value: 12,
+      value: item?.like_counts?.funny || 0,
+      name: 'funny',
     },
     {
       id: '3',
       img: IMAGES.SAD_EMOJI,
-      value: 32,
+      value: item?.like_counts?.sad || 0,
+      name: 'sad',
     },
     {
       id: '4',
       img: IMAGES.YELLOW_EMOJI,
-      value: 42,
+      value: item?.like_counts?.liked || 0,
+      name: 'liked',
     },
     {
       id: '5',
       img: IMAGES.THUMB_EMOJI,
-      value: 88,
+      value: item?.like_counts?.not_liked || 0,
+      name: 'not_liked',
     },
   ];
+
+  const handelLike = async (emojiName: string, post_id: any) => {
+    try {
+      const res = await mutation(`posts/like-or-dislike`, {
+        method: 'POST',
+        body: {
+          [emojiName]: item?.is_liked ? !item?.is_liked?.[emojiName] : true,
+          post_id,
+        },
+      });
+      if (res?.results?.success === true) {
+        likeMutate();
+        mutate();
+      } else {
+        Alert.alert('Error', res?.results?.error?.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const onViewableItemsChanged = useRef(({viewableItems}: any) => {
     if (viewableItems?.length > 0) {
@@ -166,10 +192,9 @@ const PostCompo = ({item, mutate}: any) => {
           <Image source={{uri: item?.url}} style={styles.media} />
         </Box>
       );
+    } else if (item?.fileType === 'video') {
+      return <VideoCompo url={item?.url} />;
     }
-    // else if (item?.fileType === 'video') {
-    //   return <VideoCompo url={item?.url} />;
-    // }
     return null;
   }, []);
   const keyExtractor = useCallback(
@@ -177,8 +202,15 @@ const PostCompo = ({item, mutate}: any) => {
     [],
   );
 
+  // console.log({item});
+
   return (
-    <Box softShadow="1" bg={'$white'} mb={'$4'} borderRadius={6} flex={1}>
+    <Box
+      softShadow="1"
+      bg={isLoading ? '$coolGray100' : '$white'}
+      mb={'$4'}
+      borderRadius={6}
+      flex={1}>
       <View
         style={{
           paddingBottom: 10,
@@ -308,14 +340,32 @@ const PostCompo = ({item, mutate}: any) => {
           </TouchableOpacity> */}
           {EMOJI_ARRAY?.map(emoji => (
             <HStack alignItems="center" gap={'$1'} key={emoji?.id}>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={
+                  isLoading
+                    ? () => {}
+                    : () => {
+                        handelLike(emoji?.name, item?._id);
+                      }
+                }>
                 <Image
                   source={emoji.img}
                   alt="img"
                   style={{height: 25, width: 25}}
                 />
               </TouchableOpacity>
-              <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+              <Text
+                fontFamily={
+                  item?.is_liked?.[emoji?.name]
+                    ? 'Montserrat-Bold'
+                    : 'Montserrat-SemiBold'
+                }
+                fontSize={13}
+                color={
+                  item?.is_liked?.[emoji?.name]
+                    ? COLORS.secondary
+                    : '$coolGray500'
+                }>
                 {emoji.value}
               </Text>
             </HStack>

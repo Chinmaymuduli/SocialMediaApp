@@ -32,6 +32,7 @@ const useBasicFunction = () => {
   const handleLogout = () => {
     AsyncStorage.removeItem('isLoggedIn')
       .then(() => {
+        setUserData({});
         setIsLoggedIn(false);
       })
       .catch(error => console.log(error));

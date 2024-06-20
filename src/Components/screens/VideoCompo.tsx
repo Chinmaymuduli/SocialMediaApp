@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
-import Video from 'react-native-video';
+import Video, {VideoRef} from 'react-native-video';
 import {WIDTH} from '~/Utils';
 
 const VideoCompo = ({url}: any) => {
@@ -12,6 +12,7 @@ const VideoCompo = ({url}: any) => {
       ref.current?.pause();
     };
   }, []);
+  console.log('video run');
   return (
     <Pressable
       // style={{width: '100%'}}

@@ -1,5 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {
+  ActionsheetBackdrop,
+  ActionsheetContent,
+  ActionsheetDragIndicatorWrapper,
   Avatar,
   Box,
   CloseIcon,
@@ -22,7 +25,7 @@ import {useNavigation} from '@react-navigation/native';
 import {PrivateRoutesTypes, PrivateScreenProps} from '~/routes/private/types';
 import AppIcon from '~/Components/core/AppIcon';
 import {PrivateContainer} from '~/Components/container';
-import {StyleSheet, useWindowDimensions} from 'react-native';
+import {Alert, StyleSheet, useWindowDimensions} from 'react-native';
 import {useMutation, useSwrApi} from '~/Hooks';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {Modal} from '@gluestack-ui/themed';
@@ -33,17 +36,18 @@ import moment from 'moment';
 import {useAppContext} from '~/Contexts';
 import LinearGradient from 'react-native-linear-gradient';
 import RenderHTML from 'react-native-render-html';
+import {Actionsheet} from '@gluestack-ui/themed';
+import {ActionsheetDragIndicator} from '@gluestack-ui/themed';
+import {COLORS} from '~/Styles';
+import {SOCKET_BASE_URL} from '~/Utils';
+import {io} from 'socket.io-client';
 
 type Props = NativeStackScreenProps<PrivateRoutesTypes, 'ChatDetails'>;
 const ChatDetails = ({route: {params}}: Props) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
-  const {socketRef} = useAppContext();
+  // const {socketRef} = useAppContext();
   const [showModal, setShowModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const {userData} = useAppContext();
-  const {data, mutate, isValidating} = useSwrApi(
-    `chats/read-all?connection_id=${params?.connection_id}`,
-  );
   const [message, setMessage] = useState('');
   const [amount, setAmount] = useState('');
   const [pin, setPin] = useState('');
@@ -51,25 +55,124 @@ const ChatDetails = ({route: {params}}: Props) => {
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [upiId, setUpiId] = useState('');
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
+  const [latitude, setLatitude] = useState('12.9880');
+  const [longitude, setLongitude] = useState('77.6895');
   const [selectedDate, setSelectedDate] = useState('');
-  const {mutation, isLoading} = useMutation();
+  const [selectedItems, setSelectedItems] = useState<any>([]);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [allMessages, setAllMessages] = useState<any>([]);
+
+  const {mutation, isLoading} = useMutation();
   const {width} = useWindowDimensions();
+  const {userData} = useAppContext();
+  const {data, mutate, isValidating} = useSwrApi(
+    `chats/read-all?connection_id=${params?.connection_id}`,
+  );
+  const {data: productsData} = useSwrApi(`products`);
+  const {data: commissionData} = useSwrApi(`commission`);
+  const {data: latestMeetingData, mutate: latestMutate} = useSwrApi(
+    `meetings/read-latest/${params?.connection_id}`,
+  );
+
   useEffect(() => {
-    socketRef?.current?.on('join-to-connection', params?.connection_id);
-    socketRef?.current?.emit('new-user-joined', {
-      message: 'New user joined.',
+    setAllMessages(data?.data?.data);
+  }, [data?.data?.data]);
+
+  const socket = io(SOCKET_BASE_URL);
+  useEffect(() => {
+    // Listen for new users joining
+    socket.on('new-user-joined', (data: any) => {
+      console.log(data.message);
     });
-  }, [socketRef]);
+
+    socket.emit('join-to-connection', {
+      connection_id: params?.connection_id,
+    });
+
+    // Listen for new messages
+    socket.on('message-received', (data: any) => {
+      console.log('====>', data);
+      // setAllMessages((prevMessages: any) => [...prevMessages, data?.data]);
+      addMessage(data.data);
+    });
+
+    // Listen for revalidate data
+    socket.on('revalidate-data', (data: any) => {
+      console.log(data.message);
+      // Handle data refetch here
+    });
+
+    // Listen for user typing
+    socket.on('user-is-typing', (data: any) => {
+      // setTyping(true);
+      console.log({data});
+    });
+
+    // Listen for user stopped typing
+    socket.on('user-typing-stopped', (data: any) => {
+      // setTyping(false);
+      console.log('object');
+    });
+
+    // // Listen for user disconnect
+    // socket.on("user_disconnected", (data) => {
+    //   console.log(`User with ID ${data.user_id} disconnected.`);
+    // });
+
+    // Cleanup on component unmount
+    return () => {
+      socket.off('new-user-joined');
+      socket.off('message-received');
+      socket.off('revalidate-data');
+      socket.off('user-is-typing');
+      socket.off('user-typing-stopped');
+      socket.off('user_disconnected');
+    };
+  }, []);
+
+  const addMessage = (newMessage: any) => {
+    setAllMessages((prevMessages: any) => {
+      const newMessages = [...prevMessages];
+      const messageDate = new Date(newMessage?.created_at)
+        ?.toISOString()
+        ?.split('T')[0];
+
+      const dateGroup = newMessages.find(group => group?.date === messageDate);
+      if (dateGroup) {
+        dateGroup?.messages?.push(newMessage);
+      } else {
+        newMessages.push({
+          date: messageDate,
+          messages: [newMessage],
+        });
+      }
+
+      return newMessages;
+    });
+  };
   const handelChat = async () => {
     try {
-      socketRef?.current.emit('send-message', {
-        message: message,
-        userId: userData?._id,
+      setMessage('');
+      const messageData = {
         connection_id: params?.connection_id,
-      });
+        _id: Date.now() * Math.random(),
+        created_at: new Date().toISOString(),
+        sender_id: userData?._id,
+        deleted_by: [],
+        is_deleted: false,
+        is_delivered: false,
+        is_edited: false,
+        is_read: false,
+        is_received: false,
+        is_replied: false,
+        message_date: new Date()?.toISOString()?.split('T')[0],
+        message_type: 'text',
+        reactions: [],
+        replies: [],
+        text: message,
+        updated_at: new Date().toISOString(),
+      };
+      socket.emit('send-message', messageData);
 
       const res = await mutation(`chats/send-message`, {
         method: 'POST',
@@ -79,10 +182,10 @@ const ChatDetails = ({route: {params}}: Props) => {
           text: message,
         },
       });
-      if (res?.status === 201) {
-        mutate();
-        setMessage('');
-      }
+      // if (res?.status === 201) {
+      //   mutate();
+      //   setMessage('');
+      // }
     } catch (error) {
       console.log(error);
     }
@@ -112,7 +215,8 @@ const ChatDetails = ({route: {params}}: Props) => {
         },
       });
       console.log({res: res?.results});
-      if (res?.status === 201) {
+      if (res?.results?.success === true) {
+        Alert.alert('Success', 'Meeting scheduled successfully');
         setShowModal(false);
       }
     } catch (error) {
@@ -120,31 +224,164 @@ const ChatDetails = ({route: {params}}: Props) => {
     }
   };
 
-  const makePayment = () => {
-    paymentMethod();
+  const handelUpdateMeeting = async () => {
+    try {
+      const res = await mutation(
+        `meetings/${latestMeetingData?.data?.data?._id}`,
+        {
+          method: 'PUT',
+          body: {
+            connection_id: params?.connection_id,
+            upi_id: upiId,
+            amount: amount,
+            date: selectedDate,
+            location_details: {
+              address: address,
+              city: city,
+              state: state,
+              coordinates: [latitude, longitude],
+              pincode: Number(pin),
+            },
+          },
+        },
+      );
+      if (res?.results?.success === true) {
+        Alert.alert('Success', 'Meeting updated successfully');
+        setShowModal(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const paymentMethod = () => {
+  const makePayment = async () => {
+    try {
+      const data: any = {
+        meeting_id: latestMeetingData?.data?.data?._id,
+        product: {
+          list: [],
+        },
+      };
+      if (selectedItems?.length > 0) {
+        data.product.list = selectedItems.map((item: any) => ({
+          title: item?.title,
+          price: item?.price,
+          product_id: item?._id,
+        }));
+      }
+      const orderResponse = await mutation(`payments/orders/create`, {
+        method: 'POST',
+        body: data,
+      });
+      console.log(orderResponse);
+      if (orderResponse?.results?.success === true) {
+        checkOutOrder(orderResponse?.results?.data?._id);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const checkOutOrder = async (orderId: any) => {
+    try {
+      const res = await mutation(`payments/orders/checkout`, {
+        method: 'POST',
+        body: {
+          order_id: orderId,
+          payment_type: 'send',
+        },
+      });
+      if (res?.results?.success === true) {
+        paymentMethod(res?.results?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const paymentMethod = (paymentData: any) => {
     const options = {
       description: 'Feveal',
       currency: 'INR',
-      key: 'rzp_test_hs7GKWV7szSVEA', // Your api key
-      amount: 2450,
+      key: 'rzp_test_hs7GKWV7szSVEA',
+      amount: paymentData?.total_fare * 100,
       name: userData?.name,
+      order_id: paymentData?.metadata?.razorpay_order_id,
       prefill: {
         email: userData?.email || 'demo@gmail.com',
-        contact: userData?.phoneNumber || 8956325102,
+        contact: userData?.phoneNumber,
         name: userData?.name,
       },
     };
     RazorpayCheckout.open(options)
       .then(async (data: any) => {
-        console.log({data});
+        const verifyOrder = await mutation(`payments/orders/verify`, {
+          method: 'PUT',
+          body: {
+            payment_order_id: paymentData?.order_id,
+            razorpay_order_id: paymentData?.metadata?.razorpay_order_id,
+            razorpay_payment_id: data.razorpay_payment_id,
+            razorpay_signature: data.razorpay_signature,
+          },
+        });
+        if (verifyOrder?.results?.success === true) {
+          mutate();
+          setShowPaymentModal(false);
+          latestMutate();
+          Alert.alert('Success', 'Payment Successful');
+        }
       })
       .catch((error: any) => {
         console.log(error);
       });
   };
+
+  // const paymentMethod = () => {
+  //   const options = {
+  //     description: 'Feveal',
+  //     currency: 'INR',
+  //     key: 'rzp_test_hs7GKWV7szSVEA', // Your api key
+  //     amount: 2450,
+  //     name: userData?.name,
+  //     prefill: {
+  //       email: userData?.email || 'demo@gmail.com',
+  //       contact: userData?.phoneNumber || 8956325102,
+  //       name: userData?.name,
+  //     },
+  //   };
+  //   RazorpayCheckout.open(options)
+  //     .then(async (data: any) => {
+  //       console.log({data});
+  //     })
+  //     .catch((error: any) => {
+  //       console.log(error);
+  //     });
+  // };
+
+  // console.log(productsData?.data?.data);
+  const addExtraItem = (extraItem: any) => {
+    let exist = selectedItems?.find((_: any) => _?._id === extraItem?._id);
+    if (exist) {
+      const updatedItems = selectedItems?.filter(
+        (item: any) => item?._id !== extraItem?._id,
+      );
+      setSelectedItems(updatedItems);
+    } else {
+      setSelectedItems((prevItems: any) => [...prevItems, extraItem]);
+    }
+  };
+
+  useEffect(() => {
+    setAmount(latestMeetingData?.data?.data?.amount?.toString());
+    setUpiId(latestMeetingData?.data?.data?.upi_id);
+    setSelectedDate(latestMeetingData?.data?.data?.date);
+    setPin(latestMeetingData?.data?.data?.location_details?.pincode);
+    setAddress(latestMeetingData?.data?.data?.location_details?.address);
+    setCity(latestMeetingData?.data?.data?.location_details?.city);
+    setState(latestMeetingData?.data?.data?.location_details?.state);
+  }, [latestMeetingData?.data?.data]);
+
+  // console.log(data?.data?.data?.[1]);
+
   return (
     <PrivateContainer
       hasBackIcon={true}
@@ -178,12 +415,14 @@ const ChatDetails = ({route: {params}}: Props) => {
         style={styles.linearGradient}>
         <Box flex={1} mt={'$3'}>
           <FlatList
-            onRefresh={() => mutate()}
-            refreshing={isValidating}
-            data={data?.data?.data}
+            // onRefresh={() => mutate()}
+            // refreshing={isValidating}
+            showsVerticalScrollIndicator={false}
+            // data={data?.data?.data}
+            data={allMessages}
             renderItem={({item}: any) => (
               <Box my={'$2'}>
-                <Box alignItems="center">
+                <Box alignItems="center" my={'$2'}>
                   <Text fontSize={13} fontFamily="Montserrat-SemiBold">
                     {item?.date === new Date().toDateString()
                       ? 'Today'
@@ -192,17 +431,47 @@ const ChatDetails = ({route: {params}}: Props) => {
                 </Box>
                 {item?.messages?.map((msg: any, key: any) => (
                   <Box key={key} my={'$1'}>
-                    {/* {console.log({msg})} */}
-                    {msg?.is_received && msg?.message_type === 'text' ? (
-                      <Text ml={'$2'} fontFamily="Montserrat-Medium">
-                        {msg?.text}
-                      </Text>
+                    {msg?.sender_id !== userData?._id &&
+                    msg?.message_type === 'text' ? (
+                      <Box
+                        alignSelf="flex-start"
+                        bg={'$white'}
+                        px={'$2'}
+                        py={'$1'}
+                        borderRadius={'$lg'}>
+                        <Text fontFamily="Montserrat-Medium" fontSize={14}>
+                          {msg?.text}
+                        </Text>
+                        <Box alignSelf="flex-end" pl={'$5'} mt={'$0.5'}>
+                          <Text
+                            fontFamily="Montserrat-Medium"
+                            fontSize={11}
+                            color={'$coolGray400'}>
+                            {moment(item?.created_at).format('hh:mm A')}
+                          </Text>
+                        </Box>
+                      </Box>
                     ) : (
                       msg?.message_type === 'text' && (
                         <Box alignSelf="flex-end" pr={'$4'}>
-                          <Text fontFamily="Montserrat-Medium">
-                            {msg?.text}
-                          </Text>
+                          <Box
+                            alignSelf="flex-start"
+                            bg={'$white'}
+                            px={'$2'}
+                            py={'$1'}
+                            borderRadius={'$lg'}>
+                            <Text fontFamily="Montserrat-Medium">
+                              {msg?.text}
+                            </Text>
+                            <Box alignSelf="flex-end" pl={'$5'} mt={'$0.5'}>
+                              <Text
+                                fontFamily="Montserrat-Medium"
+                                fontSize={11}
+                                color={'$coolGray400'}>
+                                {moment(item?.created_at).format('hh:mm A')}
+                              </Text>
+                            </Box>
+                          </Box>
                         </Box>
                       )
                     )}
@@ -368,7 +637,7 @@ const ChatDetails = ({route: {params}}: Props) => {
                   />
                 </Input>
               </VStack>
-              <VStack gap={'$0.5'}>
+              {/* <VStack gap={'$0.5'}>
                 <Text fontFamily="Montserrat-Medium">Latitude</Text>
                 <Input borderRadius={'$lg'}>
                   <InputField
@@ -389,18 +658,22 @@ const ChatDetails = ({route: {params}}: Props) => {
                     onChangeText={txt => setLongitude(txt)}
                   />
                 </Input>
-              </VStack>
+              </VStack> */}
               <Button
                 borderRadius={5}
                 isLoading={isLoading}
                 py={'$2'}
-                onPress={() => handelCreatePayment()}
+                onPress={
+                  latestMeetingData?.data?.data?._id
+                    ? () => handelUpdateMeeting()
+                    : () => handelCreatePayment()
+                }
                 btnWidth={'100%'}>
                 <Text
                   color="$white"
                   fontFamily="Montserrat-Medium"
                   fontSize={13}>
-                  Confirm
+                  {latestMeetingData?.data?.data?._id ? 'Update' : 'Confirm'}
                 </Text>
               </Button>
             </VStack>
@@ -409,7 +682,7 @@ const ChatDetails = ({route: {params}}: Props) => {
       </Modal>
       {/* Send money */}
 
-      <Modal
+      {/* <Modal
         isOpen={showPaymentModal}
         onClose={() => {
           setShowPaymentModal(false);
@@ -481,8 +754,201 @@ const ChatDetails = ({route: {params}}: Props) => {
               </Button>
             </VStack>
           </ModalBody>
+
         </ModalContent>
-      </Modal>
+      </Modal> */}
+      <Actionsheet
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}>
+        <ActionsheetBackdrop />
+        <ActionsheetContent>
+          {/* <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper> */}
+          <Box w={'$full'}>
+            <Box
+              py={'$3'}
+              px={'$3'}
+              borderBottomWidth={1}
+              borderStyle={'dashed'}>
+              <Text
+                fontSize={15}
+                fontFamily="Montserrat-SemiBold"
+                color={'$black'}>
+                Meeting Details
+              </Text>
+            </Box>
+            {latestMeetingData?.data?.data?._id ? (
+              <Box px={'$3'} py={'$3'}>
+                <VStack>
+                  <Text
+                    fontFamily="Montserrat-SemiBold"
+                    fontSize={15}
+                    color="$black">
+                    Meeting Address :-
+                  </Text>
+                  <Box mt={'$2'}>
+                    <Text fontFamily="Montserrat-Medium" fontSize={14}>
+                      {latestMeetingData?.data?.data?.location_details
+                        ?.address +
+                        ' , ' +
+                        latestMeetingData?.data?.data?.location_details?.city +
+                        ' , ' +
+                        latestMeetingData?.data?.data?.location_details?.state +
+                        ' , ' +
+                        latestMeetingData?.data?.data?.location_details
+                          ?.pincode}
+                    </Text>
+                  </Box>
+                </VStack>
+                <VStack mt={'$5'} gap={'$2'}>
+                  <Text
+                    fontFamily="Montserrat-SemiBold"
+                    fontSize={15}
+                    color="$black">
+                    Meeting Date & Timing :-
+                  </Text>
+                  <Box>
+                    <Text fontFamily="Montserrat-Medium" fontSize={15}>
+                      {moment(latestMeetingData?.data?.data?.date).format(
+                        'LL LT',
+                      )}
+                    </Text>
+                  </Box>
+                </VStack>
+                <VStack mt={'$5'} gap={'$2'}>
+                  <Text
+                    fontFamily="Montserrat-SemiBold"
+                    fontSize={15}
+                    color="$black">
+                    Meeting Price :-
+                  </Text>
+                  <Box>
+                    <Text
+                      fontFamily="Montserrat-SemiBold"
+                      color={COLORS.secondary}
+                      fontSize={15}>
+                      {`RS ${latestMeetingData?.data?.data?.amount}`}
+                    </Text>
+                  </Box>
+                </VStack>
+                {!latestMeetingData?.data?.data?.is_sender_paid && (
+                  <VStack mt={'$5'} gap={'$2'}>
+                    <Text
+                      fontFamily="Montserrat-SemiBold"
+                      fontSize={15}
+                      color="$black">
+                      Add Extra Items :-
+                    </Text>
+                    <Box>
+                      {productsData?.data?.data?.map((item: any) => (
+                        <HStack
+                          key={item?._id}
+                          alignItems="center"
+                          justifyContent="space-between">
+                          <HStack alignItems="center" gap={'$3'}>
+                            <Text
+                              fontFamily="Montserrat-SemiBold"
+                              // color={COLORS.secondary}
+                              fontSize={15}>
+                              {item?.title}
+                            </Text>
+                            <Text
+                              fontFamily="Montserrat-Medium"
+                              // color={COLORS.secondary}
+                              fontSize={15}>
+                              {`(RS ${item?.price} /-)`}
+                            </Text>
+                          </HStack>
+                          <Pressable onPress={() => addExtraItem(item)}>
+                            {selectedItems?.find(
+                              (_: any) => _?._id === item?._id,
+                            ) ? (
+                              <Text
+                                fontFamily="Montserrat-SemiBold"
+                                fontSize={13}
+                                color={'$red400'}>
+                                Remove
+                              </Text>
+                            ) : (
+                              <Text
+                                fontFamily="Montserrat-SemiBold"
+                                color={COLORS.secondary}>
+                                Add
+                              </Text>
+                            )}
+                          </Pressable>
+                        </HStack>
+                      ))}
+                    </Box>
+                  </VStack>
+                )}
+                <VStack mt={'$5'} gap={'$2'}>
+                  <Text
+                    fontFamily="Montserrat-SemiBold"
+                    fontSize={15}
+                    color="$black">
+                    Platform Fee :-
+                  </Text>
+                  <Box>
+                    <Text
+                      fontFamily="Montserrat-SemiBold"
+                      color={COLORS.secondary}
+                      fontSize={15}>
+                      {`RS ${
+                        (latestMeetingData?.data?.data?.amount *
+                          commissionData?.data?.data?.percent) /
+                        100
+                      } `}
+                    </Text>
+                  </Box>
+                </VStack>
+                {latestMeetingData?.data?.data?.is_sender_paid && (
+                  <VStack mt={'$5'} gap={'$2'}>
+                    <Text
+                      fontFamily="Montserrat-SemiBold"
+                      fontSize={15}
+                      color="$black">
+                      Payment Status :-
+                    </Text>
+                    <Box>
+                      <Text
+                        fontFamily="Montserrat-SemiBold"
+                        color={'$green500'}
+                        fontSize={15}>
+                        {'Paid'}
+                      </Text>
+                    </Box>
+                  </VStack>
+                )}
+                {!latestMeetingData?.data?.data?.is_sender_paid && (
+                  <Box mt={'$10'}>
+                    <Button
+                      borderRadius={5}
+                      isLoading={isLoading}
+                      py={'$2'}
+                      onPress={() => makePayment()}
+                      btnWidth={'100%'}>
+                      <Text
+                        color="$white"
+                        fontFamily="Montserrat-SemiBold"
+                        fontSize={13}>
+                        Make Payment
+                      </Text>
+                    </Button>
+                  </Box>
+                )}
+              </Box>
+            ) : (
+              <Box py={'$3'} alignItems="center" justifyContent="center">
+                <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
+                  No Meeting Found
+                </Text>
+              </Box>
+            )}
+          </Box>
+        </ActionsheetContent>
+      </Actionsheet>
 
       <DateTimePicker
         isVisible={isDatePickerVisible}

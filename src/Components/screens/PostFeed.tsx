@@ -54,19 +54,30 @@ const PostFeed = () => {
   );
   // console.log(data?.data?.data?.[0]);
   return (
-    <View>
-      {/* <Box px={'$3'} mb={'$3'} mt={'$6'}>
-        <Input borderRadius={'$lg'}>
-          <InputSlot pl="$3">
-            <InputIcon as={SearchIcon} />
-          </InputSlot>
-          <InputField type="text" placeholder="Search for results" />
-        </Input>
-      </Box> */}
+    <>
       <Box mt={'$3'} mx={'$2'}>
-        {data?.data?.data?.map((item: any, index: any) => (
+        {/* {data?.data?.data?.map((item: any, index: any) => (
           <PostCompo item={item} mutate={mutate} key={index} />
-        ))}
+        ))} */}
+        <FlatList
+          data={data?.data?.data}
+          showsVerticalScrollIndicator={false}
+          renderItem={({item, index}) => (
+            <PostCompo item={item} mutate={mutate} key={index} />
+          )}
+          ListEmptyComponent={
+            <Box alignItems="center" mt={'$20'}>
+              <VStack alignItems="center" gap={10}>
+                <Image
+                  source={IMAGES.CONNECT_BG_REMOVE}
+                  alt="img"
+                  style={{width: 200, height: 200}}
+                />
+                <Text fontFamily="Montserrat-SemiBold">No Posts found</Text>
+              </VStack>
+            </Box>
+          }
+        />
       </Box>
 
       <Modal
@@ -116,7 +127,7 @@ const PostFeed = () => {
           </ModalBody>
         </ModalContent>
       </Modal>
-    </View>
+    </>
   );
 };
 

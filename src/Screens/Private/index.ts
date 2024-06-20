@@ -39,3 +39,4 @@ export {default as RevenueMetricsAllUsers} from './Admin/RevenueMetricsAllUsers'
 // voice call
 export {default as AgoraVoiceCall} from './Agora';
 export {default as ShareScreenDetails} from './ShareScreenDetails';
+export {default as UserAllPhotos} from './UserAllPhotos';

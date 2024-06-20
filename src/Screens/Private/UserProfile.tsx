@@ -1,4 +1,4 @@
-import {Divider, TextareaInput} from '@gluestack-ui/themed';
+import {Divider, Spinner, TextareaInput} from '@gluestack-ui/themed';
 import {
   CloseIcon,
   Modal,
@@ -22,8 +22,9 @@ import {
   Text,
   VStack,
 } from '@gluestack-ui/themed';
+import {useFocusEffect} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {NativeScrollEvent} from 'react-native';
 import {NativeSyntheticEvent, StatusBar} from 'react-native';
 import {Alert} from 'react-native';
@@ -32,6 +33,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import {IMAGES} from '~/Assets';
 import {Button} from '~/Components/core';
 import AppIcon from '~/Components/core/AppIcon';
+import {useAppContext} from '~/Contexts';
 
 import {useMutation, useSwrApi} from '~/Hooks';
 import {PrivateRoutesTypes} from '~/Routes/Private/types';
@@ -45,7 +47,15 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
   const {data, mutate: connectMutate} = useSwrApi(
     `connections/check-is-connected/${params?.user_id}`,
   );
-  const {data: userData, mutate} = useSwrApi(`users/read/${params?.user_id}`);
+
+  const {userData: currentUser} = useAppContext();
+  const {
+    data: userData,
+    isValidating,
+    mutate,
+  } = useSwrApi(`users/read/${params?.user_id}`);
+  console.log(userData);
+
   const handelConnectRequest = async () => {
     try {
       const res = await mutation(`connections/send-request`, {
@@ -83,7 +93,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                 is_accepted: false,
               },
             });
-            console.log(res);
+            console.log(res?.results?.error);
             if (res?.results?.success === true) {
               mutate();
             } else {
@@ -99,6 +109,30 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     setScrollY(event.nativeEvent.contentOffset.y);
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      StatusBar.setBarStyle('light-content');
+      StatusBar.setTranslucent(true);
+      StatusBar.setBackgroundColor('rgba(0, 0, 0, 0.5)');
+      connectMutate();
+      mutate();
+
+      return () => {
+        StatusBar.setBarStyle('default');
+        StatusBar.setTranslucent(false);
+        StatusBar.setBackgroundColor('#000');
+      };
+    }, []),
+  );
+
+  if (isValidating)
+    return (
+      <Box flex={1} justifyContent="center" alignItems="center">
+        <Spinner size={'large'} />
+      </Box>
+    );
+
   return (
     <>
       {scrollY < 300 && (
@@ -120,6 +154,22 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
               alt="image"
               style={{height: 450, width: '100%'}}
             />
+            {userData?.data?.data?.avatars?.length > 0 && (
+              <Box position="absolute" top={60} right={20}>
+                <Pressable
+                  onPress={() =>
+                    navigation.navigate('UserAllPhotos', {
+                      photos: userData?.data?.data?.avatars,
+                    })
+                  }>
+                  <AppIcon
+                    MaterialCommunityIconsName="folder-multiple-image"
+                    size={23}
+                    color={'white'}
+                  />
+                </Pressable>
+              </Box>
+            )}
             <LinearGradient
               // colors={['transparent', COLORS.primary]}
               colors={['transparent', '#290D61']}
@@ -148,27 +198,49 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                     {userData?.data?.data?.location_details?.state}
                   </Text>
                 </VStack>
-                <Box position="absolute" bottom={25} left="30%">
+                <Box position="absolute" bottom={25} left="18%">
                   <Box bg={'$white'} px={'$3'} borderRadius={40}>
                     <HStack alignItems="center" gap={'$3'} py={'$1'}>
-                      <CircularProgress
-                        value={
-                          userData?.data?.data?.personal_matching_percentage ||
-                          0
-                        }
-                        radius={25}
-                        duration={2500}
-                        progressValueColor={COLORS.secondary}
-                        maxValue={100}
-                        activeStrokeColor={COLORS.secondary}
-                        activeStrokeSecondaryColor={COLORS.secondary}
-                        valueSuffix={'%'}
-                      />
-                      <Text
-                        fontFamily="Montserrat-SemiBold"
-                        color={COLORS.secondary}>
-                        Match
-                      </Text>
+                      <HStack alignItems="center" gap={'$2'}>
+                        <CircularProgress
+                          value={
+                            userData?.data?.data
+                              ?.personal_matching_percentage || 0
+                          }
+                          radius={25}
+                          duration={2500}
+                          progressValueColor={COLORS.secondary}
+                          maxValue={100}
+                          activeStrokeColor={COLORS.secondary}
+                          activeStrokeSecondaryColor={COLORS.secondary}
+                          valueSuffix={'%'}
+                        />
+                        <Text
+                          fontFamily="Montserrat-SemiBold"
+                          color={COLORS.secondary}>
+                          social
+                        </Text>
+                      </HStack>
+                      <HStack alignItems="center" gap={'$2'} py={'$1'}>
+                        <CircularProgress
+                          value={
+                            userData?.data?.data
+                              ?.professional_matching_percentage || 0
+                          }
+                          radius={25}
+                          duration={2500}
+                          progressValueColor={COLORS.secondary}
+                          maxValue={100}
+                          activeStrokeColor={COLORS.secondary}
+                          activeStrokeSecondaryColor={COLORS.secondary}
+                          valueSuffix={'%'}
+                        />
+                        <Text
+                          fontFamily="Montserrat-SemiBold"
+                          color={COLORS.secondary}>
+                          skill
+                        </Text>
+                      </HStack>
                     </HStack>
                   </Box>
                 </Box>
@@ -243,35 +315,35 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                 color={COLORS.secondary}>
                 Interests
               </Text>
-              {data?.data?.data?.connection?._id ? (
-                <HStack flexWrap="wrap" mt={'$3'}>
-                  {userData?.data?.data?.interests?.map((int: any) => (
-                    <Box
-                      key={int._id}
-                      borderWidth={1}
-                      borderColor={COLORS.secondary}
-                      borderRadius={20}
-                      mr={'$2'}>
-                      <Text
-                        px={'$2'}
-                        py={'$1'}
-                        fontFamily="Montserrat-SemiBold"
-                        fontSize={12}
-                        color={'$black'}>
-                        {int?.label}
-                      </Text>
-                    </Box>
-                  ))}
-                </HStack>
-              ) : (
-                <Box mt={'$2'}>
-                  <Box bg={'$pink50'} py={'$2'} px={'$2'} borderRadius={7}>
-                    <Text fontFamily="Montserrat-SemiBold" fontSize={11}>
-                      After connected with user you can see their interests !
+              {/* {data?.data?.data?.connection?._id ? ( */}
+              <HStack flexWrap="wrap" mt={'$3'}>
+                {userData?.data?.data?.interests?.map((int: any) => (
+                  <Box
+                    key={int._id}
+                    borderWidth={1}
+                    borderColor={COLORS.secondary}
+                    borderRadius={20}
+                    mr={'$2'}>
+                    <Text
+                      px={'$2'}
+                      py={'$1'}
+                      fontFamily="Montserrat-SemiBold"
+                      fontSize={12}
+                      color={'$black'}>
+                      {int?.label}
                     </Text>
                   </Box>
-                </Box>
-              )}
+                ))}
+              </HStack>
+              {/* // ) : (
+              //   <Box mt={'$2'}>
+              //     <Box bg={'$pink50'} py={'$2'} px={'$2'} borderRadius={7}>
+              //       <Text fontFamily="Montserrat-SemiBold" fontSize={11}>
+              //         After connected with user you can see their interests !
+              //       </Text>
+              //     </Box>
+              //   </Box>
+              // )} */}
             </Box>
 
             <Box px={'$4'} mt={'$5'}>
@@ -304,138 +376,165 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
               </Box>
             )}
             {/* Connect Button Section */}
-            {!params?.isFromConnect && (
-              <Box px={'$4'} mt={'$4'}>
-                <Box bg={COLORS.secondary} borderRadius={7}>
-                  {data?.data?.data?.connection?._id &&
-                  data?.data?.data?.connection?.is_accepted ? (
-                    <HStack py={'$3'}>
-                      {!data?.data?.data?.connection?._id ? (
+
+            {!userData?.data?.data?.connection?.is_blocked &&
+              userData?.data?.data?.connection?.blocked_by !==
+                currentUser?._id && (
+                <Box px={'$4'} mt={'$4'}>
+                  <Box bg={COLORS.secondary} borderRadius={7}>
+                    {data?.data?.data?.connection?._id &&
+                    data?.data?.data?.connection?.is_accepted ? (
+                      <HStack py={'$3'}>
+                        {!data?.data?.data?.connection?._id ? (
+                          <Pressable
+                            w={'$1/3'}
+                            onPress={() => {
+                              setShowModal(true);
+                            }}
+                            justifyContent="center"
+                            alignItems="center">
+                            <Text
+                              color="$white"
+                              fontFamily="Montserrat-Medium"
+                              fontSize={13}>
+                              Connect
+                            </Text>
+                          </Pressable>
+                        ) : (
+                          <Pressable
+                            w={'$1/3'}
+                            onPress={
+                              data?.data?.data?.connection?.is_accepted
+                                ? () =>
+                                    handelRemoveUser(
+                                      data?.data?.data?.connection?._id,
+                                    )
+                                : () => {}
+                            }
+                            justifyContent="center"
+                            alignItems="center">
+                            {data?.data?.data?.connection?.is_accepted ? (
+                              <Text
+                                color="$white"
+                                fontFamily="Montserrat-Medium"
+                                fontSize={13}>
+                                Remove
+                              </Text>
+                            ) : (
+                              <Text
+                                color="$white"
+                                fontFamily="Montserrat-Medium"
+                                fontSize={13}>
+                                Pending
+                              </Text>
+                            )}
+                          </Pressable>
+                        )}
+                        <Divider orientation="vertical" />
                         <Pressable
+                          onPress={() =>
+                            navigation.navigate('ChatDetails', {
+                              connection_id: data?.data?.data?.connection?._id,
+                              userNickName: data?.data?.data?.nick_name,
+                              isReceived: data?.data?.data?.is_received,
+                              name: data?.data?.data?.name,
+                            })
+                          }
                           w={'$1/3'}
-                          onPress={() => {
-                            setShowModal(true);
-                          }}
                           justifyContent="center"
                           alignItems="center">
                           <Text
                             color="$white"
                             fontFamily="Montserrat-Medium"
                             fontSize={13}>
-                            Connect
+                            Message
                           </Text>
                         </Pressable>
-                      ) : (
+                        <Divider orientation="vertical" />
                         <Pressable
+                          onPress={() =>
+                            navigation.navigate('Reviews', {
+                              user_id: params?.user_id,
+                            })
+                          }
                           w={'$1/3'}
+                          justifyContent="center"
+                          alignItems="center">
+                          <Text
+                            color="$white"
+                            fontFamily="Montserrat-Medium"
+                            fontSize={13}>
+                            Review
+                          </Text>
+                        </Pressable>
+                      </HStack>
+                    ) : (
+                      <HStack py={'$3'}>
+                        <Pressable
+                          w={'$2/4'}
                           onPress={
-                            data?.data?.data?.connection?.is_accepted
-                              ? () =>
-                                  handelRemoveUser(
-                                    data?.data?.data?.connection?._id,
-                                  )
-                              : () => {}
+                            data?.data?.data?.connection?.connection?._id
+                              ? () => {}
+                              : () => {
+                                  setShowModal(true);
+                                }
                           }
                           justifyContent="center"
                           alignItems="center">
-                          {data?.data?.data?.connection?.is_accepted ? (
-                            <Text
-                              color="$white"
-                              fontFamily="Montserrat-Medium"
-                              fontSize={13}>
-                              Remove
-                            </Text>
-                          ) : (
+                          {data?.data?.data?.connection?.is_accepted ===
+                            false && data?.data?.data?.connection?._id ? (
                             <Text
                               color="$white"
                               fontFamily="Montserrat-Medium"
                               fontSize={13}>
                               Pending
                             </Text>
+                          ) : (
+                            <Text
+                              color="$white"
+                              fontFamily="Montserrat-Medium"
+                              fontSize={13}>
+                              Connect
+                            </Text>
                           )}
                         </Pressable>
-                      )}
-                      <Divider orientation="vertical" />
-                      <Pressable
-                        onPress={() =>
-                          navigation.navigate('ChatDetails', {
-                            connection_id: data?.data?.data?.connection?._id,
-                            userNickName: data?.data?.data?.nick_name,
-                            isReceived: data?.data?.data?.is_received,
-                            name: data?.data?.data?.name,
-                          })
-                        }
-                        w={'$1/3'}
-                        justifyContent="center"
-                        alignItems="center">
-                        <Text
-                          color="$white"
-                          fontFamily="Montserrat-Medium"
-                          fontSize={13}>
-                          Message
-                        </Text>
-                      </Pressable>
-                      <Divider orientation="vertical" />
-                      <Pressable
-                        w={'$1/3'}
-                        justifyContent="center"
-                        alignItems="center">
-                        <Text
-                          color="$white"
-                          fontFamily="Montserrat-Medium"
-                          fontSize={13}>
-                          Review
-                        </Text>
-                      </Pressable>
-                    </HStack>
-                  ) : (
-                    <HStack py={'$3'}>
-                      <Pressable
-                        w={'$2/4'}
-                        onPress={
-                          data?.data?.data?.connection?.connection?._id
-                            ? () => {}
-                            : () => {
-                                setShowModal(true);
-                              }
-                        }
-                        justifyContent="center"
-                        alignItems="center">
-                        {!data?.data?.data?.connection?.is_accepted &&
-                        data?.data?.data?.connection?.connection?._id ? (
+                        <Divider orientation="vertical" />
+                        <Pressable
+                          onPress={() =>
+                            navigation.navigate('Reviews', {
+                              user_id: params?.user_id,
+                            })
+                          }
+                          w={'$2/4'}
+                          justifyContent="center"
+                          alignItems="center">
                           <Text
                             color="$white"
                             fontFamily="Montserrat-Medium"
                             fontSize={13}>
-                            Pending
+                            Review
                           </Text>
-                        ) : (
-                          <Text
-                            color="$white"
-                            fontFamily="Montserrat-Medium"
-                            fontSize={13}>
-                            Connect
-                          </Text>
-                        )}
-                      </Pressable>
-                      <Divider orientation="vertical" />
-                      <Pressable
-                        onPress={() => navigation.navigate('Reviews')}
-                        w={'$2/4'}
-                        justifyContent="center"
-                        alignItems="center">
-                        <Text
-                          color="$white"
-                          fontFamily="Montserrat-Medium"
-                          fontSize={13}>
-                          Review
-                        </Text>
-                      </Pressable>
-                    </HStack>
-                  )}
+                        </Pressable>
+                      </HStack>
+                    )}
+                  </Box>
                 </Box>
-              </Box>
-            )}
+              )}
+            {userData?.data?.data?.connection?.is_blocked &&
+              userData?.data?.data?.connection?.blocked_by ===
+                currentUser?._id && (
+                <Box px={'$4'} mt={'$2'}>
+                  <Box bg={'$pink50'} py={'$2'} px={'$2'} borderRadius={7}>
+                    <Text
+                      fontFamily="Montserrat-SemiBold"
+                      fontSize={11}
+                      textAlign="center">
+                      This user is blocked by you !
+                    </Text>
+                  </Box>
+                </Box>
+              )}
+
             {/* All Posts */}
             <Box px={'$4'} mt={'$7'}>
               <Box>
@@ -452,7 +551,14 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                     numColumns={3}
                     data={userData?.data?.data?.posts}
                     renderItem={({item}: any) => (
-                      <Pressable mr={'$0.5'} mb={'$0.5'}>
+                      <Pressable
+                        mr={'$0.5'}
+                        mb={'$0.5'}
+                        onPress={() =>
+                          navigation.navigate('ShareScreenDetails', {
+                            postId: item?._id,
+                          })
+                        }>
                         {item?.media?.[0]?.fileType === 'image' && (
                           <Box>
                             <Image
@@ -481,8 +587,50 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                             )}
                           </Box>
                         )}
+                        {item?.media?.[0]?.fileType === 'video' && (
+                          <Box>
+                            <Image
+                              source={{
+                                uri: 'https://imgs.search.brave.com/ZQKFWt71y6kyxaexg-bVvHR_3oR1RaCfjeDmspvxgJk/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wMzQv/OTU0LzMwMC9zbWFs/bC9wbGF5LXZpZGVv/LWljb24tcG5nLnBu/Zw',
+                              }}
+                              alt="image"
+                              style={{height: 110, width: 110}}
+                            />
+                            {item?.media?.length > 1 && (
+                              <Box
+                                style={{
+                                  position: 'absolute',
+                                  top: 5,
+                                  right: 5,
+                                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                                  borderRadius: 20,
+                                  padding: 5,
+                                }}>
+                                <AppIcon
+                                  MaterialCommunityIconsName="checkbox-multiple-blank"
+                                  color={'white'}
+                                  size={18}
+                                />
+                              </Box>
+                            )}
+                          </Box>
+                        )}
                       </Pressable>
                     )}
+                    ListEmptyComponent={
+                      <Box alignItems="center" mt={'$10'}>
+                        <VStack alignItems="center" gap={10}>
+                          <Image
+                            source={IMAGES.CONNECT_BG_REMOVE}
+                            alt="img"
+                            style={{width: 100, height: 100}}
+                          />
+                          <Text fontFamily="Montserrat-SemiBold">
+                            No Post found
+                          </Text>
+                        </VStack>
+                      </Box>
+                    }
                   />
                 </Box>
               ) : (
@@ -566,7 +714,6 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
           <Box position="absolute" top={0} zIndex={10} w={'$full'}>
             <Box bg={'$coolGray200'} w={'$full'}>
               <Pressable
-                // bg={scrollY > 100 ? 'white' : '$coolGray400'}
                 ml={'$2'}
                 w={'$12'}
                 py={'$2'}

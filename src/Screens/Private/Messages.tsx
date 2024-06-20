@@ -10,20 +10,34 @@ import {
   HStack,
   Image,
   Pressable,
+  Spinner,
   Text,
 } from '@gluestack-ui/themed';
 import {PrivateScreenProps} from '~/Routes/Private/types';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {VStack} from '@gluestack-ui/themed';
 import {useSwrApi} from '~/Hooks';
 import moment from 'moment';
+import {COLORS} from '~/Styles';
 
 const Messages = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
-  const {data} = useSwrApi(
+  const {data, isValidating, mutate} = useSwrApi(
     `chats/read-chat-heads?is_accepted=true&is_blocked=false`,
   );
-  console.log(data?.data?.data);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      mutate();
+    }, []),
+  );
+
+  if (isValidating)
+    return (
+      <Box flex={1} justifyContent="center" alignItems="center">
+        <Spinner size={'large'} color={COLORS.secondary} />
+      </Box>
+    );
   return (
     <PrivateContainer
       icons={[
@@ -65,25 +79,6 @@ const Messages = () => {
               }>
               <HStack gap={'$3'} alignItems={'center'}>
                 <Pressable>
-                  {/* <Avatar>
-                    <AvatarFallbackText>
-                      {item?.is_received
-                        ? item?.sender_id?.nick_name
-                        : item?.receiver_id?.nick_name}
-                    </AvatarFallbackText>
-                    {(item?.sender_id?.avatar || item?.receiver_id?.avatar) && (
-                      <AvatarImage
-                        source={{
-                          uri: item?.is_received
-                            ? item?.sender_id?.avatar
-                            : item?.receiver_id?.avatar,
-                        }}
-                        alt="img"
-                        h={'$12'}
-                        w={'$12'}
-                      />
-                    )}
-                  </Avatar> */}
                   <Image
                     source={{
                       uri: item?.is_received
@@ -112,11 +107,23 @@ const Messages = () => {
                   </Text>
                 </VStack>
                 <Text color={'#94a3b8'} fontSize={11}>
-                  {moment(item?.receiver_id?.created_at).fromNow()}
+                  {moment(item?.last_message?.updated_at).fromNow()}
                 </Text>
               </HStack>
             </Pressable>
           )}
+          ListEmptyComponent={
+            <Box alignItems="center" mt={'$10'}>
+              <VStack alignItems="center" gap={10}>
+                <Image
+                  source={IMAGES.CONNECT_BG_REMOVE}
+                  alt="img"
+                  style={{width: 200, height: 200}}
+                />
+                <Text fontFamily="Montserrat-SemiBold">No Messages found</Text>
+              </VStack>
+            </Box>
+          }
         />
       </Box>
     </PrivateContainer>

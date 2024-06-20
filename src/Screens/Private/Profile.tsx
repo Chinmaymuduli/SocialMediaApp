@@ -32,6 +32,8 @@ const Profile = () => {
   const [imagesPicker, setImagesPicker] = useState(false);
   const [isImagePick, setIsImagePick] = useState(false);
   const [images, setImages] = useState<any>([]);
+  const [allPersonalData, setAllPersonalData] = useState<any>([]);
+  const [allProfessionalData, setAllProfessionalData] = useState<any>([]);
   const {data, isValidating, mutate} = useSwrApi(`users/self`);
   const handelImages = (img: any) => {
     console.log({img});
@@ -64,6 +66,19 @@ const Profile = () => {
   useEffect(() => {
     setImages(data?.data?.data?.avatars);
   });
+
+  useEffect(() => {
+    const personalData = data?.data?.data?.interests?.filter(
+      (item: any) => item?.type === 'personal',
+    );
+    const professionalData = data?.data?.data?.interests?.filter(
+      (item: any) => item?.type === 'professional',
+    );
+    setAllPersonalData(personalData);
+    setAllProfessionalData(professionalData);
+  }, [data?.data?.data]);
+
+  // console.log(data?.data?.data);
   return (
     <PrivateContainer
       icons={[
@@ -298,38 +313,69 @@ const Profile = () => {
                 <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
                   Interested/Skills
                 </Text>
-                <HStack justifyContent={'space-between'} mt={2}>
+                <VStack mt={2}>
                   <VStack gap={'$2'} w={'45%'}>
                     <Text
                       fontFamily="Montserrat-Medium"
                       fontSize={13}
                       mt={'$1'}>
-                      Personal
+                      Personal :
                     </Text>
                     <Text>
                       {
                         data?.data?.data?.interests?.find(
                           (i: any) => i?.type === 'personal',
-                        )?.label
+                        )?.category
                       }
                     </Text>
                   </VStack>
-                  <VStack w={'45%'} gap={'$2'}>
+                  <VStack gap={'$2'} mt={'$2'}>
                     <Text
                       fontFamily="Montserrat-Medium"
                       fontSize={13}
                       mt={'$1'}>
-                      Professional
+                      Personal Interests :
+                    </Text>
+                    <HStack gap={'$1'} flexWrap={'wrap'}>
+                      {allPersonalData?.map((item: any) => (
+                        <Box key={item?._id}>
+                          <Text>{item?.label},</Text>
+                        </Box>
+                      ))}
+                    </HStack>
+                  </VStack>
+
+                  <VStack gap={'$2'} w={'45%'} mt={'$3'}>
+                    <Text
+                      fontFamily="Montserrat-Medium"
+                      fontSize={13}
+                      mt={'$1'}>
+                      Professional :
                     </Text>
                     <Text>
                       {
                         data?.data?.data?.interests?.find(
                           (i: any) => i?.type === 'professional',
-                        )?.label
+                        )?.category
                       }
                     </Text>
                   </VStack>
-                </HStack>
+                  <VStack gap={'$2'} mt={'$2'}>
+                    <Text
+                      fontFamily="Montserrat-Medium"
+                      fontSize={13}
+                      mt={'$1'}>
+                      Professional Interests :
+                    </Text>
+                    <HStack gap={'$1'} flexWrap={'wrap'}>
+                      {allProfessionalData?.map((item: any) => (
+                        <Box key={item?._id}>
+                          <Text>{item?.label},</Text>
+                        </Box>
+                      ))}
+                    </HStack>
+                  </VStack>
+                </VStack>
               </VStack>
             </Box>
           </Box>

@@ -52,7 +52,6 @@ const CompleteProfile = () => {
   const [city, setCity] = useState('');
   const [area, setArea] = useState('');
   const [expertise, setExpertise] = useState<any>();
-  const [expertiseFor, setExpertiseFor] = useState<any>();
   const [allState, setState] = useState<any>();
   const [visiblePhoto, setVisiblePhoto] = useState(false);
   const [showStatePicker, setShowStatePicker] = useState(false);
@@ -66,24 +65,41 @@ const CompleteProfile = () => {
   const [imagesPicker, setImagesPicker] = useState(false);
   const [isImagePick, setIsImagePick] = useState(false);
   const [images, setImages] = useState<any>([]);
+  const [allCategory, setAllCategory] = useState<any>([]);
+  const [selectProfessional, setSelectProfessional] = useState<any>();
+  const [allProfessionalCategory, setAllProfessionalCategory] = useState<any>(
+    [],
+  );
 
   const [showActionsheet, setShowActionsheet] = React.useState(false);
+  const [showActionsheetPrecessional, setShowActionsheetPrecessional] =
+    React.useState(false);
   const [showActionsheet2, setShowActionsheet2] = React.useState(false);
+  const [showActionsheetSubProfessional, setShowActionsheetSubProfessional] =
+    React.useState(false);
   const [citiesModal, setCitiesModal] = React.useState(false);
 
   const [allCities, setAllCities] = useState<any>([]);
+  const [multipleSubCategory, setMultipleSubCategory] = useState<any>([]);
+  const [allSubCategory, setAllSubCategory] = useState<any>([]);
+  const [multipleSubProfessional, setMultipleSubProfessional] = useState<any>(
+    [],
+  );
   const [selectCity, setSelectCity] = useState<any>();
-
   const {mutation, isLoading} = useMutation();
   const {data} = useSwrApi(`interests?type=personal`);
+  const {data: professionalCategory} = useSwrApi(`interests?type=professional`);
+  const {data: personalData} = useSwrApi(
+    `interests?search=${expertise?.category}`,
+  );
   const {data: professionalData} = useSwrApi(
-    `interests?type=professional&search=${expertise}`,
+    `interests?search=${selectProfessional?.category}`,
   );
 
   const {getUser} = useBasicFunctions();
 
   useEffect(() => {
-    setEmail(userData?.email);
+    setEmail(userData?.email || '');
     setProfileImage({path: userData?.avatar});
     setPhone(userData?.phone);
     setName(userData?.name);
@@ -100,10 +116,30 @@ const CompleteProfile = () => {
     setExpertise(
       userData?.interests?.find((item: any) => item?.type === 'personal'),
     );
-    setExpertiseFor(
+    setSelectProfessional(
       userData?.interests?.find((item: any) => item?.type === 'professional'),
     );
+
+    setMultipleSubCategory(
+      userData?.interests?.filter((i: any) => i?.type === 'personal'),
+    );
+    setMultipleSubProfessional(
+      userData?.interests?.filter((i: any) => i?.type === 'professional'),
+    );
   }, [userData]);
+
+  useEffect(() => {
+    setMultipleSubCategory([]);
+  }, [expertise]);
+  useEffect(() => {
+    setMultipleSubProfessional([]);
+  }, [selectProfessional]);
+
+  useEffect(() => {
+    setAllSubCategory([...multipleSubCategory, ...multipleSubProfessional]);
+  }, [multipleSubCategory, multipleSubProfessional]);
+
+  // console.log({allSubCategory});
 
   const handelUpdateProfile = async () => {
     try {
@@ -114,16 +150,20 @@ const CompleteProfile = () => {
         state: allState?.title,
         coordinates: [12.988, 77.6895],
       };
-      const interests = [expertise?._id, expertiseFor?._id];
+      // const interests = [expertise?._id, expertiseFor?._id];
       const locationDetailsString = JSON.stringify(locationDetails);
       const formData = new FormData();
       formData.append('name', name);
       formData.append('nick_name', nickName);
       formData.append('gender', gender);
       formData.append('dob', moment(selectedDate).toISOString());
-      interests.forEach(interest => {
-        formData.append('interests', interest);
-      });
+      allSubCategory?.length > 0 &&
+        allSubCategory?.forEach((interest: any) => {
+          formData.append('interests', interest?._id);
+        });
+      // interests.forEach(interest => {
+      //   formData.append('interests', interest);
+      // });
       formData.append('location_details', locationDetailsString);
       profileImage?.path &&
         formData.append('avatar', {
@@ -154,7 +194,6 @@ const CompleteProfile = () => {
     }
   };
 
-  // console.log({expertise, expertiseFor});
   const handleStateSelect = (state: any) => {
     setShowStatePicker(false);
     setState(state);
@@ -164,7 +203,6 @@ const CompleteProfile = () => {
     setDatePickerVisibility(false);
   };
 
-  // console.log({allCities});
   useEffect(() => {
     const data = State?.find((item: any) => item?.title === allState?.title);
     setAllCities(data?.Cities);
@@ -174,14 +212,107 @@ const CompleteProfile = () => {
     setShowActionsheet(false);
     setExpertise(data);
   };
+  const handlePerfessionalSelect = (data: any) => {
+    setShowActionsheetPrecessional(false);
+    setSelectProfessional(data);
+  };
   const handleSelect2 = (data: any) => {
-    setShowActionsheet2(false);
-    setExpertiseFor(data);
+    let exist = multipleSubCategory?.find((i: any) => i?.label === data?.label);
+    if (exist) {
+      const removeLabel = multipleSubCategory?.filter(
+        (i: any) => i?.label !== data?.label,
+      );
+      setMultipleSubCategory(removeLabel);
+    } else {
+      setMultipleSubCategory([...multipleSubCategory, data]);
+    }
+    // setShowActionsheet2(false);
+    // setExpertiseFor(data);
+  };
+  const handleSelectProfessional = (data: any) => {
+    let exist = multipleSubProfessional?.find(
+      (i: any) => i?.label === data?.label,
+    );
+    if (exist) {
+      const removeLabel = multipleSubProfessional?.filter(
+        (i: any) => i?.label !== data?.label,
+      );
+      setMultipleSubProfessional(removeLabel);
+    } else {
+      setMultipleSubProfessional([...multipleSubProfessional, data]);
+    }
+    // setShowActionsheet2(false);
+    // setExpertiseFor(data);
   };
 
   const handelVerifyPhone = async () => {
     try {
       setIsPhoneVerify(!isPhoneVerify);
+      const res = await mutation(`users/generate-otp`, {
+        method: 'POST',
+        body: {
+          phone: phone,
+          country_details: {
+            name: 'IN',
+            code: '+91',
+          },
+        },
+      });
+      console.log(res?.results);
+      // 483600
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const verifyPhoneNumber = async () => {
+    try {
+      const res = await mutation(`users/verify-otp`, {
+        method: 'PUT',
+        body: {
+          phone,
+          country_details: {
+            name: 'IN',
+            code: '+91',
+          },
+          otp: otp,
+        },
+      });
+      console.log(res?.results);
+      if (res?.results?.success === true) {
+        Alert.alert('Success', 'Phone Number verified successfully');
+        getUser();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handelEmailVerify = async () => {
+    setIsEmailVerify(true);
+    const res = await mutation(`users/generate-otp`, {
+      method: 'POST',
+      body: {
+        email: email,
+      },
+    });
+  };
+
+  const emailVerification = async () => {
+    try {
+      const res = await mutation(`users/verify-otp`, {
+        method: 'PUT',
+        body: {
+          email,
+          password: 'Feveal@96',
+          otp: otp,
+        },
+      });
+      console.log(res?.results);
+      if (res?.results?.success === true) {
+        getUser();
+        Alert.alert('Success', 'Email verified successfully');
+      }
     } catch (error) {
       console.log(error);
     }
@@ -221,9 +352,35 @@ const CompleteProfile = () => {
     setCitiesModal(false);
   };
 
+  useEffect(() => {
+    const removeDuplicatesByCategory = (data: any) => {
+      const categoryMap = new Map();
+
+      data?.forEach((item: any) => {
+        if (!categoryMap.has(item.category)) {
+          categoryMap.set(item.category, item);
+        }
+      });
+
+      return Array.from(categoryMap.values());
+    };
+
+    const filteredData = removeDuplicatesByCategory(data?.data?.data);
+    const filteredAllProfessionalData = removeDuplicatesByCategory(
+      professionalCategory?.data?.data,
+    );
+
+    setAllCategory(filteredData);
+    setAllProfessionalCategory(filteredAllProfessionalData);
+  }, [data?.data?.data, professionalCategory?.data?.data]);
+
+  // console.log(data?.data?.data);
+
   return (
     <SafeAreaView>
-      <ScrollView contentContainerStyle={{paddingBottom: 50}}>
+      <ScrollView
+        contentContainerStyle={{paddingBottom: 50}}
+        showsVerticalScrollIndicator={false}>
         <Box bg={'$pink300'}>
           <Text
             textAlign={'center'}
@@ -555,7 +712,7 @@ const CompleteProfile = () => {
               )}
             </VStack>
 
-            {!isPhoneVerify && (
+            {isPhoneVerify && (
               <VStack>
                 <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
                   Enter OTP
@@ -574,7 +731,10 @@ const CompleteProfile = () => {
                       onChangeText={text => setOtp(text)}
                     />
                   </Input>
-                  <Pressable bg={COLORS.secondary} borderRadius={'$xl'}>
+                  <Pressable
+                    bg={COLORS.secondary}
+                    borderRadius={'$xl'}
+                    onPress={() => verifyPhoneNumber()}>
                     <Text
                       fontFamily="Montserrat-Bold"
                       color={'$white'}
@@ -608,7 +768,7 @@ const CompleteProfile = () => {
               </Input>
               {!userData?.email_verify?.is_verified && (
                 <Pressable
-                  onPress={() => setIsEmailVerify(true)}
+                  onPress={() => handelEmailVerify()}
                   alignSelf="flex-end">
                   <Text
                     fontFamily="Montserrat-Bold"
@@ -639,7 +799,10 @@ const CompleteProfile = () => {
                       onChangeText={text => setOtp(text)}
                     />
                   </Input>
-                  <Pressable bg={COLORS.secondary} borderRadius={'$xl'}>
+                  <Pressable
+                    bg={COLORS.secondary}
+                    borderRadius={'$xl'}
+                    onPress={() => emailVerification()}>
                     <Text
                       fontFamily="Montserrat-Bold"
                       color={'$white'}
@@ -788,16 +951,45 @@ const CompleteProfile = () => {
                       fontSize={'$sm'}
                       color={'$coolGray500'}
                       p={'$3'}>
-                      {expertise?.label ? expertise?.label : 'Select Personal'}
+                      {expertise?.category
+                        ? expertise?.category
+                        : 'Select Personal'}
                     </Text>
                   </Pressable>
                 </VStack>
                 <VStack w={'45%'} gap={'$2'}>
                   <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
-                    Professional
+                    Expertise in
                   </Text>
                   <Pressable
                     onPress={() => setShowActionsheet2(true)}
+                    borderWidth={1}
+                    borderRadius={5}
+                    style={{
+                      height: 45,
+                    }}
+                    bg={'white'}
+                    borderColor={'$coolGray300'}>
+                    <Text
+                      fontWeight={'bold'}
+                      fontSize={'$xs'}
+                      color={'$coolGray500'}
+                      p={'$3'}>
+                      {multipleSubCategory?.length > 0
+                        ? multipleSubCategory?.length + ' ' + 'Expertises'
+                        : 'Select Professional '}
+                    </Text>
+                  </Pressable>
+                </VStack>
+              </HStack>
+
+              <HStack justifyContent={'space-between'} mt={2}>
+                <VStack gap={'$2'} w={'45%'}>
+                  <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
+                    Professional
+                  </Text>
+                  <Pressable
+                    onPress={() => setShowActionsheetPrecessional(true)}
                     borderWidth={1}
                     borderRadius={5}
                     style={{
@@ -810,26 +1002,49 @@ const CompleteProfile = () => {
                       fontSize={'$sm'}
                       color={'$coolGray500'}
                       p={'$3'}>
-                      {expertiseFor?.label
-                        ? expertiseFor?.label
-                        : 'Select Personal'}
+                      {selectProfessional?.category
+                        ? selectProfessional?.category
+                        : 'Select Professional'}
+                    </Text>
+                  </Pressable>
+                </VStack>
+                <VStack w={'45%'} gap={'$2'}>
+                  <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
+                    Expertise in
+                  </Text>
+                  <Pressable
+                    onPress={() => setShowActionsheetSubProfessional(true)}
+                    borderWidth={1}
+                    borderRadius={5}
+                    style={{
+                      height: 45,
+                    }}
+                    bg={'white'}
+                    borderColor={'$coolGray300'}>
+                    <Text
+                      fontWeight={'bold'}
+                      fontSize={'$xs'}
+                      color={'$coolGray500'}
+                      p={'$3'}>
+                      {multipleSubProfessional?.length > 0
+                        ? multipleSubProfessional?.length + ' ' + 'Expertise'
+                        : 'Select Expertise  '}
                     </Text>
                   </Pressable>
                 </VStack>
               </HStack>
             </VStack>
-            <VStack gap={'$2'} mt={'$2'}>
+            {/* <VStack gap={'$2'} mt={'$2'}>
               <Text fontFamily="Montserrat-Medium" fontSize={13} mt={'$1'}>
                 Description
               </Text>
               <Textarea
-                // size="md"
                 isReadOnly={false}
                 isInvalid={false}
                 isDisabled={false}>
                 <TextareaInput placeholder="Write description..." />
               </Textarea>
-            </VStack>
+            </VStack> */}
           </Box>
         </Box>
 
@@ -878,7 +1093,7 @@ const CompleteProfile = () => {
         onCancel={() => setDatePickerVisibility(false)}
         maximumDate={new Date()}
       />
-      {/* ActionSheet */}
+      {/* ActionSheet PerFectional*/}
       <Actionsheet
         isOpen={showActionsheet}
         onClose={() => setShowActionsheet(false)}
@@ -888,9 +1103,28 @@ const CompleteProfile = () => {
           <ActionsheetDragIndicatorWrapper>
             <ActionsheetDragIndicator />
           </ActionsheetDragIndicatorWrapper>
-          {data?.data?.data?.map((item: any) => (
+          {allCategory?.map((item: any) => (
             <ActionsheetItem onPress={() => handleSelect(item)} key={item?._id}>
-              <ActionsheetItemText>{item?.label}</ActionsheetItemText>
+              <ActionsheetItemText>{item?.category}</ActionsheetItemText>
+            </ActionsheetItem>
+          ))}
+        </ActionsheetContent>
+      </Actionsheet>
+      {/* ActionSheet */}
+      <Actionsheet
+        isOpen={showActionsheetPrecessional}
+        onClose={() => setShowActionsheetPrecessional(false)}
+        zIndex={999}>
+        <ActionsheetBackdrop />
+        <ActionsheetContent h="$72" zIndex={999}>
+          <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper>
+          {allProfessionalCategory?.map((item: any) => (
+            <ActionsheetItem
+              onPress={() => handlePerfessionalSelect(item)}
+              key={item?._id}>
+              <ActionsheetItemText>{item?.category}</ActionsheetItemText>
             </ActionsheetItem>
           ))}
         </ActionsheetContent>
@@ -901,17 +1135,80 @@ const CompleteProfile = () => {
         onClose={() => setShowActionsheet2(false)}
         zIndex={999}>
         <ActionsheetBackdrop />
-        <ActionsheetContent h="$72" zIndex={999}>
+        <ActionsheetContent zIndex={999}>
           <ActionsheetDragIndicatorWrapper>
             <ActionsheetDragIndicator />
           </ActionsheetDragIndicatorWrapper>
-          {professionalData?.data?.data?.map((item: any) => (
-            <ActionsheetItem
-              onPress={() => handleSelect2(item)}
-              key={item?._id}>
-              <ActionsheetItemText>{item?.label}</ActionsheetItemText>
-            </ActionsheetItem>
-          ))}
+          <Box w={'$full'}>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {personalData?.data?.data?.map((item: any) => (
+                <ActionsheetItem
+                  onPress={() => handleSelect2(item)}
+                  bg={
+                    multipleSubCategory?.find(
+                      (i: any) => i?.label === item?.label,
+                    )
+                      ? COLORS.secondary
+                      : '$white'
+                  }
+                  mb={'$2'}
+                  key={item?._id}>
+                  <ActionsheetItemText
+                    color={
+                      multipleSubCategory?.find(
+                        (i: any) => i?.label === item?.label,
+                      )
+                        ? '$white'
+                        : COLORS.secondary
+                    }
+                    fontFamily="Montserrat-Medium">
+                    {item?.label}
+                  </ActionsheetItemText>
+                </ActionsheetItem>
+              ))}
+            </ScrollView>
+          </Box>
+        </ActionsheetContent>
+      </Actionsheet>
+      {/* sub category */}
+      <Actionsheet
+        isOpen={showActionsheetSubProfessional}
+        onClose={() => setShowActionsheetSubProfessional(false)}
+        zIndex={999}>
+        <ActionsheetBackdrop />
+        <ActionsheetContent zIndex={999}>
+          <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper>
+          <Box w={'$full'}>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {professionalData?.data?.data?.map((item: any) => (
+                <ActionsheetItem
+                  onPress={() => handleSelectProfessional(item)}
+                  bg={
+                    multipleSubProfessional?.find(
+                      (i: any) => i?.label === item?.label,
+                    )
+                      ? COLORS.secondary
+                      : '$white'
+                  }
+                  mb={'$2'}
+                  key={item?._id}>
+                  <ActionsheetItemText
+                    color={
+                      multipleSubProfessional?.find(
+                        (i: any) => i?.label === item?.label,
+                      )
+                        ? '$white'
+                        : COLORS.secondary
+                    }
+                    fontFamily="Montserrat-Medium">
+                    {item?.label}
+                  </ActionsheetItemText>
+                </ActionsheetItem>
+              ))}
+            </ScrollView>
+          </Box>
         </ActionsheetContent>
       </Actionsheet>
       {/* Cities  */}

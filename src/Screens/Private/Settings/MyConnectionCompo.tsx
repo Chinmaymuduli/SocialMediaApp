@@ -1,5 +1,11 @@
 import React from 'react';
-import {Box, Button, ButtonText, Divider} from '@gluestack-ui/themed';
+import {
+  Box,
+  Button,
+  ButtonText,
+  Divider,
+  Pressable,
+} from '@gluestack-ui/themed';
 import {FlatList} from '@gluestack-ui/themed';
 import {VStack} from '@gluestack-ui/themed';
 import {HStack} from '@gluestack-ui/themed';
@@ -17,7 +23,7 @@ const MyConnectionCompo = ({data}: any) => {
       <FlatList
         data={data}
         renderItem={({item}: any) => (
-          <Box
+          <Pressable
             py={'$1'}
             mx={'$2'}
             softShadow="1"
@@ -31,15 +37,13 @@ const MyConnectionCompo = ({data}: any) => {
               alignItems="center">
               <HStack gap={'$1'} alignItems="center">
                 <Image
-                  source={
-                    item?.sender_id?.avatar
-                      ? {
-                          uri: item?.is_received
-                            ? item?.sender_id?.avatar
-                            : item?.receiver_id?.avatar,
-                        }
-                      : IMAGES.USER
-                  }
+                  source={{
+                    uri: item?.is_received
+                      ? item?.sender_id?.avatar ||
+                        'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?size=626&ext=jpg'
+                      : item?.receiver_id?.avatar ||
+                        'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?size=626&ext=jpg',
+                  }}
                   alt="img"
                   style={{
                     height: 50,
@@ -130,7 +134,7 @@ const MyConnectionCompo = ({data}: any) => {
               </Box> */}
             </HStack>
             {/* <Divider mt={'$4'} /> */}
-          </Box>
+          </Pressable>
         )}
         ListEmptyComponent={
           <Box alignItems="center" mt={'$10'}>
