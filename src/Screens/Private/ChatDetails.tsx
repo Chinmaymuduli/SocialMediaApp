@@ -673,7 +673,7 @@ const ChatDetails = ({route: {params}}: Props) => {
                   color="$white"
                   fontFamily="Montserrat-Medium"
                   fontSize={13}>
-                  Confirm
+                  {latestMeetingData?.data?.data?._id ? 'Update' : 'Confirm'}
                 </Text>
               </Button>
             </VStack>
