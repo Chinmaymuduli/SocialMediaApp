@@ -337,7 +337,7 @@ const Profile = () => {
                       Personal Interests :
                     </Text>
                     <HStack gap={'$1'} flexWrap={'wrap'}>
-                      {allPersonalData.map((item: any) => (
+                      {allPersonalData?.map((item: any) => (
                         <Box key={item?._id}>
                           <Text>{item?.label},</Text>
                         </Box>

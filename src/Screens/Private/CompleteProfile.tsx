@@ -52,7 +52,6 @@ const CompleteProfile = () => {
   const [city, setCity] = useState('');
   const [area, setArea] = useState('');
   const [expertise, setExpertise] = useState<any>();
-  const [expertiseFor, setExpertiseFor] = useState<any>();
   const [allState, setState] = useState<any>();
   const [visiblePhoto, setVisiblePhoto] = useState(false);
   const [showStatePicker, setShowStatePicker] = useState(false);
@@ -87,7 +86,6 @@ const CompleteProfile = () => {
     [],
   );
   const [selectCity, setSelectCity] = useState<any>();
-
   const {mutation, isLoading} = useMutation();
   const {data} = useSwrApi(`interests?type=personal`);
   const {data: professionalCategory} = useSwrApi(`interests?type=professional`);
@@ -116,17 +114,26 @@ const CompleteProfile = () => {
     });
 
     setExpertise(
+      userData?.interests?.find((item: any) => item?.type === 'personal'),
+    );
+    setSelectProfessional(
       userData?.interests?.find((item: any) => item?.type === 'professional'),
     );
-    // setExpertiseFor(
-    //   userData?.interests?.find((item: any) => item?.type === 'professional'),
-    // );
-    setMultipleSubCategory(userData?.interests);
+
+    setMultipleSubCategory(
+      userData?.interests?.filter((i: any) => i?.type === 'personal'),
+    );
+    setMultipleSubProfessional(
+      userData?.interests?.filter((i: any) => i?.type === 'professional'),
+    );
   }, [userData]);
 
   useEffect(() => {
     setMultipleSubCategory([]);
   }, [expertise]);
+  useEffect(() => {
+    setMultipleSubProfessional([]);
+  }, [selectProfessional]);
 
   useEffect(() => {
     setAllSubCategory([...multipleSubCategory, ...multipleSubProfessional]);

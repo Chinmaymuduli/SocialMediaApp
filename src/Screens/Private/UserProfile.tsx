@@ -126,8 +126,6 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
     }, []),
   );
 
-  // console.log(userData?.data?.data, '====>');
-
   if (isValidating)
     return (
       <Box flex={1} justifyContent="center" alignItems="center">
@@ -527,7 +525,10 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                 currentUser?._id && (
                 <Box px={'$4'} mt={'$2'}>
                   <Box bg={'$pink50'} py={'$2'} px={'$2'} borderRadius={7}>
-                    <Text fontFamily="Montserrat-SemiBold" fontSize={11}>
+                    <Text
+                      fontFamily="Montserrat-SemiBold"
+                      fontSize={11}
+                      textAlign="center">
                       This user is blocked by you !
                     </Text>
                   </Box>
