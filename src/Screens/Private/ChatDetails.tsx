@@ -217,6 +217,7 @@ const ChatDetails = ({route: {params}}: Props) => {
       console.log({res: res?.results});
       if (res?.results?.success === true) {
         Alert.alert('Success', 'Meeting scheduled successfully');
+        navigate('Messages');
         setShowModal(false);
       }
     } catch (error) {
@@ -247,6 +248,7 @@ const ChatDetails = ({route: {params}}: Props) => {
       );
       if (res?.results?.success === true) {
         Alert.alert('Success', 'Meeting updated successfully');
+        navigate('Messages');
         setShowModal(false);
       }
     } catch (error) {
@@ -379,8 +381,6 @@ const ChatDetails = ({route: {params}}: Props) => {
     setCity(latestMeetingData?.data?.data?.location_details?.city);
     setState(latestMeetingData?.data?.data?.location_details?.state);
   }, [latestMeetingData?.data?.data]);
-
-  // console.log(data?.data?.data?.[1]);
 
   return (
     <PrivateContainer

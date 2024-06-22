@@ -54,6 +54,8 @@ const SettingScreen = () => {
                 });
                 console.log(res?.results?.error);
                 if (res?.results?.success === true) {
+                  GoogleSignin.revokeAccess();
+                  GoogleSignin.signOut();
                   logout();
                 } else {
                   Alert.alert('Error', res?.results?.error?.message);

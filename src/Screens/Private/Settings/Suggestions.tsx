@@ -49,11 +49,10 @@ const Suggestions = ({data}: any) => {
                   <Text fontFamily="Montserrat-SemiBold" fontSize={15}>
                     {item?.nick_name}
                   </Text>
-                  <HStack w={'$32'}>
+                  <HStack w={'$48'}>
                     {item?.interests?.map((int: any) => (
                       <Text
                         key={int?._id}
-                        numberOfLines={1}
                         fontFamily="Montserrat-SemiBold"
                         fontSize={11}
                         color={'$coolGray400'}>

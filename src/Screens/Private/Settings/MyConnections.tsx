@@ -68,16 +68,13 @@ const MyConnections = () => {
       title: 'Suggestions',
     },
   ];
-  if (isValidating) <FetchLoader />;
 
   useFocusEffect(
     React.useCallback(() => {
-      mutate();
+      sentMutate();
       requestMutate();
     }, []),
   );
-
-  // console.log(sentData?.data?.data);
 
   return (
     <PrivateContainer
@@ -104,7 +101,7 @@ const MyConnections = () => {
           <Box bg="$white" softShadow="1" borderRadius={1} w={'$full'}>
             <HStack w={'$full'} overflow="hidden">
               {btnArray?.map(btn => (
-                <Box w={'$1/3'} overflow="hidden">
+                <Box w={'$1/3'} overflow="hidden" key={btn?.id}>
                   <Pressable
                     onPress={() => setSelectTab(btn?.id)}
                     py={'$4'}

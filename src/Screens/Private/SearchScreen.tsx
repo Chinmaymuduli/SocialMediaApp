@@ -90,6 +90,18 @@ const SearchScreen = () => {
               <Divider mt={'$4'} />
             </Pressable>
           )}
+          ListEmptyComponent={
+            <Box alignItems="center" mt={'$20'}>
+              <VStack alignItems="center" gap={10}>
+                <Image
+                  source={IMAGES.CONNECT_BG_REMOVE}
+                  alt="img"
+                  style={{width: 200, height: 200}}
+                />
+                <Text fontFamily="Montserrat-SemiBold">No User found</Text>
+              </VStack>
+            </Box>
+          }
         />
       )}
     </Box>

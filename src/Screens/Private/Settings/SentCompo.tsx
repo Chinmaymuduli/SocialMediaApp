@@ -7,16 +7,21 @@ import {
   Text,
   VStack,
   Pressable,
+  Spinner,
 } from '@gluestack-ui/themed';
-import {ANIMATIONS, IMAGES} from '~/Assets';
-import Empty from '~/Components/core/Empty';
+import {IMAGES} from '~/Assets';
 import {useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
 import AppIcon from '~/Components/core/AppIcon';
 
 const SentCompo = ({data, sentMutate, isValidating}: any) => {
   const {navigate} = useNavigation<PrivateScreenProps>();
-  // console.log(data?.[0]?.receiver_id?.interests);
+  if (isValidating)
+    return (
+      <Box flex={1} alignItems="center" justifyContent="center">
+        <Spinner size={'large'} />
+      </Box>
+    );
   return (
     <Box mt={'$2'} px={'$2'}>
       <FlatList

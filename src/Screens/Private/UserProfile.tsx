@@ -54,7 +54,6 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
     isValidating,
     mutate,
   } = useSwrApi(`users/read/${params?.user_id}`);
-  console.log(userData);
 
   const handelConnectRequest = async () => {
     try {

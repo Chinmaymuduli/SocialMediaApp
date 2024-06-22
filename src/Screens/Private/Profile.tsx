@@ -198,7 +198,7 @@ const Profile = () => {
             <VStack gap={'$2'} px={'$3'} mt={'$2'}>
               <VStack gap={'$2'}>
                 <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
-                  Employee Name
+                  Full Name
                 </Text>
                 <Text>{data?.data?.data?.name}</Text>
               </VStack>

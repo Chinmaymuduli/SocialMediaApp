@@ -15,10 +15,9 @@ import {useMutation, useSwrApi} from '~/Hooks';
 import {useAppContext} from '~/Contexts';
 import {Image} from '@gluestack-ui/themed';
 import {IMAGES} from '~/Assets';
+import moment from 'moment';
 
 const Notifications = () => {
-  const [notificationTitle, setNotificationTitle] = useState('');
-  const [notificationDesc, setNotificationDesc] = useState('');
   const {userData} = useAppContext();
   const {data, isValidating, mutate} = useSwrApi(
     `notifications?user_id=${userData?._id}`,
@@ -59,6 +58,8 @@ const Notifications = () => {
       console.log(error);
     }
   };
+
+  // console.log(data?.data?.data?.[0]);
 
   if (isValidating)
     return (
@@ -135,18 +136,23 @@ const Notifications = () => {
                   size={32}
                   color={COLORS.primary}
                 />
-                <VStack ml={'$3'} w={'$full'}>
+                <VStack ml={'$3'} w={'$full'} mb={'$4'}>
                   <Box w={'80%'}>
-                    <Text fontWeight={'semibold'} fontSize={'$sm'}>
+                    <Text fontFamily="Montserrat-SemiBold" fontSize={'$xs'}>
                       {item?.title}
                     </Text>
                   </Box>
                   <Box w={'70%'}>
-                    <Text fontWeight={'normal'} fontSize={'$xs'}>
+                    <Text fontFamily="Montserrat-Medium" fontSize={'$xs'}>
                       {item?.description}
                     </Text>
                   </Box>
                 </VStack>
+                <Box position="absolute" left={10} bottom={2}>
+                  <Text fontFamily="Montserrat-Medium" fontSize={'$xs'}>
+                    {moment(item?.created_at).format('ll')}
+                  </Text>
+                </Box>
               </HStack>
             </Pressable>
           )}

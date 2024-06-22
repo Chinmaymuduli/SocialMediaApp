@@ -32,6 +32,8 @@ const Messages = () => {
     }, []),
   );
 
+  // console.log(data?.data?.data?.[0]);
+
   if (isValidating)
     return (
       <Box flex={1} justifyContent="center" alignItems="center">
@@ -64,7 +66,7 @@ const Messages = () => {
               py={'$2'}
               onPress={() =>
                 navigate('ChatDetails', {
-                  connection_id: item?.last_message?.connection_id,
+                  connection_id: item?._id,
                   isReceived: item?.is_received,
                   name: item?.is_received
                     ? item?.sender_id?.name || ''

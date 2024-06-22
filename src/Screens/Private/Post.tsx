@@ -121,10 +121,14 @@ const Post = () => {
         // console.log(res?.results?.error);
         if (res?.status === 201) {
           setMultipleMedia([]);
-          // setVideoUrl([]);
           setCaption('');
           setTags([]);
-          Alert.alert('Success', 'Post Successfully Done');
+          Alert.alert('Success', 'Post Successfully Done', [
+            {
+              text: 'Ok',
+              onPress: () => navigate('Feeds'),
+            },
+          ]);
         } else {
           Alert.alert('Error', res?.results?.error?.message);
         }

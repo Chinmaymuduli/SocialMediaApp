@@ -224,7 +224,11 @@ const PostCompo = ({item, mutate}: any) => {
             justifyContent: 'space-between',
             padding: 15,
           }}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <Pressable
+            style={{flexDirection: 'row', alignItems: 'center'}}
+            onPress={() =>
+              navigate('UserProfile', {user_id: item?.user_id?._id})
+            }>
             <Image
               source={
                 item?.user_id?.avatar
@@ -251,7 +255,7 @@ const PostCompo = ({item, mutate}: any) => {
                 {`${item?.user_id?.gender}`}
               </Text>
             </View>
-          </View>
+          </Pressable>
           {item?.user_id?._id === userData?._id ? (
             <Pressable
               onPress={loading ? () => {} : () => DeletePost(item?._id)}>

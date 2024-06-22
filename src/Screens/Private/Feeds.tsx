@@ -5,11 +5,10 @@ import {useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
 import {PrivateContainer} from '~/Components/container';
 import {PostFeed} from '~/Components/screens';
-import {Box, FlatList, ScrollView} from '@gluestack-ui/themed';
-import {useFCMToken, useSwrApi} from '~/Hooks';
+import {Box, ScrollView} from '@gluestack-ui/themed';
+import {useFCMToken} from '~/Hooks';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {COLORS} from '~/Styles';
-import {Image} from '@gluestack-ui/themed';
 
 const Feeds = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();

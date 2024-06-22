@@ -374,8 +374,6 @@ const CompleteProfile = () => {
     setAllProfessionalCategory(filteredAllProfessionalData);
   }, [data?.data?.data, professionalCategory?.data?.data]);
 
-  // console.log(data?.data?.data);
-
   return (
     <SafeAreaView>
       <ScrollView
@@ -1166,6 +1164,21 @@ const CompleteProfile = () => {
                   </ActionsheetItemText>
                 </ActionsheetItem>
               ))}
+              <Box px={'$2'} mt={'$5'}>
+                <Pressable
+                  onPress={() => {
+                    setShowActionsheet2(false);
+                  }}
+                  mb={'$10'}
+                  py={'$2'}
+                  borderRadius={7}
+                  bgColor={COLORS.secondary}
+                  alignItems="center">
+                  <Text color="$white" fontFamily="Montserrat-Bold">
+                    Continue
+                  </Text>
+                </Pressable>
+              </Box>
             </ScrollView>
           </Box>
         </ActionsheetContent>
@@ -1207,6 +1220,21 @@ const CompleteProfile = () => {
                   </ActionsheetItemText>
                 </ActionsheetItem>
               ))}
+              <Box px={'$2'} mt={'$5'}>
+                <Pressable
+                  onPress={() => {
+                    setShowActionsheetSubProfessional(false);
+                  }}
+                  mb={'$10'}
+                  py={'$2'}
+                  borderRadius={7}
+                  bgColor={COLORS.secondary}
+                  alignItems="center">
+                  <Text color="$white" fontFamily="Montserrat-Bold">
+                    Continue
+                  </Text>
+                </Pressable>
+              </Box>
             </ScrollView>
           </Box>
         </ActionsheetContent>

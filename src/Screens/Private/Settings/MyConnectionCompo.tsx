@@ -1,29 +1,29 @@
 import React from 'react';
-import {
-  Box,
-  Button,
-  ButtonText,
-  Divider,
-  Pressable,
-} from '@gluestack-ui/themed';
+import {Box, Pressable} from '@gluestack-ui/themed';
 import {FlatList} from '@gluestack-ui/themed';
 import {VStack} from '@gluestack-ui/themed';
 import {HStack} from '@gluestack-ui/themed';
 import {Image} from '@gluestack-ui/themed';
 import {IMAGES} from '~/Assets';
-import {useSwrApi} from '~/Hooks';
 import {Text} from '@gluestack-ui/themed';
 import {useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
-import AppIcon from '~/Components/core/AppIcon';
 
 const MyConnectionCompo = ({data}: any) => {
+  const {navigate} = useNavigation<PrivateScreenProps>();
   return (
     <Box px={'$2'} mt={'$3'}>
       <FlatList
         data={data}
         renderItem={({item}: any) => (
           <Pressable
+            onPress={() =>
+              navigate('UserProfile', {
+                user_id: item?.is_received
+                  ? item?.sender_id?._id
+                  : item?.receiver_id?._id,
+              })
+            }
             py={'$1'}
             mx={'$2'}
             softShadow="1"
