@@ -16,6 +16,7 @@ import {
   FlatList,
   HStack,
   ScrollView,
+  Spinner,
   VStack,
 } from '@gluestack-ui/themed';
 import {Image} from '@gluestack-ui/themed';
@@ -78,7 +79,13 @@ const Profile = () => {
     setAllProfessionalData(professionalData);
   }, [data?.data?.data]);
 
-  // console.log(data?.data?.data);
+  if (isValidating)
+    return (
+      <Box flex={1} alignItems="center" justifyContent="center">
+        <Spinner size={'large'} />
+      </Box>
+    );
+
   return (
     <PrivateContainer
       icons={[
