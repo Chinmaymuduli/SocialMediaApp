@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import useMutation from './useMutation';
 import {Alert, Platform} from 'react-native';
 import {CustomToast} from '~/Components/core';
+import NotificationService from './NotificationServices';
 
 const useFCMToken = () => {
   const {mutation} = useMutation();
@@ -45,13 +46,28 @@ const useFCMToken = () => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       console.log('message ', JSON.stringify(remoteMessage));
       const notificationData = JSON.parse(JSON.stringify(remoteMessage));
-      Alert.alert(
-        notificationData?.notification?.title,
-        notificationData?.notification?.body,
-      );
+      onMessageReceived(onMessageReceived(notificationData));
+      // Alert.alert(
+      //   notificationData?.notification?.title,
+      //   notificationData?.notification?.body,
+      // );
     });
     return unsubscribe;
   }, [getFCMToken, requestUserPermission]);
+
+  async function onMessageReceived(message: any) {
+    console.log({messageForNotification: message});
+    if (
+      message?.notification?.title !== undefined &&
+      message?.notification?.body !== undefined
+    ) {
+      NotificationService.displayLocalNotification(
+        message?.notification?.title,
+        message?.notification?.body,
+        message?.data,
+      );
+    }
+  }
 };
 
 export default useFCMToken;

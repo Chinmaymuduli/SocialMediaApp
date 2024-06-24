@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {PrivateContainer} from '~/Components/container';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {
   PrivateNavigationProp,
   PrivateScreenProps,
@@ -78,6 +78,12 @@ const Profile = () => {
     setAllPersonalData(personalData);
     setAllProfessionalData(professionalData);
   }, [data?.data?.data]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      mutate();
+    }, []),
+  );
 
   if (isValidating)
     return (

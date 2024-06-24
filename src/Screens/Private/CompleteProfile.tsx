@@ -139,7 +139,7 @@ const CompleteProfile = () => {
     setAllSubCategory([...multipleSubCategory, ...multipleSubProfessional]);
   }, [multipleSubCategory, multipleSubProfessional]);
 
-  // console.log({allSubCategory});
+  console.log({userData});
 
   const handelUpdateProfile = async () => {
     try {
@@ -281,6 +281,7 @@ const CompleteProfile = () => {
       console.log(res?.results);
       if (res?.results?.success === true) {
         Alert.alert('Success', 'Phone Number verified successfully');
+        setIsPhoneVerify(false);
         getUser();
       }
     } catch (error) {
@@ -296,6 +297,9 @@ const CompleteProfile = () => {
         email: email,
       },
     });
+    if (res?.results?.success === true) {
+      Alert.alert('Success', 'OTP Sent Successfully');
+    }
   };
 
   const emailVerification = async () => {
@@ -310,8 +314,9 @@ const CompleteProfile = () => {
       });
       console.log(res?.results);
       if (res?.results?.success === true) {
-        getUser();
         Alert.alert('Success', 'Email verified successfully');
+        setIsEmailVerify(false);
+        getUser();
       }
     } catch (error) {
       console.log(error);
