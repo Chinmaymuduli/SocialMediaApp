@@ -77,6 +77,9 @@ const Messages = () => {
                   avatar: item?.is_received
                     ? item?.sender_id?.avatar
                     : item?.receiver_id?.avatar,
+                  user_id: item?.is_received
+                    ? item?.sender_id?._id
+                    : item?.receiver_id?._id,
                 })
               }>
               <HStack gap={'$3'} alignItems={'center'}>

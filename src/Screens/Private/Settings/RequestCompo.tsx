@@ -26,7 +26,11 @@ const RequestCompo = ({data, requestMutate, mutate}: any) => {
   const [showModal, setShowModal] = useState(false);
   const [connectMessage, setConnectMessage] = useState('');
   const {mutation, isLoading} = useMutation();
-  const handelConfirmReject = async (id: any, isAccepted: boolean) => {
+  const handelConfirmReject = async (
+    id: any,
+    isAccepted: boolean,
+    allData: any,
+  ) => {
     try {
       const res = await mutation(`connections/accept-or-reject/${id}`, {
         method: 'PUT',
@@ -36,8 +40,26 @@ const RequestCompo = ({data, requestMutate, mutate}: any) => {
       });
       if (res?.results?.success === true) {
         requestMutate();
+        handelNotification(isAccepted, allData);
         mutate();
       }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handelNotification = async (isAccepted: boolean, allData: any) => {
+    try {
+      const res = await mutation(`notifications`, {
+        method: 'POST',
+        body: {
+          title: `Connection Request ${isAccepted ? 'Accepted' : 'Rejected'}`,
+          description: `${allData?.receiver_id?.nick_name} ${
+            isAccepted ? 'accepted' : 'rejected'
+          } your connection request.`,
+          user_id: allData?.receiver_id?._id,
+        },
+      });
     } catch (error) {
       console.log(error);
     }
@@ -99,7 +121,7 @@ const RequestCompo = ({data, requestMutate, mutate}: any) => {
                 w={'$1/3'}
                 alignItems="center"
                 justifyContent="center"
-                onPress={() => handelConfirmReject(item?._id, true)}>
+                onPress={() => handelConfirmReject(item?._id, true, item)}>
                 <Text
                   fontFamily="Montserrat-SemiBold"
                   color={'$white'}
@@ -112,7 +134,7 @@ const RequestCompo = ({data, requestMutate, mutate}: any) => {
                 w={'$1/3'}
                 alignItems="center"
                 justifyContent="center"
-                onPress={() => handelConfirmReject(item?._id, false)}>
+                onPress={() => handelConfirmReject(item?._id, false, item)}>
                 <Text
                   fontFamily="Montserrat-SemiBold"
                   color={'$white'}

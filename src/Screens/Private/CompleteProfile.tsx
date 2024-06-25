@@ -139,8 +139,6 @@ const CompleteProfile = () => {
     setAllSubCategory([...multipleSubCategory, ...multipleSubProfessional]);
   }, [multipleSubCategory, multipleSubProfessional]);
 
-  console.log({userData});
-
   const handelUpdateProfile = async () => {
     try {
       const locationDetails = {
@@ -150,6 +148,20 @@ const CompleteProfile = () => {
         state: allState?.title,
         coordinates: [12.988, 77.6895],
       };
+      if (
+        !name ||
+        !nickName ||
+        !gender ||
+        !selectedDate ||
+        !selectCity ||
+        !phone ||
+        !email ||
+        !area ||
+        !allState?.title
+      ) {
+        return Alert.alert('Error', 'Please fill all the fields');
+      }
+
       // const interests = [expertise?._id, expertiseFor?._id];
       const locationDetailsString = JSON.stringify(locationDetails);
       const formData = new FormData();
@@ -181,7 +193,6 @@ const CompleteProfile = () => {
         body: formData,
         isFormData: true,
       });
-      console.log(updateData);
       if (updateData?.status === 200) {
         Alert.alert('Success', 'Profile Updated Successfully');
         getUser();
@@ -914,23 +925,6 @@ const CompleteProfile = () => {
             </Text>
           </Box>
           <Box px={'$3'} mt={'$2'}>
-            {/* <VStack gap={'$2'}>
-              <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
-                Expertise *
-              </Text>
-              <Input
-                flex={1}
-                variant="outline"
-                size="md"
-                isDisabled={false}
-                alignItems="center"
-                borderColor="$coolGray300"
-                isInvalid={false}
-                isReadOnly={false}>
-                <InputField placeholder="Enter Name" fontSize={12} />
-              </Input>
-            </VStack> */}
-
             <VStack gap={'$2'} mt={'$2'}>
               <Text mt={4} fontFamily="Montserrat-Medium" fontSize={13}>
                 Interested / Skills *

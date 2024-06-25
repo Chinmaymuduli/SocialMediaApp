@@ -17,8 +17,8 @@ import createAgoraRtcEngine, {
   ClientRoleType,
   IRtcEngine,
 } from 'react-native-agora';
-import {AGORA_SECRETE_KEY} from '~/Utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useAppContext} from '~/Contexts';
 
 const getPermission = async () => {
   if (Platform.OS === 'android') {
@@ -39,9 +39,12 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
   const [isLeaveLoading, setLeaveLoading] = React.useState(false);
   const [message, setMessage] = useState('');
   const appId = 'eae9231f9e4a45748e2ac4208f87421f';
-  const channelName = '123456';
+  const channelName = params?.channelId;
   const token = '92d00f7b953b4e6d8efb3e67baf1af33';
-  const uid = 0;
+  const uid = 1234567892;
+  const {userData} = useAppContext();
+
+  console.log({params});
   // Get Token
   React.useEffect(() => {
     const getTokenData = async () => {
@@ -59,7 +62,7 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
 
   useEffect(() => {
     setupVoiceSDKEngine();
-  }, []);
+  }, [appId]);
   function showMessage(msg: string) {
     setMessage(msg);
   }
@@ -87,9 +90,10 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
           setRemoteUid(0);
         },
       });
-      agoraEngine.initialize({
+      const res = agoraEngine.initialize({
         appId: appId,
       });
+      console.log({res});
       console.log('Agora engine initialized successfully');
     } catch (e) {
       console.log(e);
@@ -124,16 +128,32 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
       );
       if (isHost) {
         // agoraEngineRef.current?.startPreview();
-        agoraEngineRef.current?.joinChannel(token, channelName, uid, {
-          clientRoleType: ClientRoleType.ClientRoleBroadcaster,
-        });
+        const joinUser = agoraEngineRef.current?.joinChannel(
+          token,
+          channelName,
+          uid,
+          {
+            clientRoleType: ClientRoleType.ClientRoleBroadcaster,
+          },
+        );
+        console.log({joinUser});
         console.log('user host use calling');
+      } else {
+        agoraEngineRef.current?.joinChannel(
+          tokenData,
+          channelName,
+          Number(userData?._id),
+          {
+            clientRoleType: ClientRoleType.ClientRoleAudience,
+          },
+        );
+        console.log('Remote user');
       }
       setJoinLoading(false);
     } catch (e) {
       console.log(e);
     }
-  }, [isJoined, isHost]);
+  }, [isJoined, isHost, userData?._id, tokenData]);
 
   const join = async () => {
     setJoinLoading(true);

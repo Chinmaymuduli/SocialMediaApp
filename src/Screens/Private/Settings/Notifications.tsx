@@ -150,7 +150,7 @@ const Notifications = () => {
                 </VStack>
                 <Box position="absolute" left={10} bottom={2}>
                   <Text fontFamily="Montserrat-Medium" fontSize={'$xs'}>
-                    {moment(item?.created_at).format('ll')}
+                    {moment(item?.created_at).format('ll LT')}
                   </Text>
                 </Box>
               </HStack>

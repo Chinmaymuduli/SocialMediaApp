@@ -44,7 +44,12 @@ const AuthRoute = ({route: {params}, navigation}: Props) => {
   const SignIn = async () => {
     try {
       const res = await GoogleSignin.hasPlayServices();
-      console.log({res});
+      const isLogin = await GoogleSignin.isSignedIn();
+      console.log({isLogin});
+      if (isLogin) {
+        await GoogleSignin.revokeAccess();
+        await GoogleSignin.signOut();
+      }
       const userInfo = await GoogleSignin.signIn();
       if (userInfo) {
         loginRegisterGoogle(userInfo);

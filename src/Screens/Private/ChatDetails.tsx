@@ -217,6 +217,7 @@ const ChatDetails = ({route: {params}}: Props) => {
       console.log({res: res?.results});
       if (res?.results?.success === true) {
         Alert.alert('Success', 'Meeting scheduled successfully');
+        handelNotification('scheduled');
         navigate('Messages');
         setShowModal(false);
       }
@@ -248,9 +249,25 @@ const ChatDetails = ({route: {params}}: Props) => {
       );
       if (res?.results?.success === true) {
         Alert.alert('Success', 'Meeting updated successfully');
+        handelNotification('updated');
         navigate('Messages');
         setShowModal(false);
       }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handelNotification = async (type: string) => {
+    try {
+      const res = await mutation(`notifications`, {
+        method: 'POST',
+        body: {
+          title: `Meeting ${type}`,
+          description: `Your meeting with [Participant's Name] has been ${type}`,
+          user_id: params?.user_id,
+        },
+      });
     } catch (error) {
       console.log(error);
     }
@@ -328,6 +345,7 @@ const ChatDetails = ({route: {params}}: Props) => {
         if (verifyOrder?.results?.success === true) {
           mutate();
           setShowPaymentModal(false);
+          handelPaymentNotification();
           latestMutate();
           Alert.alert('Success', 'Payment Successful');
         }
@@ -382,6 +400,23 @@ const ChatDetails = ({route: {params}}: Props) => {
     setState(latestMeetingData?.data?.data?.location_details?.state);
   }, [latestMeetingData?.data?.data]);
 
+  const handelPaymentNotification = async () => {
+    try {
+      const res = await mutation(`notifications`, {
+        method: 'POST',
+        body: {
+          title: `Payment Successful`,
+          description: `You have received payment from ${params?.userNickName}`,
+          user_id: latestMeetingData?.data?.data?.receiver_id?._id,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // console.log(latestMeetingData?.data?.data?.receiver_id?._id);
+
   return (
     <PrivateContainer
       hasBackIcon={true}
@@ -394,6 +429,7 @@ const ChatDetails = ({route: {params}}: Props) => {
               avatar: params?.avatar,
               nickName: params?.userNickName,
               isHost: true,
+              channelId: params?.connection_id,
             });
           },
           side: 'RIGHT',

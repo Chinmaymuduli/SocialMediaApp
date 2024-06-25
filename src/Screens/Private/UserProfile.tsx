@@ -69,8 +69,24 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
         connectMutate();
         setShowModal(false);
         setMessage('');
+        handelNotification();
         Alert.alert('success', 'Connection request sent successfully');
       }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handelNotification = async () => {
+    try {
+      const res = await mutation(`notifications`, {
+        method: 'POST',
+        body: {
+          title: 'New Connection Request Received',
+          description: `You have a new connection request from ${currentUser?.nick_name}. View their profile and connect to expand your professional network`,
+          user_id: params?.user_id,
+        },
+      });
     } catch (error) {
       console.log(error);
     }
@@ -437,6 +453,7 @@ const UserProfile = ({route: {params}, navigation}: Props) => {
                               userNickName: data?.data?.data?.nick_name,
                               isReceived: data?.data?.data?.is_received,
                               name: data?.data?.data?.name,
+                              user_id: params?.user_id,
                             })
                           }
                           w={'$1/3'}

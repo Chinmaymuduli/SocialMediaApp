@@ -37,11 +37,13 @@ export type PrivateNavigationProp = Omit<PrivateScreens, OmittedScreens> & {
     isReceived?: boolean;
     name?: string;
     avatar?: any;
+    user_id?: any;
   };
   AgoraVoiceCall: {
     avatar?: any;
     nickName?: string;
     isHost?: boolean;
+    channelId?: any;
   };
   ShareScreenDetails: {
     postId: string;
