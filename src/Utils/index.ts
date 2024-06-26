@@ -1,6 +1,7 @@
 import {Dimensions} from 'react-native';
 
 export const BASE_URL = 'https://feveal-apis.onrender.com/api/v1';
+export const LIVE_BASE_URL = 'https://api.feveal.in/api/v1';
 export const SOCKET_BASE_URL = 'wss://feveal-apis.onrender.com';
 export const WIDTH = Dimensions.get('window').width;
 export const HEIGHT = Dimensions.get('window').height;
