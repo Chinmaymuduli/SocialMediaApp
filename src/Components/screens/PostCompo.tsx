@@ -299,6 +299,9 @@ const PostCompo = ({item, mutate}: any) => {
             renderItem={renderItem}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
+            snapToInterval={WIDTH}
+            decelerationRate="fast"
+            pagingEnabled
             keyExtractor={keyExtractor}
           />
 

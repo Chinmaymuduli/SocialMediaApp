@@ -4,14 +4,10 @@ import {PrivateRoutesTypes} from '~/Routes/Private/types';
 import {Box, HStack, Pressable, VStack} from '@gluestack-ui/themed';
 import {Text} from '@gluestack-ui/themed';
 import LinearGradient from 'react-native-linear-gradient';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Platform, PermissionsAndroid} from 'react-native';
 import {COLORS} from '~/Styles';
-import {Avatar} from '@gluestack-ui/themed';
-import {AvatarFallbackText} from '@gluestack-ui/themed';
-import {AvatarImage} from '@gluestack-ui/themed';
+import {Avatar, AvatarFallbackText, AvatarImage} from '@gluestack-ui/themed';
 import AppIcon from '~/Components/core/AppIcon';
-import {Platform} from 'react-native';
-import {PermissionsAndroid} from 'react-native';
 import createAgoraRtcEngine, {
   ChannelProfileType,
   ClientRoleType,
@@ -27,7 +23,9 @@ const getPermission = async () => {
     ]);
   }
 };
+
 type Props = NativeStackScreenProps<PrivateRoutesTypes, 'AgoraVoiceCall'>;
+
 const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
   const [isMicOff, setIsMicOff] = useState(false);
   const [tokenData, setToken] = useState('');
@@ -35,8 +33,8 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
   const [isJoined, setIsJoined] = useState(false); // Indicates if the local user has joined the channel
   const [remoteUid, setRemoteUid] = useState(0); // Uid of the remote user
   const [isHost, setIsHost] = useState(params?.isHost);
-  const [isJoinLoading, setJoinLoading] = React.useState(false);
-  const [isLeaveLoading, setLeaveLoading] = React.useState(false);
+  const [isJoinLoading, setJoinLoading] = useState(false);
+  const [isLeaveLoading, setLeaveLoading] = useState(false);
   const [message, setMessage] = useState('');
   const appId = 'eae9231f9e4a45748e2ac4208f87421f';
   const channelName = params?.channelId;
@@ -45,8 +43,8 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
   const {userData} = useAppContext();
 
   console.log({params});
-  // Get Token
-  React.useEffect(() => {
+
+  useEffect(() => {
     const getTokenData = async () => {
       try {
         const value = await AsyncStorage.getItem('accessToken');
@@ -62,26 +60,36 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
 
   useEffect(() => {
     setupVoiceSDKEngine();
-  }, [appId]);
+    return () => {
+      agoraEngineRef?.current?.leaveChannel();
+      agoraEngineRef?.current?.stopPreview();
+    };
+  }, [isJoined, params?.isHost, userData?._id, tokenData, uid]);
+
   function showMessage(msg: string) {
     setMessage(msg);
+    console.log(msg);
   }
 
   const setupVoiceSDKEngine = async () => {
     try {
-      // use the helper function to get permissions
+      console.log('Agora setupVoiceSDKEngine called');
+      console.log(params?.isHost);
       if (Platform.OS === 'android') {
         await getPermission();
       }
 
       agoraEngineRef.current = createAgoraRtcEngine();
       const agoraEngine = agoraEngineRef.current;
+
       agoraEngine.registerEventHandler({
-        onJoinChannelSuccess: () => {
+        onJoinChannelSuccess: (_connection, uid) => {
+          console.log('Successfully joined the channel');
           showMessage('Successfully joined the channel ' + channelName);
           setIsJoined(true);
         },
         onUserJoined: (_connection, Uid) => {
+          console.log({Uid});
           showMessage('Remote user joined with uid ' + Uid);
           setRemoteUid(Uid);
         },
@@ -90,119 +98,105 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
           setRemoteUid(0);
         },
       });
-      const res = agoraEngine.initialize({
-        appId: appId,
-      });
-      console.log({res});
+
+      const res = agoraEngine.initialize({appId});
       console.log('Agora engine initialized successfully');
+
+      if (isJoined) {
+        console.log('Already joined the channel');
+        setJoinLoading(false);
+        return;
+      }
+      try {
+        agoraEngineRef.current?.setChannelProfile(
+          ChannelProfileType.ChannelProfileCommunication,
+        );
+        if (isHost) {
+          console.log({token, channelName, uid});
+          const joinUser = agoraEngineRef.current?.joinChannel(
+            token,
+            channelName,
+            uid,
+            {
+              clientRoleType: ClientRoleType.ClientRoleBroadcaster,
+            },
+          );
+          console.log({joinUser});
+          console.log('User host use calling');
+        } else {
+          agoraEngineRef.current?.joinChannel(
+            tokenData,
+            channelName,
+            Number(userData?._id),
+            {
+              clientRoleType: ClientRoleType.ClientRoleAudience,
+            },
+          );
+          console.log('Remote user');
+        }
+        setJoinLoading(false);
+      } catch (e) {
+        console.log('Error in joinChannel:', e);
+      }
     } catch (e) {
-      console.log(e);
+      console.log('Error in setupVoiceSDKEngine:', e);
     }
   };
 
-  console.log({isJoined});
-
-  // Call End
   const leave = () => {
     try {
-      agoraEngineRef.current?.leaveChannel();
+      const leaveRes = agoraEngineRef.current?.leaveChannel();
+      console.log({leaveRes});
       setRemoteUid(0);
       setIsJoined(false);
       showMessage('You left the channel');
-      console.log('leave channel successfully');
+      console.log('Leave channel successfully');
       navigation.goBack();
     } catch (e) {
-      console.log(e);
+      console.log('Error in leave:', e);
     }
   };
 
-  // Join Call
-  useEffect(() => {
-    if (isJoined) {
-      setJoinLoading(false);
-      return;
-    }
-    try {
-      agoraEngineRef.current?.setChannelProfile(
-        ChannelProfileType.ChannelProfileCommunication,
-      );
-      if (isHost) {
-        // agoraEngineRef.current?.startPreview();
-        const joinUser = agoraEngineRef.current?.joinChannel(
-          token,
-          channelName,
-          uid,
-          {
-            clientRoleType: ClientRoleType.ClientRoleBroadcaster,
-          },
-        );
-        console.log({joinUser});
-        console.log('user host use calling');
-      } else {
-        agoraEngineRef.current?.joinChannel(
-          tokenData,
-          channelName,
-          Number(userData?._id),
-          {
-            clientRoleType: ClientRoleType.ClientRoleAudience,
-          },
-        );
-        console.log('Remote user');
-      }
-      setJoinLoading(false);
-    } catch (e) {
-      console.log(e);
-    }
-  }, [isJoined, isHost, userData?._id, tokenData]);
-
-  const join = async () => {
-    setJoinLoading(true);
-    console.log('joining channel');
-    if (isJoined) {
-      setJoinLoading(false);
-      return;
-    }
-    try {
-      agoraEngineRef.current?.setChannelProfile(
-        ChannelProfileType.ChannelProfileCommunication,
-      );
-      agoraEngineRef.current?.joinChannel(token, channelName, uid, {
-        clientRoleType: ClientRoleType.ClientRoleAudience,
-      });
-      console.log('User 2 join');
-      setJoinLoading(false);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  // const join = async () => {
-  //   setJoinLoading(true);
-  //   console.log('joining channel');
-  //   if (isJoined) {
-  //     setJoinLoading(false);
-  //     return;
-  //   }
-  //   try {
-  //     agoraEngineRef.current?.setChannelProfile(
-  //       ChannelProfileType.ChannelProfileCommunication,
-  //     );
-  //     if (isHost) {
-  //       agoraEngineRef.current?.startPreview();
-  //       agoraEngineRef.current?.joinChannel(token, channelName, uid, {
-  //         clientRoleType: ClientRoleType.ClientRoleBroadcaster,
-  //       });
-  //       console.log('user host calling');
-  //     } else {
-  //       agoraEngineRef.current?.joinChannel(token, channelName, uid, {
-  //         clientRoleType: ClientRoleType.ClientRoleAudience,
-  //       });
-  //       console.log('User 2 join');
+  // useEffect(() => {
+  //   const joinChannel = async () => {
+  //     if (isJoined) {
+  //       console.log('Already joined the channel');
+  //       setJoinLoading(false);
+  //       return;
   //     }
-  //     setJoinLoading(false);
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // };
+  //     try {
+  //       agoraEngineRef.current?.setChannelProfile(
+  //         ChannelProfileType.ChannelProfileCommunication,
+  //       );
+  //       if (isHost) {
+  //         const joinUser = agoraEngineRef.current?.joinChannel(
+  //           token,
+  //           channelName,
+  //           uid,
+  //           {
+  //             clientRoleType: ClientRoleType.ClientRoleBroadcaster,
+  //           },
+  //         );
+  //         console.log({joinUser});
+  //         console.log('User host use calling');
+  //       } else {
+  //         agoraEngineRef.current?.joinChannel(
+  //           tokenData,
+  //           channelName,
+  //           Number(userData?._id),
+  //           {
+  //             clientRoleType: ClientRoleType.ClientRoleAudience,
+  //           },
+  //         );
+  //         console.log('Remote user');
+  //       }
+  //       setJoinLoading(false);
+  //     } catch (e) {
+  //       console.log('Error in joinChannel:', e);
+  //     }
+  //   };
+  //   joinChannel();
+  // }, [isJoined, isHost, userData?._id, tokenData]);
 
   return (
     <Box flex={1}>
@@ -242,7 +236,8 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
           <HStack gap={'$16'}>
             <Pressable
               onPress={() => {
-                setIsMicOff(!isMicOff), join();
+                setIsMicOff(!isMicOff);
+                //  join();
               }}
               bg={'$pink600'}
               borderRadius={40}
@@ -258,10 +253,7 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
             </Pressable>
 
             <Pressable
-              onPress={() => {
-                // navigation.goBack();
-                leave();
-              }}
+              onPress={leave}
               bg={'$red500'}
               borderRadius={40}
               h={'$16'}
@@ -284,6 +276,5 @@ var styles = StyleSheet.create({
     flex: 1,
     paddingLeft: 15,
     paddingRight: 15,
-    // borderRadius: 5,
   },
 });

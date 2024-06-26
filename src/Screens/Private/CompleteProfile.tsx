@@ -51,7 +51,7 @@ const CompleteProfile = () => {
   const [gender, setGender] = useState('');
   const [city, setCity] = useState('');
   const [area, setArea] = useState('');
-  const [expertise, setExpertise] = useState<any>();
+  const [expertise, setExpertise] = useState<any>([]);
   const [allState, setState] = useState<any>();
   const [visiblePhoto, setVisiblePhoto] = useState(false);
   const [showStatePicker, setShowStatePicker] = useState(false);
@@ -66,7 +66,7 @@ const CompleteProfile = () => {
   const [isImagePick, setIsImagePick] = useState(false);
   const [images, setImages] = useState<any>([]);
   const [allCategory, setAllCategory] = useState<any>([]);
-  const [selectProfessional, setSelectProfessional] = useState<any>();
+  const [selectProfessional, setSelectProfessional] = useState<any>([]);
   const [allProfessionalCategory, setAllProfessionalCategory] = useState<any>(
     [],
   );
@@ -89,11 +89,16 @@ const CompleteProfile = () => {
   const {mutation, isLoading} = useMutation();
   const {data} = useSwrApi(`interests?type=personal`);
   const {data: professionalCategory} = useSwrApi(`interests?type=professional`);
-  const {data: personalData} = useSwrApi(
-    `interests?search=${expertise?.category}`,
-  );
+
+  const categoriesQuery = expertise
+    .map((i: any) => `categories=${i?.category}`)
+    .join('&');
+  const professionalCategoriesQuery = selectProfessional
+    .map((i: any) => `categories=${i?.category}`)
+    .join('&');
+  const {data: personalData} = useSwrApi(`interests?${categoriesQuery}`);
   const {data: professionalData} = useSwrApi(
-    `interests?search=${selectProfessional?.category}`,
+    `interests?${professionalCategoriesQuery}`,
   );
 
   const {getUser} = useBasicFunctions();
@@ -114,10 +119,10 @@ const CompleteProfile = () => {
     });
 
     setExpertise(
-      userData?.interests?.find((item: any) => item?.type === 'personal'),
+      userData?.interests?.filter((item: any) => item?.type === 'personal'),
     );
     setSelectProfessional(
-      userData?.interests?.find((item: any) => item?.type === 'professional'),
+      userData?.interests?.filter((item: any) => item?.type === 'professional'),
     );
 
     setMultipleSubCategory(
@@ -127,6 +132,8 @@ const CompleteProfile = () => {
       userData?.interests?.filter((i: any) => i?.type === 'professional'),
     );
   }, [userData]);
+
+  // console.log(userData?.interests);
 
   useEffect(() => {
     setMultipleSubCategory([]);
@@ -220,12 +227,33 @@ const CompleteProfile = () => {
   }, [allState]);
 
   const handleSelect = (data: any) => {
-    setShowActionsheet(false);
-    setExpertise(data);
+    // setShowActionsheet(false);
+    // setExpertise(data);
+    let exist = expertise?.find((i: any) => i?.category === data?.category);
+    if (exist) {
+      const removeLabel = expertise?.filter(
+        (i: any) => i?.category !== data?.category,
+      );
+      setExpertise(removeLabel);
+    } else {
+      setExpertise([...expertise, data]);
+    }
   };
+  console.log({expertise});
   const handlePerfessionalSelect = (data: any) => {
-    setShowActionsheetPrecessional(false);
-    setSelectProfessional(data);
+    // setShowActionsheetPrecessional(false);
+    // setSelectProfessional(data);
+    let exist = selectProfessional?.find(
+      (i: any) => i?.category === data?.category,
+    );
+    if (exist) {
+      const removeLabel = selectProfessional?.filter(
+        (i: any) => i?.category !== data?.category,
+      );
+      setSelectProfessional(removeLabel);
+    } else {
+      setSelectProfessional([...selectProfessional, data]);
+    }
   };
   const handleSelect2 = (data: any) => {
     let exist = multipleSubCategory?.find((i: any) => i?.label === data?.label);
@@ -948,8 +976,8 @@ const CompleteProfile = () => {
                       fontSize={'$sm'}
                       color={'$coolGray500'}
                       p={'$3'}>
-                      {expertise?.category
-                        ? expertise?.category
+                      {expertise?.length > 0
+                        ? expertise?.length + ' ' + 'Personal'
                         : 'Select Personal'}
                     </Text>
                   </Pressable>
@@ -999,8 +1027,8 @@ const CompleteProfile = () => {
                       fontSize={'$sm'}
                       color={'$coolGray500'}
                       p={'$3'}>
-                      {selectProfessional?.category
-                        ? selectProfessional?.category
+                      {selectProfessional?.length > 0
+                        ? selectProfessional?.length + ' ' + 'Professional'
                         : 'Select Professional'}
                     </Text>
                   </Pressable>
@@ -1101,8 +1129,23 @@ const CompleteProfile = () => {
             <ActionsheetDragIndicator />
           </ActionsheetDragIndicatorWrapper>
           {allCategory?.map((item: any) => (
-            <ActionsheetItem onPress={() => handleSelect(item)} key={item?._id}>
-              <ActionsheetItemText>{item?.category}</ActionsheetItemText>
+            <ActionsheetItem
+              onPress={() => handleSelect(item)}
+              key={item?._id}
+              bg={
+                expertise?.find((i: any) => i?.category === item?.category)
+                  ? COLORS.secondary
+                  : '$white'
+              }
+              mb={'$2'}>
+              <ActionsheetItemText
+                color={
+                  expertise?.find((i: any) => i?.category === item?.category)
+                    ? '$white'
+                    : COLORS.secondary
+                }>
+                {item?.category}
+              </ActionsheetItemText>
             </ActionsheetItem>
           ))}
         </ActionsheetContent>
@@ -1120,8 +1163,25 @@ const CompleteProfile = () => {
           {allProfessionalCategory?.map((item: any) => (
             <ActionsheetItem
               onPress={() => handlePerfessionalSelect(item)}
-              key={item?._id}>
-              <ActionsheetItemText>{item?.category}</ActionsheetItemText>
+              key={item?._id}
+              bg={
+                selectProfessional?.find(
+                  (i: any) => i?.category === item?.category,
+                )
+                  ? COLORS.secondary
+                  : '$white'
+              }
+              mb={'$2'}>
+              <ActionsheetItemText
+                color={
+                  selectProfessional?.find(
+                    (i: any) => i?.category === item?.category,
+                  )
+                    ? '$white'
+                    : COLORS.secondary
+                }>
+                {item?.category}
+              </ActionsheetItemText>
             </ActionsheetItem>
           ))}
         </ActionsheetContent>

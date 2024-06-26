@@ -334,13 +334,13 @@ const Profile = () => {
                       mt={'$1'}>
                       Personal :
                     </Text>
-                    <Text>
-                      {
-                        data?.data?.data?.interests?.find(
-                          (i: any) => i?.type === 'personal',
-                        )?.category
-                      }
-                    </Text>
+                    <HStack gap={'$1'} flexWrap={'wrap'}>
+                      {allPersonalData?.map((item: any) => (
+                        <Box key={item?._id}>
+                          <Text>{item?.category},</Text>
+                        </Box>
+                      ))}
+                    </HStack>
                   </VStack>
                   <VStack gap={'$2'} mt={'$2'}>
                     <Text
@@ -365,13 +365,13 @@ const Profile = () => {
                       mt={'$1'}>
                       Professional :
                     </Text>
-                    <Text>
-                      {
-                        data?.data?.data?.interests?.find(
-                          (i: any) => i?.type === 'professional',
-                        )?.category
-                      }
-                    </Text>
+                    <HStack gap={'$1'} flexWrap={'wrap'}>
+                      {allProfessionalData?.map((item: any) => (
+                        <Box key={item?._id}>
+                          <Text>{item?.category},</Text>
+                        </Box>
+                      ))}
+                    </HStack>
                   </VStack>
                   <VStack gap={'$2'} mt={'$2'}>
                     <Text
