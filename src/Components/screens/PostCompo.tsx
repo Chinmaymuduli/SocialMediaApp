@@ -102,7 +102,6 @@ const PostCompo = ({item, mutate}: any) => {
   const onShare = async (id: any) => {
     try {
       const getLink = await buildLink(id);
-      console.log({getLink});
       const result = await Share.share({
         message: getLink,
         url: getLink,

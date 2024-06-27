@@ -75,8 +75,19 @@ const Profile = () => {
     const professionalData = data?.data?.data?.interests?.filter(
       (item: any) => item?.type === 'professional',
     );
-    setAllPersonalData(personalData);
-    setAllProfessionalData(professionalData);
+    const uniquePersonalData = Array.from(
+      new Map(personalData.map((item: any) => [item.category, item])).values(),
+    );
+    const uniqueProfessionalData = Array.from(
+      new Map(
+        professionalData.map((item: any) => [item.category, item]),
+      ).values(),
+    );
+
+    setAllPersonalData(uniquePersonalData);
+    setAllProfessionalData(uniqueProfessionalData);
+    // setAllPersonalData(personalData);
+    // setAllProfessionalData(professionalData);
   }, [data?.data?.data]);
 
   useFocusEffect(

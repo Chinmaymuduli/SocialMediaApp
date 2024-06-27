@@ -78,6 +78,7 @@ const CompleteProfile = () => {
   const [showActionsheetSubProfessional, setShowActionsheetSubProfessional] =
     React.useState(false);
   const [citiesModal, setCitiesModal] = React.useState(false);
+  const [isPersonalChange, setIsPersonalChange] = React.useState(false);
 
   const [allCities, setAllCities] = useState<any>([]);
   const [multipleSubCategory, setMultipleSubCategory] = useState<any>([]);
@@ -104,6 +105,20 @@ const CompleteProfile = () => {
   const {getUser} = useBasicFunctions();
 
   useEffect(() => {
+    const personalData = userData?.interests?.filter(
+      (item: any) => item?.type === 'personal',
+    );
+    const professionalData = userData?.interests?.filter(
+      (item: any) => item?.type === 'professional',
+    );
+    const uniquePersonalData = Array.from(
+      new Map(personalData.map((item: any) => [item.category, item])).values(),
+    );
+    const uniqueProfessionalData = Array.from(
+      new Map(
+        professionalData.map((item: any) => [item.category, item]),
+      ).values(),
+    );
     setEmail(userData?.email || '');
     setProfileImage({path: userData?.avatar});
     setPhone(userData?.phone);
@@ -118,12 +133,8 @@ const CompleteProfile = () => {
       state: userData?.location_details?.state,
     });
 
-    setExpertise(
-      userData?.interests?.filter((item: any) => item?.type === 'personal'),
-    );
-    setSelectProfessional(
-      userData?.interests?.filter((item: any) => item?.type === 'professional'),
-    );
+    setExpertise(uniquePersonalData);
+    setSelectProfessional(uniqueProfessionalData);
 
     setMultipleSubCategory(
       userData?.interests?.filter((i: any) => i?.type === 'personal'),
@@ -133,14 +144,14 @@ const CompleteProfile = () => {
     );
   }, [userData]);
 
-  // console.log(userData?.interests);
-
   useEffect(() => {
-    setMultipleSubCategory([]);
-  }, [expertise]);
-  useEffect(() => {
-    setMultipleSubProfessional([]);
-  }, [selectProfessional]);
+    if (isPersonalChange) {
+      setMultipleSubCategory([]);
+    }
+  }, [isPersonalChange]);
+  // useEffect(() => {
+  //   setMultipleSubProfessional([]);
+  // }, [selectProfessional]);
 
   useEffect(() => {
     setAllSubCategory([...multipleSubCategory, ...multipleSubProfessional]);
@@ -229,6 +240,7 @@ const CompleteProfile = () => {
   const handleSelect = (data: any) => {
     // setShowActionsheet(false);
     // setExpertise(data);
+    setIsPersonalChange(true);
     let exist = expertise?.find((i: any) => i?.category === data?.category);
     if (exist) {
       const removeLabel = expertise?.filter(
