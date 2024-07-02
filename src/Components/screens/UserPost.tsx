@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {
   Box,
   Divider,
@@ -14,6 +14,9 @@ import AppIcon from '../core/AppIcon';
 import {COLORS} from '~/Styles';
 import {useMutation} from '~/Hooks';
 import {Alert} from 'react-native';
+import {WIDTH} from '~/Utils';
+import VideoCompo from './VideoCompo';
+import {StyleSheet} from 'react-native';
 
 type Props = {
   postData: any;
@@ -23,6 +26,7 @@ type Props = {
 
 const UserPost = ({postData, isFormUser, mutate}: Props) => {
   const {mutation, isLoading} = useMutation();
+  const [currentIndex, setCurrentIndex] = useState(0);
   const DeletePost = async (id: string) => {
     try {
       const response = await mutation(`posts/remove/${id}`, {
@@ -43,26 +47,56 @@ const UserPost = ({postData, isFormUser, mutate}: Props) => {
       console.log(error);
     }
   };
+
+  const onViewableItemsChanged = useRef(({viewableItems}: any) => {
+    if (viewableItems?.length > 0) {
+      setCurrentIndex(viewableItems[0]?.index);
+    }
+  }).current;
+
+  const viewabilityConfig = {
+    itemVisiblePercentThreshold: 50,
+  };
+
+  const renderItem = useCallback(({item}: any) => {
+    if (item?.fileType === 'image') {
+      return (
+        <Box alignItems="center" justifyContent="center" position="relative">
+          <Image source={{uri: item?.url}} style={styles.media} alt="img" />
+        </Box>
+      );
+    } else if (item?.fileType === 'video') {
+      return <VideoCompo url={item?.url} />;
+    }
+    return null;
+  }, []);
+  const keyExtractor = useCallback(
+    (item: any, index: any) => item._id || index.toString(),
+    [],
+  );
+
   return (
     <Box style={{marginTop: 10}}>
-      {/* <View style={{flexDirection: 'row', flexWrap: 'wrap', marginTop: 10}}> */}
       {postData?.map((item: any, index: any) => (
         <Pressable
           key={index}
           style={{margin: 5}}
           onPress={() => {}}
           overflow="hidden">
-          <Image
-            source={{uri: item?.media?.[0]}}
-            alt="image"
-            style={{
-              // height: 110,
-              height: 110,
-              width: '100%',
-              // width: 110,
-              borderRadius: 5,
-            }}
-          />
+          <Box>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={item?.media}
+              renderItem={renderItem}
+              onViewableItemsChanged={onViewableItemsChanged}
+              viewabilityConfig={viewabilityConfig}
+              snapToInterval={WIDTH}
+              decelerationRate="fast"
+              pagingEnabled
+              keyExtractor={keyExtractor}
+            />
+          </Box>
           <VStack px={'$2'}>
             <Box mt={'$4'}>
               <Text fontFamily="Montserrat-SemiBold" fontSize={13}>
@@ -119,3 +153,9 @@ const UserPost = ({postData, isFormUser, mutate}: Props) => {
 };
 
 export default UserPost;
+const styles = StyleSheet.create({
+  media: {
+    width: WIDTH,
+    height: 200, // Adjust the height as needed
+  },
+});

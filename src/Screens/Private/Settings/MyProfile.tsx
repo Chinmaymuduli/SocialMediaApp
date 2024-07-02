@@ -4,6 +4,7 @@ import {
   Image,
   Pressable,
   ScrollView,
+  Spinner,
   Text,
   VStack,
 } from '@gluestack-ui/themed';
@@ -21,9 +22,13 @@ const MyProfile = () => {
   const {userData} = useAppContext();
 
   const {data, isValidating, mutate} = useSwrApi(`users/read/${userData?._id}`);
-  //   console.log(data?.data?.data);
 
-  if (isValidating) return <FetchLoader />;
+  if (isValidating)
+    return (
+      <Box flex={1} justifyContent="center" alignItems="center">
+        <Spinner size={'large'} />
+      </Box>
+    );
 
   return (
     <PrivateContainer title={'My Profile'} bg={'purple.50'} hasBackIcon={true}>

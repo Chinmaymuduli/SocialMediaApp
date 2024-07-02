@@ -76,11 +76,11 @@ const Profile = () => {
       (item: any) => item?.type === 'professional',
     );
     const uniquePersonalData = Array.from(
-      new Map(personalData.map((item: any) => [item.category, item])).values(),
+      new Map(personalData?.map((item: any) => [item.category, item])).values(),
     );
     const uniqueProfessionalData = Array.from(
       new Map(
-        professionalData.map((item: any) => [item.category, item]),
+        professionalData?.map((item: any) => [item.category, item]),
       ).values(),
     );
 

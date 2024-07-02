@@ -12,6 +12,7 @@ import createAgoraRtcEngine, {
   ChannelProfileType,
   ClientRoleType,
   IRtcEngine,
+  IRtcEngineEventHandler,
 } from 'react-native-agora';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useAppContext} from '~/Contexts';
@@ -38,11 +39,33 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
   const [message, setMessage] = useState('');
   const appId = 'eae9231f9e4a45748e2ac4208f87421f';
   const channelName = params?.channelId;
-  const token = '92d00f7b953b4e6d8efb3e67baf1af33';
-  const uid = 1234567892;
+  const token =
+    '007eJxSYOBn3T410HRRV02FIv+t+TMWPDGydzUTPjNFXXdO87SdazMUGFITUy2NjA3TLFNNEk1MzU0sUo0Sk02MDCzSLMxNjAzT0jVa0gT4GBjCfStYGBkYGVgYGBlAfCYwyQwmWcCkBIOZmbmZZVKysamhiYWZSZplmkWKaZpJmiUbg6GRsYmpGSAAAP//f0Ahww==';
+  const uid = 123456;
   const {userData} = useAppContext();
 
-  console.log({params});
+  const agoraEventHandler: IRtcEngineEventHandler = {
+    onJoinChannelSuccess: (_connection, uid) => {
+      console.log('Successfully joined the channel');
+      showMessage('Successfully joined the channel ' + channelName);
+      setIsJoined(true);
+    },
+    onUserJoined: (_connection, Uid) => {
+      console.log({Uid});
+      showMessage('Remote user joined with uid ' + Uid);
+      setRemoteUid(Uid);
+    },
+    onUserOffline: (_connection, Uid) => {
+      showMessage('Remote user left the channel. uid: ' + Uid);
+      setRemoteUid(0);
+    },
+    onLeaveChannel: _connection => {
+      console.log('Left the channel');
+      showMessage('Left the channel');
+      setIsJoined(false);
+      navigation.goBack();
+    },
+  };
 
   useEffect(() => {
     const getTokenData = async () => {
@@ -59,72 +82,75 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
   }, []);
 
   useEffect(() => {
-    setupVoiceSDKEngine();
-    return () => {
-      agoraEngineRef?.current?.leaveChannel();
-      agoraEngineRef?.current?.stopPreview();
+    const setupVoiceSDKEngine = async () => {
+      try {
+        if (Platform.OS === 'android') {
+          await getPermission();
+        }
+
+        const agoraEngine = createAgoraRtcEngine();
+        agoraEngineRef.current = agoraEngine;
+
+        agoraEngine.registerEventHandler(agoraEventHandler);
+
+        agoraEngine.initialize({appId});
+        console.log('Agora engine initialized successfully');
+      } catch (e) {
+        console.log('Error in setupVoiceSDKEngine:', e);
+      }
     };
-  }, [isJoined, params?.isHost, userData?._id, tokenData, uid]);
+
+    setupVoiceSDKEngine();
+
+    return () => {
+      const agoraEngine = agoraEngineRef.current;
+      if (agoraEngine) {
+        agoraEngine.leaveChannel();
+        agoraEngine.unregisterEventHandler(agoraEventHandler);
+        agoraEngine.release();
+      }
+    };
+  }, []);
 
   function showMessage(msg: string) {
     setMessage(msg);
     console.log(msg);
   }
 
-  const setupVoiceSDKEngine = async () => {
+  const leave = () => {
     try {
-      console.log('Agora setupVoiceSDKEngine called');
-      console.log(params?.isHost);
-      if (Platform.OS === 'android') {
-        await getPermission();
-      }
+      const leaveRes = agoraEngineRef.current?.leaveChannel();
+      console.log({leaveRes});
+      setRemoteUid(0);
+      setIsJoined(false);
+      showMessage('You left the channel');
+      console.log('Leave channel successfully');
+      // navigation.goBack();
+    } catch (e) {
+      console.log('Error in leave:', e);
+    }
+  };
 
-      agoraEngineRef.current = createAgoraRtcEngine();
-      const agoraEngine = agoraEngineRef.current;
-
-      agoraEngine.registerEventHandler({
-        onJoinChannelSuccess: (_connection, uid) => {
-          console.log('Successfully joined the channel');
-          showMessage('Successfully joined the channel ' + channelName);
-          setIsJoined(true);
-        },
-        onUserJoined: (_connection, Uid) => {
-          console.log({Uid});
-          showMessage('Remote user joined with uid ' + Uid);
-          setRemoteUid(Uid);
-        },
-        onUserOffline: (_connection, Uid) => {
-          showMessage('Remote user left the channel. uid: ' + Uid);
-          setRemoteUid(0);
-        },
-      });
-
-      const res = agoraEngine.initialize({appId});
-      console.log('Agora engine initialized successfully');
-
+  useEffect(() => {
+    const joinChannel = async () => {
       if (isJoined) {
         console.log('Already joined the channel');
         setJoinLoading(false);
         return;
       }
       try {
-        agoraEngineRef.current?.setChannelProfile(
+        const agoraEngine = agoraEngineRef.current;
+        agoraEngine?.setChannelProfile(
           ChannelProfileType.ChannelProfileCommunication,
         );
         if (isHost) {
-          console.log({token, channelName, uid});
-          const joinUser = agoraEngineRef.current?.joinChannel(
-            token,
-            channelName,
-            uid,
-            {
-              clientRoleType: ClientRoleType.ClientRoleBroadcaster,
-            },
-          );
+          const joinUser = agoraEngine?.joinChannel(token, channelName, uid, {
+            clientRoleType: ClientRoleType.ClientRoleBroadcaster,
+          });
           console.log({joinUser});
           console.log('User host use calling');
         } else {
-          agoraEngineRef.current?.joinChannel(
+          agoraEngine?.joinChannel(
             tokenData,
             channelName,
             Number(userData?._id),
@@ -138,65 +164,11 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
       } catch (e) {
         console.log('Error in joinChannel:', e);
       }
-    } catch (e) {
-      console.log('Error in setupVoiceSDKEngine:', e);
-    }
-  };
+    };
+    joinChannel();
+  }, [isHost, userData?._id, tokenData]);
 
-  const leave = () => {
-    try {
-      const leaveRes = agoraEngineRef.current?.leaveChannel();
-      console.log({leaveRes});
-      setRemoteUid(0);
-      setIsJoined(false);
-      showMessage('You left the channel');
-      console.log('Leave channel successfully');
-      navigation.goBack();
-    } catch (e) {
-      console.log('Error in leave:', e);
-    }
-  };
-
-  // useEffect(() => {
-  //   const joinChannel = async () => {
-  //     if (isJoined) {
-  //       console.log('Already joined the channel');
-  //       setJoinLoading(false);
-  //       return;
-  //     }
-  //     try {
-  //       agoraEngineRef.current?.setChannelProfile(
-  //         ChannelProfileType.ChannelProfileCommunication,
-  //       );
-  //       if (isHost) {
-  //         const joinUser = agoraEngineRef.current?.joinChannel(
-  //           token,
-  //           channelName,
-  //           uid,
-  //           {
-  //             clientRoleType: ClientRoleType.ClientRoleBroadcaster,
-  //           },
-  //         );
-  //         console.log({joinUser});
-  //         console.log('User host use calling');
-  //       } else {
-  //         agoraEngineRef.current?.joinChannel(
-  //           tokenData,
-  //           channelName,
-  //           Number(userData?._id),
-  //           {
-  //             clientRoleType: ClientRoleType.ClientRoleAudience,
-  //           },
-  //         );
-  //         console.log('Remote user');
-  //       }
-  //       setJoinLoading(false);
-  //     } catch (e) {
-  //       console.log('Error in joinChannel:', e);
-  //     }
-  //   };
-  //   joinChannel();
-  // }, [isJoined, isHost, userData?._id, tokenData]);
+  console.log({isJoined});
 
   return (
     <Box flex={1}>
@@ -253,6 +225,7 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
             </Pressable>
 
             <Pressable
+              // onPress={joinChannel}
               onPress={leave}
               bg={'$red500'}
               borderRadius={40}
