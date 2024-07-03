@@ -21,6 +21,7 @@ import {
   Icon,
   CloseIcon,
   Text,
+  Spinner,
 } from '@gluestack-ui/themed';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {PrivateScreenProps} from '~/Routes/Private/types';
@@ -52,13 +53,15 @@ const PostFeed = () => {
       mutate();
     }, []),
   );
-  // console.log(data?.data?.data?.[0]);
+  if (isValidating)
+    return (
+      <Box flex={1} justifyContent="center" alignItems="center">
+        <Spinner size={'large'} />
+      </Box>
+    );
   return (
     <>
       <Box mt={'$3'} mx={'$2'}>
-        {/* {data?.data?.data?.map((item: any, index: any) => (
-          <PostCompo item={item} mutate={mutate} key={index} />
-        ))} */}
         <FlatList
           data={data?.data?.data}
           showsVerticalScrollIndicator={false}

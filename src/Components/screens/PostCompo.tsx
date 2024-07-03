@@ -91,7 +91,7 @@ const PostCompo = ({item, mutate}: any) => {
 
   const buildLink = async (id: any) => {
     const link = await dynamicLinks().buildLink({
-      link: `https://invertase.io?id=${id}`,
+      link: `https://www.feveal.in?id=${id}`,
       // domainUriPrefix is created in your Firebase console
       domainUriPrefix: 'https://feveal.page.link',
     });
@@ -315,68 +315,48 @@ const PostCompo = ({item, mutate}: any) => {
           )}
         </Box>
 
-        <HStack
-          style={{
-            alignItems: 'center',
-            paddingVertical: 15,
-            paddingHorizontal: 12,
-          }}
-          // gap={'$2'}
-          justifyContent="space-between">
-          {/* <TouchableOpacity onPress={() => giveLikeDislike(item?._id)}>
-            <AntDesign
-              name={item?.is_liked ? 'like1' : 'like2'}
-              style={{
-                paddingRight: 10,
-                fontSize: 20,
-                color: item?.is_liked ? 'red' : 'black',
-              }}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigate('AllComments', {post_id: item?._id})}>
-            <MaterialCommunityIcons
-              name="comment-outline"
-              style={{fontSize: 20, paddingRight: 10}}
-              color={'black'}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => onShare(item?._id)}>
-            <Feather name="repeat" style={{fontSize: 20}} />
-          </TouchableOpacity> */}
-          {EMOJI_ARRAY?.map(emoji => (
-            <HStack alignItems="center" gap={'$1'} key={emoji?.id}>
-              <TouchableOpacity
-                onPress={
-                  isLoading
-                    ? () => {}
-                    : () => {
-                        handelLike(emoji?.name, item?._id);
-                      }
-                }>
-                <Image
-                  source={emoji.img}
-                  alt="img"
-                  style={{height: 25, width: 25}}
-                />
-              </TouchableOpacity>
-              <Text
-                fontFamily={
-                  item?.is_liked?.[emoji?.name]
-                    ? 'Montserrat-Bold'
-                    : 'Montserrat-SemiBold'
-                }
-                fontSize={13}
-                color={
-                  item?.is_liked?.[emoji?.name]
-                    ? COLORS.secondary
-                    : '$coolGray500'
-                }>
-                {emoji.value}
-              </Text>
-            </HStack>
-          ))}
-        </HStack>
+        {item?.media?.length > 0 && (
+          <HStack
+            style={{
+              alignItems: 'center',
+              paddingVertical: 15,
+              paddingHorizontal: 12,
+            }}
+            justifyContent="space-between">
+            {EMOJI_ARRAY?.map(emoji => (
+              <HStack alignItems="center" gap={'$1'} key={emoji?.id}>
+                <TouchableOpacity
+                  onPress={
+                    isLoading
+                      ? () => {}
+                      : () => {
+                          handelLike(emoji?.name, item?._id);
+                        }
+                  }>
+                  <Image
+                    source={emoji.img}
+                    alt="img"
+                    style={{height: 25, width: 25}}
+                  />
+                </TouchableOpacity>
+                <Text
+                  fontFamily={
+                    item?.is_liked?.[emoji?.name]
+                      ? 'Montserrat-Bold'
+                      : 'Montserrat-SemiBold'
+                  }
+                  fontSize={13}
+                  color={
+                    item?.is_liked?.[emoji?.name]
+                      ? COLORS.secondary
+                      : '$coolGray500'
+                  }>
+                  {emoji.value}
+                </Text>
+              </HStack>
+            ))}
+          </HStack>
+        )}
 
         <View style={{paddingHorizontal: 15}}>
           {/* <Pressable
@@ -424,6 +404,48 @@ const PostCompo = ({item, mutate}: any) => {
             </Text>
           </Box>
         </View>
+        {item?.media?.length < 1 && (
+          <HStack
+            style={{
+              alignItems: 'center',
+              paddingVertical: 15,
+              paddingHorizontal: 12,
+            }}
+            justifyContent="space-between">
+            {EMOJI_ARRAY?.map(emoji => (
+              <HStack alignItems="center" gap={'$1'} key={emoji?.id}>
+                <TouchableOpacity
+                  onPress={
+                    isLoading
+                      ? () => {}
+                      : () => {
+                          handelLike(emoji?.name, item?._id);
+                        }
+                  }>
+                  <Image
+                    source={emoji.img}
+                    alt="img"
+                    style={{height: 25, width: 25}}
+                  />
+                </TouchableOpacity>
+                <Text
+                  fontFamily={
+                    item?.is_liked?.[emoji?.name]
+                      ? 'Montserrat-Bold'
+                      : 'Montserrat-SemiBold'
+                  }
+                  fontSize={13}
+                  color={
+                    item?.is_liked?.[emoji?.name]
+                      ? COLORS.secondary
+                      : '$coolGray500'
+                  }>
+                  {emoji.value}
+                </Text>
+              </HStack>
+            ))}
+          </HStack>
+        )}
         <View
           style={{
             flexDirection: 'row',

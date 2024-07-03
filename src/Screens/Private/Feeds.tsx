@@ -14,6 +14,7 @@ const Feeds = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
   useFCMToken();
   const handleDynamicLink = (link: any) => {
+    console.log({link});
     if (!!link?.url) {
       let getId = link.url?.split('=').pop();
       console.log('post id', getId);

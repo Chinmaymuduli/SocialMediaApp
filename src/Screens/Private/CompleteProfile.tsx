@@ -149,9 +149,6 @@ const CompleteProfile = () => {
       setMultipleSubCategory([]);
     }
   }, [isPersonalChange]);
-  // useEffect(() => {
-  //   setMultipleSubProfessional([]);
-  // }, [selectProfessional]);
 
   useEffect(() => {
     setAllSubCategory([...multipleSubCategory, ...multipleSubProfessional]);
@@ -178,6 +175,14 @@ const CompleteProfile = () => {
         !allState?.title
       ) {
         return Alert.alert('Error', 'Please fill all the fields');
+      }
+
+      if (!userData?.phone_verify?.is_verified) {
+        return Alert.alert('Error', 'Please verify your phone number');
+      }
+
+      if (!userData?.email_verify?.is_verified) {
+        return Alert.alert('Error', 'Please verify your email');
       }
 
       // const interests = [expertise?._id, expertiseFor?._id];
@@ -238,8 +243,6 @@ const CompleteProfile = () => {
   }, [allState]);
 
   const handleSelect = (data: any) => {
-    // setShowActionsheet(false);
-    // setExpertise(data);
     setIsPersonalChange(true);
     let exist = expertise?.find((i: any) => i?.category === data?.category);
     if (exist) {
@@ -251,10 +254,7 @@ const CompleteProfile = () => {
       setExpertise([...expertise, data]);
     }
   };
-  console.log({expertise});
   const handlePerfessionalSelect = (data: any) => {
-    // setShowActionsheetPrecessional(false);
-    // setSelectProfessional(data);
     let exist = selectProfessional?.find(
       (i: any) => i?.category === data?.category,
     );
@@ -277,8 +277,6 @@ const CompleteProfile = () => {
     } else {
       setMultipleSubCategory([...multipleSubCategory, data]);
     }
-    // setShowActionsheet2(false);
-    // setExpertiseFor(data);
   };
   const handleSelectProfessional = (data: any) => {
     let exist = multipleSubProfessional?.find(
@@ -292,8 +290,6 @@ const CompleteProfile = () => {
     } else {
       setMultipleSubProfessional([...multipleSubProfessional, data]);
     }
-    // setShowActionsheet2(false);
-    // setExpertiseFor(data);
   };
 
   const handelVerifyPhone = async () => {
@@ -309,8 +305,6 @@ const CompleteProfile = () => {
           },
         },
       });
-      console.log(res?.results);
-      // 483600
     } catch (error) {
       console.log(error);
     }
@@ -329,7 +323,6 @@ const CompleteProfile = () => {
           otp: otp,
         },
       });
-      console.log(res?.results);
       if (res?.results?.success === true) {
         Alert.alert('Success', 'Phone Number verified successfully');
         setIsPhoneVerify(false);
