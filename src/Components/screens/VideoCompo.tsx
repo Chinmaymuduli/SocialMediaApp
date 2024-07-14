@@ -1,22 +1,25 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
-import Video, {VideoRef} from 'react-native-video';
+import Video from 'react-native-video';
 import {WIDTH} from '~/Utils';
 
-const VideoCompo = ({url}: any) => {
+const VideoCompo = ({url, isVisible}: any) => {
   const [paused, setPaused] = useState(true);
-  const ref = useRef<any>();
+  const videoRef = useRef<any>(null);
+  const handleVideoPress = () => {
+    setPaused(!paused);
+  };
+
   useEffect(() => {
-    // Ensure the video is paused when the component is unmounted
-    return () => {
-      ref.current?.pause();
-    };
-  }, []);
+    if (!isVisible) {
+      setPaused(true);
+    }
+  }, [isVisible]);
   return (
     <Pressable
       // style={{width: '100%'}}
       onPress={() => {
-        setPaused(!paused);
+        handleVideoPress();
       }}>
       <View
         style={{
@@ -31,9 +34,8 @@ const VideoCompo = ({url}: any) => {
           style={styles.media}
           rate={1}
           resizeMode="cover"
-          repeat
           paused={paused}
-          ref={ref}
+          ref={videoRef}
           onEnd={() => {
             setPaused(true);
           }}

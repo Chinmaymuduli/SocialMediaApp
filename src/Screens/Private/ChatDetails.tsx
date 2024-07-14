@@ -18,6 +18,7 @@ import {
   ModalContent,
   ModalHeader,
   Pressable,
+  Spinner,
   Text,
   VStack,
 } from '@gluestack-ui/themed';
@@ -415,7 +416,12 @@ const ChatDetails = ({route: {params}}: Props) => {
     }
   };
 
-  // console.log(latestMeetingData?.data?.data?.receiver_id?._id);
+  if (isValidating)
+    return (
+      <Box flex={1} justifyContent="center" alignItems="center">
+        <Spinner size={'large'} color={COLORS.secondary} />
+      </Box>
+    );
 
   return (
     <PrivateContainer

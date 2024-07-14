@@ -5,6 +5,7 @@ import {useAppContext} from './Contexts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useBasicFunction from './Hooks/useBasicFunctions';
 import {SplashScreen} from './Screens/Public';
+import {PrivateRouteWithSocket} from './Components';
 
 const Route = () => {
   const [token, setToken] = React.useState<string | null>();
@@ -44,8 +45,14 @@ const Route = () => {
   console.log({userData});
 
   if (userData === null) return <SplashScreen />;
+
   return userData?._id ? (
-    <PrivateRoutes
+    // <PrivateRoutes
+    //   initialRouteName={
+    //     userData?.is_profile_completed ? 'TabLayout' : 'CompleteProfile'
+    //   }
+    // />
+    <PrivateRouteWithSocket
       initialRouteName={
         userData?.is_profile_completed ? 'TabLayout' : 'CompleteProfile'
       }

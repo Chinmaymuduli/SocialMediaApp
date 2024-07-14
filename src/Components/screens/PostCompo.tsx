@@ -184,7 +184,8 @@ const PostCompo = ({item, mutate}: any) => {
     itemVisiblePercentThreshold: 50,
   };
 
-  const renderItem = useCallback(({item}: any) => {
+  const renderItem = useCallback(({item, index}: any) => {
+    const isVisible = index === currentIndex;
     if (item?.fileType === 'image') {
       return (
         <Box alignItems="center" justifyContent="center" position="relative">
@@ -192,7 +193,7 @@ const PostCompo = ({item, mutate}: any) => {
         </Box>
       );
     } else if (item?.fileType === 'video') {
-      return <VideoCompo url={item?.url} />;
+      return <VideoCompo url={item?.url} isVisible={isVisible} />;
     }
     return null;
   }, []);
@@ -274,23 +275,6 @@ const PostCompo = ({item, mutate}: any) => {
           )}
         </View>
         <Box>
-          {/* {item?.media?.length > 0 &&
-            (item?.media_type === 'image' ? (
-              <View
-                style={{
-                  position: 'relative',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Image
-                  source={{uri: item?.media[0]}}
-                  style={{width: '100%', height: 200}}
-                  // resizeMode="contain"
-                />
-              </View>
-            ) : (
-              <VideoCompo url={item?.media?.[0]} />
-            ))} */}
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}

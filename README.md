@@ -79,3 +79,86 @@ To learn more about React Native, take a look at the following resources:
 - [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
   adb -s emulator-5554 reverse tcp:8081 tcp:8081
   adb -s b85e914e reverse tcp:8081 tcp:8081
+
+  ###### ALTERNATIVE METHOD AGORA
+
+  agoraEngineRef.current = createAgoraRtcEngine();
+  const agoraEngine = agoraEngineRef.current;
+
+  useEffect(() => {
+  const tokenCreateFn = async () => {
+  console.log({channelName, uid});
+  try {
+  console.log({
+  channel_name: String(channelName),
+  uid: uid,
+  role: 'publisher',
+  expire_time: 3600,
+  });
+  const fetchData = await fetch(
+  `${BASE_URL}/meetings/generate-agora-token`,
+  {
+  method: 'POST',
+  headers: {
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${tokenData}`,
+  },
+  body: JSON.stringify({
+  channel_name: String(channelName),
+  uid: String(uid),
+  role: 'publisher',
+  expire_time: 3600,
+  }),
+  },
+  );
+  const agoraToken = await fetchData.json();
+  console.log({agoraToken});
+  return agoraToken.data?.token;
+  } catch (error) {
+  new Error();
+  console.log(error);
+  }
+  };
+
+  (async function init() {
+  try {
+  if (!isHost || !channelName || !uid) return;
+  if (Platform.OS === 'android') await getPermission();
+  const tokenRes = await tokenCreateFn();
+  agoraEngine.initialize({
+  appId: appId,
+  });
+
+        if (isHost === true) {
+          console.log({tokenRes, channelName, uid});
+          const joinUser = agoraEngine.joinChannel(
+            tokenRes,
+            String(channelName),
+            Number(uid),
+            {
+              clientRoleType: ClientRoleType.ClientRoleBroadcaster,
+            },
+          );
+          console.log({joinUser});
+        } else {
+          agoraEngine.joinChannel(tokenRes, String(channelName), Number(uid), {
+            clientRoleType: ClientRoleType.ClientRoleAudience,
+          });
+        }
+
+        agoraEngine.registerEventHandler(agoraEventHandler);
+      } catch (error) {
+        console.log('error', error);
+      }
+
+  })();
+
+  return () => {
+  const agoraEngine = agoraEngineRef.current;
+  if (agoraEngine) {
+  agoraEngine.leaveChannel();
+  agoraEngine.unregisterEventHandler(agoraEventHandler);
+  agoraEngine.release();
+  }
+  };
+  }, [uid, channelName, isHost, appId, tokenData]);
