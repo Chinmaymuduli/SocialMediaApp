@@ -1,5 +1,5 @@
-import { SafeAreaView, StyleSheet } from 'react-native';
-import React, { useState } from 'react';
+import {SafeAreaView, StyleSheet} from 'react-native';
+import React, {useState} from 'react';
 import {
   Box,
   Center,
@@ -10,23 +10,23 @@ import {
   ButtonText,
   VStack,
 } from '@gluestack-ui/themed';
-import { IMAGES } from '~/Assets';
+import {IMAGES} from '~/Assets';
 import LinearGradient from 'react-native-linear-gradient';
-import { COLORS } from '~/Styles';
-import { LinearComponent } from '~/Components/core';
-import { useNavigation } from '@react-navigation/native';
-import { PublicNavigationProps } from '~/Routes/Public/types';
+import {COLORS} from '~/Styles';
+import {LinearComponent} from '~/Components/core';
+import {useNavigation} from '@react-navigation/native';
+import {PublicNavigationProps} from '~/Routes/Public/types';
 import LoginHelpModal from '~/Components/screens/LoginHelpModal';
 
 const AuthScreen = () => {
-  const { navigate } = useNavigation<PublicNavigationProps>();
-  const [showModal, setShowModal] = useState<Boolean>(false)
+  const {navigate} = useNavigation<PublicNavigationProps>();
+  const [showModal, setShowModal] = useState<Boolean>(false);
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{flex: 1}}>
       <LinearComponent>
         <Center mt={'$5'}>
           <Image
-            source={IMAGES.LOGO2}
+            source={IMAGES.LOGO}
             alt="logo"
             style={{
               width: 200,
@@ -76,12 +76,10 @@ const AuthScreen = () => {
             </Button>
             <Button
               borderRadius={20}
-              backgroundColor='$rose600'
+              backgroundColor="$rose600"
               gap={'$1'}
               w={'100%'}
-              onPress={() =>
-                setShowModal(true)
-              }>
+              onPress={() => setShowModal(true)}>
               <ButtonText color="$white" fontFamily={'Montserrat-Bold'}>
                 Help
               </ButtonText>
@@ -89,9 +87,7 @@ const AuthScreen = () => {
           </VStack>
         </Box>
       </LinearComponent>
-      <LoginHelpModal
-        showModal={showModal} setShowModal={setShowModal}
-      />
+      <LoginHelpModal showModal={showModal} setShowModal={setShowModal} />
     </SafeAreaView>
   );
 };

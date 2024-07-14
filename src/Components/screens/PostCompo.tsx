@@ -91,7 +91,7 @@ const PostCompo = ({item, mutate}: any) => {
 
   const buildLink = async (id: any) => {
     const link = await dynamicLinks().buildLink({
-      link: `https://www.feveal.in?id=${id}`,
+      link: `https://invertase.io?id=${id}`,
       // domainUriPrefix is created in your Firebase console
       domainUriPrefix: 'https://feveal.page.link',
     });

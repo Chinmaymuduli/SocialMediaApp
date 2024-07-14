@@ -16,6 +16,7 @@ import createAgoraRtcEngine, {
 } from 'react-native-agora';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useAppContext} from '~/Contexts';
+import {BASE_URL} from '~/Utils';
 
 const getPermission = async () => {
   if (Platform.OS === 'android') {
@@ -37,6 +38,7 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
   const [isJoinLoading, setJoinLoading] = useState(false);
   const [isLeaveLoading, setLeaveLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [agoraToken, setAgoraToken] = useState('');
   const appId = 'eae9231f9e4a45748e2ac4208f87421f';
   const channelName = params?.channelId;
   const token =
@@ -81,6 +83,39 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
     getTokenData();
   }, []);
 
+  const tokenCreateFn = async () => {
+    try {
+      const fetchData = await fetch(
+        `${BASE_URL}/meetings/generate-agora-token`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${tokenData}`,
+          },
+          body: JSON.stringify({
+            channel_name: String(channelName),
+            uid: String(uid),
+            role: 'publisher',
+            expire_time: 3600,
+          }),
+        },
+      );
+      console.log({fetchData});
+      const token = await fetchData.json();
+      return token.data?.token;
+    } catch (error) {
+      new Error();
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    tokenCreateFn().then(res => {
+      setAgoraToken(res);
+    });
+  }, [tokenData]);
+
   useEffect(() => {
     const setupVoiceSDKEngine = async () => {
       try {
@@ -114,7 +149,6 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
 
   function showMessage(msg: string) {
     setMessage(msg);
-    console.log(msg);
   }
 
   const leave = () => {
@@ -125,7 +159,7 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
       setIsJoined(false);
       showMessage('You left the channel');
       console.log('Leave channel successfully');
-      // navigation.goBack();
+      navigation.goBack();
     } catch (e) {
       console.log('Error in leave:', e);
     }
@@ -144,14 +178,19 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
           ChannelProfileType.ChannelProfileCommunication,
         );
         if (isHost) {
-          const joinUser = agoraEngine?.joinChannel(token, channelName, uid, {
-            clientRoleType: ClientRoleType.ClientRoleBroadcaster,
-          });
+          const joinUser = agoraEngine?.joinChannel(
+            agoraToken,
+            channelName,
+            uid,
+            {
+              clientRoleType: ClientRoleType.ClientRoleBroadcaster,
+            },
+          );
           console.log({joinUser});
           console.log('User host use calling');
         } else {
           agoraEngine?.joinChannel(
-            tokenData,
+            agoraToken,
             channelName,
             Number(userData?._id),
             {
@@ -166,7 +205,7 @@ const AgoraVoiceCall = ({route: {params}, navigation}: Props) => {
       }
     };
     joinChannel();
-  }, [isHost, userData?._id, tokenData]);
+  }, [isHost, userData?._id, agoraToken]);
 
   console.log({isJoined});
 

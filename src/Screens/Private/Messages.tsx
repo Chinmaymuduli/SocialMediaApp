@@ -54,7 +54,7 @@ const Messages = () => {
           side: 'RIGHT',
         },
       ]}
-      image={IMAGES.LOGO}>
+      image={IMAGES.LOGO2}>
       <Box flex={1}>
         <FlatList
           contentContainerStyle={{paddingBottom: 50}}

@@ -7,47 +7,50 @@ import {
   Image,
   VStack,
 } from '@gluestack-ui/themed';
-import { PrivateScreenProps } from '~/Routes/Private/types';
-import { PrivateContainer } from '~/Components/container';
-import { useNavigation } from '@react-navigation/native';
-import { Text } from '@gluestack-ui/themed';
-import { useAppContext } from '~/Contexts';
-import { useSwrApi } from '~/Hooks';
-import { IMAGES } from '~/Assets';
+import {PrivateScreenProps} from '~/Routes/Private/types';
+import {PrivateContainer} from '~/Components/container';
+import {useNavigation} from '@react-navigation/native';
+import {Text} from '@gluestack-ui/themed';
+import {useAppContext} from '~/Contexts';
+import {useSwrApi} from '~/Hooks';
+import {IMAGES} from '~/Assets';
 
 const AllUsers = () => {
-  const { navigate } = useNavigation<PrivateScreenProps>();
-  const { data, isValidating } = useSwrApi(`users/read-all`);
+  const {navigate} = useNavigation<PrivateScreenProps>();
+  const {data, isValidating} = useSwrApi(`users/read-all`);
   // console.log(data?.data?.data[0]);
   // if (isValidating) <FetchLoader />;
-  const { userData } = useAppContext();
+  const {userData} = useAppContext();
   return (
     <PrivateContainer
       icons={[
         {
-          icon: { IoniconsName: 'notifications' },
+          icon: {IoniconsName: 'notifications'},
           onPress: () => navigate('Notifications'),
           side: 'RIGHT',
         },
         {
-          icon: { EntypoName: 'dots-three-vertical' },
-          onPress: userData?.role === 'admin' ? () => navigate('MoreOptions') : () => navigate('Settings'),
+          icon: {EntypoName: 'dots-three-vertical'},
+          onPress:
+            userData?.role === 'admin'
+              ? () => navigate('MoreOptions')
+              : () => navigate('Settings'),
           side: 'RIGHT',
         },
       ]}
-      image={IMAGES.LOGO}>
+      image={IMAGES.LOGO2}>
       <Box mt={'$4'} flex={1}>
         <FlatList
           data={data?.data?.data}
-          contentContainerStyle={{ paddingBottom: 50 }}
-          renderItem={({ item }: any) => (
+          contentContainerStyle={{paddingBottom: 50}}
+          renderItem={({item}: any) => (
             <Box py={'$1'}>
               <VStack px={'$4'}>
                 <HStack gap={'$2'} alignItems="center">
                   <Image
                     source={
                       item?.sender_id?.image
-                        ? { uri: item?.sender_id?.image }
+                        ? {uri: item?.sender_id?.image}
                         : IMAGES.USER
                     }
                     alt="img"

@@ -71,6 +71,8 @@ const Post = () => {
   };
   const handelPost = async () => {
     try {
+      if (cation === '' || multipleMedia?.length === 0)
+        return Alert.alert('Error', 'Please add atleast one media or caption');
       let formData = new FormData();
       formData.append('caption', cation);
       // formData.append('media_type', file === 'Photo' ? 'image' : 'video');
@@ -188,7 +190,7 @@ const Post = () => {
           side: 'RIGHT',
         },
       ]}
-      image={IMAGES.LOGO}>
+      image={IMAGES.LOGO2}>
       <LinearComponent>
         <ScrollView contentContainerStyle={{paddingBottom: 60}}>
           <Box mt={'$2'} mx={'$4'}>

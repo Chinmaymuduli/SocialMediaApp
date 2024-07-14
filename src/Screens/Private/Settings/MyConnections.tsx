@@ -95,7 +95,7 @@ const MyConnections = () => {
           side: 'RIGHT',
         },
       ]}
-      image={IMAGES.LOGO}>
+      image={IMAGES.LOGO2}>
       <LinearComponent>
         <Box px={'$2'} mt={'$4'}>
           <Box bg="$white" softShadow="1" borderRadius={1} w={'$full'}>

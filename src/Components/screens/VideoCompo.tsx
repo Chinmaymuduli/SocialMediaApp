@@ -12,7 +12,6 @@ const VideoCompo = ({url}: any) => {
       ref.current?.pause();
     };
   }, []);
-  console.log('video run');
   return (
     <Pressable
       // style={{width: '100%'}}

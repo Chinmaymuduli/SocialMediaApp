@@ -117,7 +117,7 @@ const Profile = () => {
           side: 'RIGHT',
         },
       ]}
-      image={IMAGES.LOGO}>
+      image={IMAGES.LOGO2}>
       <ScrollView contentContainerStyle={{paddingBottom: 60}}>
         <Box mt={'$5'}>
           <Center>
@@ -144,9 +144,9 @@ const Profile = () => {
                   fontFamily="Montserrat-Bold"
                   fontSize={13}
                   color={COLORS.secondary}>
-                  Add More Images
+                  More Images
                 </Text>
-                <Pressable
+                {/* <Pressable
                   onPress={() => {
                     setIsImagePick(true), setImagesPicker(true);
                   }}>
@@ -163,7 +163,7 @@ const Profile = () => {
                       Add Images
                     </Text>
                   </HStack>
-                </Pressable>
+                </Pressable> */}
               </HStack>
             </Box>
             {images?.length > 0 ? (

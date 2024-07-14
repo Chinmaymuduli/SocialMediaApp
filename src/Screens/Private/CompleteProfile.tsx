@@ -294,7 +294,6 @@ const CompleteProfile = () => {
 
   const handelVerifyPhone = async () => {
     try {
-      setIsPhoneVerify(!isPhoneVerify);
       const res = await mutation(`users/generate-otp`, {
         method: 'POST',
         body: {
@@ -305,6 +304,11 @@ const CompleteProfile = () => {
           },
         },
       });
+      if (res?.results?.success !== true) {
+        Alert.alert('Error', res?.results?.error?.message);
+      } else {
+        setIsPhoneVerify(!isPhoneVerify);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -327,6 +331,8 @@ const CompleteProfile = () => {
         Alert.alert('Success', 'Phone Number verified successfully');
         setIsPhoneVerify(false);
         getUser();
+      } else {
+        Alert.alert('Error', res?.results?.error?.message);
       }
     } catch (error) {
       console.log(error);
@@ -334,7 +340,6 @@ const CompleteProfile = () => {
   };
 
   const handelEmailVerify = async () => {
-    setIsEmailVerify(true);
     const res = await mutation(`users/generate-otp`, {
       method: 'POST',
       body: {
@@ -343,6 +348,9 @@ const CompleteProfile = () => {
     });
     if (res?.results?.success === true) {
       Alert.alert('Success', 'OTP Sent Successfully');
+      setIsEmailVerify(true);
+    } else {
+      Alert.alert('Error', res?.results?.error?.message);
     }
   };
 
@@ -361,6 +369,8 @@ const CompleteProfile = () => {
         Alert.alert('Success', 'Email verified successfully');
         setIsEmailVerify(false);
         getUser();
+      } else {
+        Alert.alert('Error', res?.results?.error?.message);
       }
     } catch (error) {
       console.log(error);

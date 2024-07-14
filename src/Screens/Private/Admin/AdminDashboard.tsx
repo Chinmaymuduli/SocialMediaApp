@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { PrivateContainer } from '~/Components/container';
-import { IMAGES } from '~/Assets';
+import React, {useState} from 'react';
+import {PrivateContainer} from '~/Components/container';
+import {IMAGES} from '~/Assets';
 import {
   Box,
   FormControl,
@@ -18,23 +18,26 @@ import {
   Button,
   ButtonText,
 } from '@gluestack-ui/themed';
-import { WIDTH } from '~/Utils';
+import {WIDTH} from '~/Utils';
 import AppIcon from '~/Components/core/AppIcon';
-import { COLORS } from '~/Styles';
-import { useNavigation } from '@react-navigation/native';
-import { PrivateScreenProps } from '~/Routes/Private/types';
-import { useAppContext } from '~/Contexts';
-import { useSwrApi } from '~/Hooks';
+import {COLORS} from '~/Styles';
+import {useNavigation} from '@react-navigation/native';
+import {PrivateScreenProps} from '~/Routes/Private/types';
+import {useAppContext} from '~/Contexts';
+import {useSwrApi} from '~/Hooks';
 
 const AdminDashboard = () => {
-
-  const { data, isValidating } = useSwrApi(`dashboard/users/stats`);
-  const { data: meeting, isValidating: meetingsValidating } = useSwrApi(`dashboard/admin/stats`);
-  const { data: post, isValidating: postValidating } = useSwrApi(`dashboard/admin/posts?require_all=true&search=Crazy`);
+  const {data, isValidating} = useSwrApi(`dashboard/users/stats`);
+  const {data: meeting, isValidating: meetingsValidating} = useSwrApi(
+    `dashboard/admin/stats`,
+  );
+  const {data: post, isValidating: postValidating} = useSwrApi(
+    `dashboard/admin/posts?require_all=true&search=Crazy`,
+  );
   console.log(post?.data?.data);
-  const { navigate } = useNavigation<PrivateScreenProps>();
+  const {navigate} = useNavigation<PrivateScreenProps>();
   const [commission, setCommission] = useState('');
-  const { userData } = useAppContext();
+  const {userData} = useAppContext();
   const handleCommissionChange = (value: any) => {
     setCommission(value);
   };
@@ -89,22 +92,24 @@ const AdminDashboard = () => {
     },
   ];
 
-
   return (
     <PrivateContainer
       icons={[
         {
-          icon: { IoniconsName: 'notifications' },
+          icon: {IoniconsName: 'notifications'},
           onPress: () => navigate('Notifications'),
           side: 'RIGHT',
         },
         {
-          icon: { EntypoName: 'dots-three-vertical' },
-          onPress: userData?.role === 'admin' ? () => navigate('MoreOptions') : () => navigate('Settings'),
+          icon: {EntypoName: 'dots-three-vertical'},
+          onPress:
+            userData?.role === 'admin'
+              ? () => navigate('MoreOptions')
+              : () => navigate('Settings'),
           side: 'RIGHT',
         },
       ]}
-      image={IMAGES.LOGO}>
+      image={IMAGES.LOGO2}>
       <ScrollView>
         <Box mx={'$2'}>
           <Box my={'$3'}>
@@ -185,22 +190,17 @@ const AdminDashboard = () => {
                 </Button>
               </HStack>
               <FormControl>
-                <VStack>
-
-                </VStack>
+                <VStack></VStack>
                 <VStack space="xs">
                   <Text fontFamily={'Montserrat-Bold'} fontSize={13}>
                     Add Extra Amount
                   </Text>
-                  <Input
-                    my={'$2'}
-                  >
+                  <Input my={'$2'}>
                     <InputField
                       type="text"
                       value={commission}
                       onChangeText={handleCommissionChange}
-                      placeholder='Enter Amount Title '
-
+                      placeholder="Enter Amount Title "
                     />
                     <InputSlot pr="$3">
                       <AppIcon
@@ -210,14 +210,11 @@ const AdminDashboard = () => {
                       />
                     </InputSlot>
                   </Input>
-                  <Input
-                    my={'$2'}
-                  >
+                  <Input my={'$2'}>
                     <InputField
                       type="text"
                       value={commission}
                       onChangeText={handleCommissionChange}
-
                     />
                     <InputSlot pr="$3">
                       <AppIcon
@@ -241,10 +238,7 @@ const AdminDashboard = () => {
                       />
                     </InputSlot>
                   </Input>
-                  <Input
-                    my={'$2'}
-
-                  >
+                  <Input my={'$2'}>
                     <InputField
                       type="text"
                       value={commission}
@@ -258,9 +252,7 @@ const AdminDashboard = () => {
                       />
                     </InputSlot>
                   </Input>
-                  <Input
-                    mb={'$2'}
-                  >
+                  <Input mb={'$2'}>
                     <InputField
                       type="text"
                       value={commission}
@@ -281,9 +273,7 @@ const AdminDashboard = () => {
                       }}>
                       <ButtonText color="$white">Add</ButtonText>
                     </Button>
-
                   </HStack>
-
                 </VStack>
               </FormControl>
               <Image
@@ -297,7 +287,6 @@ const AdminDashboard = () => {
               />
             </VStack>
           </FormControl>
-
         </Box>
       </ScrollView>
     </PrivateContainer>

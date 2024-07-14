@@ -14,7 +14,6 @@ const Feeds = () => {
   const {navigate} = useNavigation<PrivateScreenProps>();
   useFCMToken();
   const handleDynamicLink = (link: any) => {
-    console.log({link});
     if (!!link?.url) {
       let getId = link.url?.split('=').pop();
       console.log('post id', getId);
@@ -56,7 +55,7 @@ const Feeds = () => {
           side: 'RIGHT',
         },
       ]}
-      image={IMAGES.LOGO}>
+      image={IMAGES.LOGO2}>
       <ScrollView contentContainerStyle={{paddingBottom: 50, flex: 1}}>
         <Box bg={COLORS.gradientLow} flex={1}>
           <PostFeed />

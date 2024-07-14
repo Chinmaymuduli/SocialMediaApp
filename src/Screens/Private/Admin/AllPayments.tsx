@@ -27,9 +27,9 @@
 // export default AllPayments;
 
 // const styles = StyleSheet.create({});
-import { StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import {StyleSheet} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import React, {useState} from 'react';
 import {
   Box,
   HStack,
@@ -38,12 +38,12 @@ import {
   Text,
   VStack,
 } from '@gluestack-ui/themed';
-import { COLORS } from '~/Styles';
-import { PrivateScreenProps } from '~/Routes/Private/types';
-import { PrivateContainer } from '~/Components/container';
+import {COLORS} from '~/Styles';
+import {PrivateScreenProps} from '~/Routes/Private/types';
+import {PrivateContainer} from '~/Components/container';
 import AppIcon from '~/Components/core/AppIcon';
-import { IMAGES } from '~/Assets';
-import { useAppContext } from '~/Contexts';
+import {IMAGES} from '~/Assets';
+import {useAppContext} from '~/Contexts';
 
 const MeetingData = [
   {
@@ -140,11 +140,11 @@ const MeetingData = [
 ];
 
 const AllPayments = () => {
-  const { navigate } = useNavigation<PrivateScreenProps>();
+  const {navigate} = useNavigation<PrivateScreenProps>();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [showSearch, setShowSearch] = React.useState(false);
   const [order, setOrder] = useState('');
-  const { userData } = useAppContext();
+  const {userData} = useAppContext();
   const Sort_Array = [
     {
       id: '13',
@@ -167,17 +167,20 @@ const AllPayments = () => {
     <PrivateContainer
       icons={[
         {
-          icon: { IoniconsName: 'notifications' },
+          icon: {IoniconsName: 'notifications'},
           onPress: () => navigate('Notifications'),
           side: 'RIGHT',
         },
         {
-          icon: { EntypoName: 'dots-three-vertical' },
-          onPress: userData?.role === 'admin' ? () => navigate('MoreOptions') : () => navigate('Settings'),
+          icon: {EntypoName: 'dots-three-vertical'},
+          onPress:
+            userData?.role === 'admin'
+              ? () => navigate('MoreOptions')
+              : () => navigate('Settings'),
           side: 'RIGHT',
         },
       ]}
-      image={IMAGES.LOGO}>
+      image={IMAGES.LOGO2}>
       <HStack
         px={'$3'}
         pt={'$5'}

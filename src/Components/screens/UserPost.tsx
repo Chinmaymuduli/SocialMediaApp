@@ -17,6 +17,8 @@ import {Alert} from 'react-native';
 import {WIDTH} from '~/Utils';
 import VideoCompo from './VideoCompo';
 import {StyleSheet} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {PrivateScreenProps} from '~/Routes/Private/types';
 
 type Props = {
   postData: any;
@@ -25,6 +27,7 @@ type Props = {
 };
 
 const UserPost = ({postData, isFormUser, mutate}: Props) => {
+  const {navigate} = useNavigation<PrivateScreenProps>();
   const {mutation, isLoading} = useMutation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const DeletePost = async (id: string) => {
@@ -110,16 +113,19 @@ const UserPost = ({postData, isFormUser, mutate}: Props) => {
                   fontFamily="Montserrat-SemiBold"
                   fontSize={12}>{`Likes: ${item?.total_likes}`}</Text>
               </HStack>
-              <HStack alignItems="center" gap={'$2'}>
-                <AppIcon
-                  FontistoName="comments"
-                  size={18}
-                  color={COLORS.secondary}
-                />
-                <Text
-                  fontFamily="Montserrat-SemiBold"
-                  fontSize={12}>{`Comments: ${item?.total_comment}`}</Text>
-              </HStack>
+              <Pressable
+                onPress={() => navigate('AllComments', {post_id: item?._id})}>
+                <HStack alignItems="center" gap={'$2'}>
+                  <AppIcon
+                    FontistoName="comments"
+                    size={18}
+                    color={COLORS.secondary}
+                  />
+                  <Text
+                    fontFamily="Montserrat-SemiBold"
+                    fontSize={12}>{`Comments: ${item?.total_comment}`}</Text>
+                </HStack>
+              </Pressable>
               <HStack alignItems="center" gap={'$2'}>
                 <AppIcon
                   FontAwesome5Name="share-square"

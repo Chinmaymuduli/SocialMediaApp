@@ -113,7 +113,7 @@ const AuthRoute = ({route: {params}, navigation}: Props) => {
       <LinearComponent>
         <Center mt={'$5'}>
           <Image
-            source={IMAGES.LOGO2}
+            source={IMAGES.LOGO}
             alt="logo"
             style={{
               width: 200,
